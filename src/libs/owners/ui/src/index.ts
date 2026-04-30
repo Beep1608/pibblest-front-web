@@ -1,0 +1,1 @@
+export * from './lib/owner-form/owner-form.component';
