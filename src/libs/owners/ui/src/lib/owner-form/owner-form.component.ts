@@ -12,7 +12,7 @@ import { email, FormField } from "@angular/forms/signals";
 export class OwnerFormComponent {
     private fb = inject(FormBuilder);
 
-    isLoadig = input<boolean>(false);
+    isLoading = input<boolean>(false);
     submitForm = output<RegisterOwnerDto>();
     
     form = this.fb.nonNullable.group({
@@ -24,7 +24,7 @@ export class OwnerFormComponent {
     });
 
     onSubmit(){
-        if(this.form.valid && !this.isLoadig()){
+        if(this.form.valid && !this.isLoading()){
             this.submitForm.emit(this.form.getRawValue());
         }else{
             this.form.markAllAsTouched();

@@ -1,46 +1,48 @@
-<div class="flex min-h-screen">
-  <div class="hidden lg:flex lg:w-1/2 bg-gray-100 items-center justify-center p-12">  </div>
-  <form
+<form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
-  class="flex flex-col gap-4 max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
+  class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
 >
   <h2 class="text-2xl font-bold mb-4">Registrar Nuevo Dueño</h2>
 
   <div class="flex flex-col">
-    <label for="" class="text-sm font-semibold mb-1"> Apellidos</label>
-    <input
-      type="email"
-      formControlName="email"
-      class="border rounded p-2"
-      placeholder="juanito@algo.com"
-    />
+    <label for="" class="text-sm font-semibold mb-1">Nombre de la empresa</label>
+    <input type="text" formControlName="company" class="border rounded p-2" placeholder="Nombre de la empresa"/>
+  </div>
+
+  <div class="flex flex-col">
+    <label for="" class="text-sm font-semibold mb-1">Nombre del dueño</label>
+    <input type="text" formControlName="name" class="border rounded p-2" placeholder="Pibble">
+  </div>
+
+  <div class="flex flex-col">
+    <!-- Corregido a lastName -->
+    <label for="" class="text-sm font-semibold mb-1">Apellido del dueño</label>
+    <input type="text" formControlName="lastName" class="border rounded p-2" placeholder="Morales">
+  </div>
+
+  <div class="flex flex-col">
+    <label for="" class="text-sm font-semibold mb-1">Email</label>
+    <input type="email" formControlName="email" class="border rounded p-2" placeholder="hola@pibble.com">
     @if (form.controls.email.hasError('email') && form.controls.email.touched) {
-      <span class="text-red-500 text-xs mt-1"> Ingresa un correo válido</span>
+      <span class="text-red-500 text-xs mt-1">Ingresa un correo válido</span>
     }
   </div>
 
   <div class="flex flex-col">
-    <label for="" class="text-sm font-semibold mb-1"> Nombre del negocio</label>
-    <input type="text" 
-    formControlName="name"
-    class="border rounded p-2"
-    placeholder="Abarrotes pibble">
+    <label for="" class="text-sm font-semibold mb-1">Contraseña</label>
+    <input type="password" formControlName="password" class="border rounded p-2" placeholder="*****">
   </div>
 
+  <!-- Corregido isLoadig() y los textos -->
   <button
     type="submit"
-    [disabled]="form.invalid || isLoadig"
-    class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 transition colors">
-    @if (isLoadig()) {
-
+    [disabled]="form.invalid || isLoading()"
+    class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
+    @if (isLoading()) {
+      Registrando...
     } @else {
-        
+      Crear Cuenta
     }
-
   </button>
-
-
 </form>
-</div>
-

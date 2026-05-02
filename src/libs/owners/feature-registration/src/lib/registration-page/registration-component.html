@@ -1,0 +1,43 @@
+<div class="min-h-screen flex">
+
+  <!-- LADO IZQUIERDO: La columna gris -->
+  <div class="hidden lg:flex lg:w-1/2 bg-gray-100 items-center justify-center p-12">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">Bienvenido al POS</h1>
+      <p class="text-gray-500">Gestiona tus sucursales, inventario y ventas desde un solo lugar.</p>
+      <!-- Aquí puedes poner tu imagen o rectángulo de diseño más adelante -->
+    </div>
+  </div>
+
+  <!-- LADO DERECHO: El Formulario -->
+  <div class="w-full lg:w-1/2 bg-white flex items-center justify-center p-8">
+    <div class="w-full max-w-md">
+      
+      <!-- 
+        CONEXIÓN MÁGICA: 
+        1. [isLoading] lee el estado del store.
+        2. (submitForm) ejecuta nuestro método cuando el usuario hace clic en guardar.
+      -->
+      <app-pos-owner-form
+        [isLoading]="store.isLoading()"
+        (submitForm)="onRegister($event)">
+      </app-pos-owner-form>
+
+      <!-- Mensaje de éxito leyendo directamente del Store -->
+      @if (store.isSuccess()) {
+        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded text-center font-semibold">
+          ¡Cuenta creada con éxito! Revisa tu correo.
+        </div>
+      }
+
+      <!-- Mensaje de error leyendo del Store -->
+      @if (store.error()) {
+        <div class="mt-4 p-4 bg-red-100 text-red-800 rounded text-center text-sm">
+          {{ store.error() }}
+        </div>
+      }
+
+    </div>
+  </div>
+
+</div>
