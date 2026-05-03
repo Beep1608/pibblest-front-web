@@ -1,0 +1,38 @@
+<div class="min-h-screen flex">
+
+  <!-- LADO IZQUIERDO: La columna gris -->
+  <div class="hidden lg:flex lg:w-1/2 bg-gray-100 items-center justify-center p-12">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">¡Qué bueno verte de nuevo!</h1>
+      <p class="text-gray-500">Ingresa a Pibble POS para continuar gestionando tus ventas e inventario.</p>
+    </div>
+  </div>
+
+  <!-- LADO DERECHO: El Formulario -->
+  <div class="w-full lg:w-1/2 bg-white flex flex-col items-center justify-center p-8">
+    <div class="w-full max-w-md">
+      
+      <!-- Conectamos el componente UI con el estado y los métodos del Store -->
+      <app-owner-login-form
+        [isLoading]="store.isLoading()"
+        (submitForm)="onLogin($event)">
+      </app-owner-login-form>
+
+      <!-- Manejo de Errores -->
+      @if (store.error()) {
+        <div class="mt-4 p-4 bg-red-100 text-red-800 rounded text-center text-sm font-medium">
+          {{ store.error() }}
+        </div>
+      }
+
+      <!-- Mensaje de Éxito temporal -->
+      @if (store.isSuccess()) {
+        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded text-center font-semibold animate-pulse">
+          ¡Acceso concedido! Preparando tu espacio...
+        </div>
+      }
+
+    </div>
+  </div>
+
+</div>

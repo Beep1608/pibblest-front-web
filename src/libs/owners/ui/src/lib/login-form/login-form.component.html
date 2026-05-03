@@ -1,0 +1,44 @@
+<form
+[formGroup]="form"
+(ngSubmit) = "onSubmit()"
+class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
+>
+
+<h2 class="text-2xl font-bold mb-4">Iniciar Sesión</h2>
+
+<div class="flex flex-col">
+    <label for="" class="text-sm font-semibold mb-1">Email</label>
+    <input type="email" formControlName="email"  class="rounded border p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+    placeholder="hola@pibble.com">
+
+    @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+        <span class="text-red-500 text-xs mt-1"> Ingresa un correo válido</span>
+    }
+
+</div>
+
+
+<div class="flex flex-col">
+    <label for="" class="text-sm font-semibold mb-1">Contraseña</label>
+    <input type="password" formControlName="password"  class="rounded border p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+    placeholder="*********">
+
+</div>
+
+<button
+type="submit"
+[disabled]="form.invalid || isLoading"
+class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-400 disabled:bg-gray-400 transition-colors">
+    @if (isLoading) {
+Iniciando sesión...
+}@else {
+Entrar al POS
+}
+</button>
+
+
+<div class="text-center mt-2 text-sm text-gray-600">
+    No tienes una cuenta ? <a href="/register-owner" class="text-blue-600 hover:underline">Registrate aquí</a>
+
+</div>
+</form>

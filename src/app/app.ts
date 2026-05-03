@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NxWelcome } from './nx-welcome';
-import { OwnerFormComponent } from "../libs/owners/ui/src";
+import { LoginFormComponent, OwnerFormComponent } from "../libs/owners/ui/src";
 
 @Component({
-  imports: [NxWelcome, RouterModule, OwnerFormComponent],
+  imports: [NxWelcome, RouterModule, OwnerFormComponent,LoginFormComponent],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',

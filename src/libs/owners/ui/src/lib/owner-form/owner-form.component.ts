@@ -16,11 +16,11 @@ export class OwnerFormComponent {
     submitForm = output<RegisterOwnerDto>();
     
     form = this.fb.nonNullable.group({
-        company: ['', Validators.required, Validators.minLength(2)],
+        company: ['', [Validators.required, Validators.minLength(2)]],
         name: ['', Validators.required],
-        lastName: ['', Validators.required, Validators.minLength(2)],
-        email: ['', Validators.required, Validators.email],
-        password: ['', Validators.required, Validators.minLength(8)]
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8)]]
     });
 
     onSubmit(){

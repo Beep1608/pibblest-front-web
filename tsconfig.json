@@ -13,7 +13,8 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "paths": {
-      "@pibblest-front-web/owners/feature-registration": ["./src/libs/owners/feature-registration/src/index.ts"]
+      "@pibblest-front-web/owners/feature-registration": ["./src/libs/owners/feature-registration/src/index.ts"],
+      "@pibblest-front-web/owners/feature-login":["./src/libs/owners/feature-login/src/index.ts"]
     },
     "strict": true,
     "noImplicitOverride": true,

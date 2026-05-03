@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { OwnerRegisterResponse, RegisterOwnerDto } from "../models/owner.model";
+import { LoginOwnerDto, LoginOwnerResponse, OwnerRegisterResponse, RegisterOwnerDto } from "../models/owner.model";
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,9 +11,13 @@ export class OwnerApiService {
 
     private http = inject(HttpClient);
 
-    private readonly API_URL = "/api/v1/owners";
+    private readonly base_url = "http://localhost:8081/api";
 
     register(dto: RegisterOwnerDto): Observable<OwnerRegisterResponse>{
-        return this.http.post<OwnerRegisterResponse>(this.API_URL,dto);
+        return this.http.post<OwnerRegisterResponse>(`${this.base_url}/owners/register`,dto);
+    }
+
+    login(dto: LoginOwnerDto): Observable<LoginOwnerResponse>{
+        return this.http.post<LoginOwnerResponse>(`${this.base_url}/login`,dto);
     }
 }

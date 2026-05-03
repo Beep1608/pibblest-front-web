@@ -16,7 +16,6 @@
   </div>
 
   <div class="flex flex-col">
-    <!-- Corregido a lastName -->
     <label for="" class="text-sm font-semibold mb-1">Apellido del dueño</label>
     <input type="text" formControlName="lastName" class="border rounded p-2" placeholder="Morales">
   </div>
@@ -34,7 +33,6 @@
     <input type="password" formControlName="password" class="border rounded p-2" placeholder="*****">
   </div>
 
-  <!-- Corregido isLoadig() y los textos -->
   <button
     type="submit"
     [disabled]="form.invalid || isLoading()"

@@ -10,3 +10,13 @@ export interface OwnerRegisterResponse{
     id: string;
     message: string;
 }
+
+export interface LoginOwnerDto{
+    email:  string;
+    password?: string;
+}
+
+export interface LoginOwnerResponse{
+    message: string;
+    token: string;
+}
