@@ -1,0 +1,51 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+    @if (store.isLoading()) {
+      <div class="animate-pulse">
+        <div
+          class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+        >
+          <h2 class="text-xl font-semibold text-gray-700">
+            Verificando tu cuenta....
+          </h2>
+          <p class="text-gray-500 mt-2">Por favor, espera un momento.</p>
+        </div>
+      </div>
+    }
+    @if (store.error() && !store.isLoading()) {
+      <div >
+        <div
+          class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"
+        >
+          X
+        </div>
+        <h2 class="text-xl font-bold text-gray-800">
+          {{ store.error() }}
+        </h2>
+        <p class="text-red-600 font-medium mt-2">{{ store.message() }}</p>
+
+        <button
+          class="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Solicitar nuevo enlace
+        </button>
+      </div>
+    }
+
+    @if (store.isSuccess() && !store.isLoading()) {
+      <div>
+        <div
+          class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"
+        >
+          ✓
+        </div>
+        <h2 class="text-xl font-bold text-gray-800">¡Cuenta verificada!</h2>
+        <p class="text-gray-600 mt-2"> Tu correo ha sido confirmado exitosamente.</p>
+
+        <a routerLink="/login" class="inline-block mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition cursor-pointer">
+            Ir a Iniciar Sesión 
+        </a>
+      </div>
+    }
+  </div>
+</div>

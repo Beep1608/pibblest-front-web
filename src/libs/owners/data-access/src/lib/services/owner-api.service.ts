@@ -20,4 +20,8 @@ export class OwnerApiService {
     login(dto: LoginOwnerDto): Observable<LoginOwnerResponse>{
         return this.http.post<LoginOwnerResponse>(`${this.base_url}/login`,dto);
     }
+
+    verifyEmail(token: string): Observable<any> {
+        return this.http.get<any>(`${this.base_url}/owners/verify?token=${token}`)
+    }
 }

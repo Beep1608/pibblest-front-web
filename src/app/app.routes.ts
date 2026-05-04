@@ -15,6 +15,14 @@ export const appRoutes: Route[] = [
         loadChildren: () => 
             import('@pibblest-front-web/owners/feature-login')
         .then((m) => m.loginRoutes)
+    },
+    {
+        path:'verify',
+        loadChildren: () => import('@pibblest-front-web/owners/feature-verify').then(m => m.verifyRoutes),
+    },
+    {
+        path:'dashboard',
+        loadChildren: () => import('@pibblest-fornt-web/owners/dashboard').then(m => m.dashboardRoutes)
     }
 
 ];

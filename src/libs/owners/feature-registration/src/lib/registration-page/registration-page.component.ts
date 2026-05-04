@@ -4,6 +4,7 @@ import { OwnerFormComponent } from "../../../../ui/src";
 import { OwnerStore, RegisterOwnerDto } from "../../../../data-access/src";
 
 
+
 @Component({
     selector:'app-owners-registration-page',
     standalone:true,

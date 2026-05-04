@@ -7,8 +7,8 @@ export interface RegisterOwnerDto{
 }
 
 export interface OwnerRegisterResponse{
-    id: string;
     message: string;
+    token: string;
 }
 
 export interface LoginOwnerDto{
