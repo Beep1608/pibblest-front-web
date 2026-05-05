@@ -1,3 +1,4 @@
+import { authGuard } from '../libs/auth/data-access/auth.guard';
 import { loginRoutes } from './../libs/owners/feature-login/src/lib.routes';
 import { Route } from '@angular/router';
 
@@ -22,7 +23,13 @@ export const appRoutes: Route[] = [
     },
     {
         path:'dashboard',
+        canActivate: [authGuard],
         loadChildren: () => import('@pibblest-fornt-web/owners/dashboard').then(m => m.dashboardRoutes)
+    },
+    {
+        path:'',
+        redirectTo: 'login',
+        pathMatch: 'full'
     }
 
 ];

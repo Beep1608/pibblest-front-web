@@ -46,7 +46,7 @@ export const OwnerStore = signalStore(
                 router.navigate(['/dashboard']);
               }),
               catchError((err: HttpErrorResponse) => {
-                patchState(store, { isLoading: false, error: err.message });
+                patchState(store, { isLoading: false, error: err.error.error, message: err.error.message });
                 return of(null);
               }),
             ),
@@ -71,6 +71,7 @@ export const OwnerStore = signalStore(
                   token: response.token,
                 });
                 localStorage.setItem('pibblest_token', response.token);
+                router.navigate(['/dashboard']);
               }),
               catchError((err: HttpErrorResponse) => {
                 patchState(store, {
@@ -119,6 +120,10 @@ export const OwnerStore = signalStore(
           ),
         ),
       ),
+
+      clearEmailError(){
+        patchState(store, {error:null, message:null});
+      },
 
       setError(errorMessage: string) {
         patchState(store, { error: errorMessage, isLoading: false });

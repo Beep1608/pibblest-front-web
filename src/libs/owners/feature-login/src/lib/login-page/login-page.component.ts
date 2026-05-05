@@ -14,5 +14,6 @@ export class LoginPageComponent{
     readonly store =   inject(OwnerStore);
     onLogin(credentials: LoginOwnerDto){
         this.store.login(credentials);
+
     }
 }

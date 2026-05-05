@@ -1,8 +1,9 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, input, output } from "@angular/core";
+import { Component, DestroyRef, EventEmitter, inject, input, Output, output } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { RegisterOwnerDto } from "../../../../data-access/src";
 import { email, FormField } from "@angular/forms/signals";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 @Component({
     selector: 'app-pos-owner-form',
     standalone: true,
@@ -14,6 +15,16 @@ export class OwnerFormComponent {
 
     isLoading = input<boolean>(false);
     submitForm = output<RegisterOwnerDto>();
+
+    @Output() formChanged = new EventEmitter<void>();
+    private destroyRef = inject(DestroyRef);
+
+    constructor() {
+        this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+            this.formChanged.emit();
+        })
+    }
     
     form = this.fb.nonNullable.group({
         company: ['', [Validators.required, Validators.minLength(2)]],
