@@ -23,7 +23,7 @@ export const appRoutes: Route[] = [
     },
     {
         path:'dashboard',
-        canActivate: [authGuard],
+      //  canActivate: [authGuard],
         loadChildren: () => import('@pibblest-fornt-web/owners/dashboard').then(m => m.dashboardRoutes)
     },
     {

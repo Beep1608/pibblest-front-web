@@ -1,0 +1,16 @@
+<div class="flex flex-col bg-gray-100 px-4 py-2 min-h-full gap-4 md:w-64 lg:w-64 ">
+
+    <div (click)="onClick('store')" class="space-x-2 py-2 rounded-lg hover:bg-white transition-all duration-300 ease-in-out" 
+    [ngClass]="selected() === 'store' ? 'bg-white shadow-md font-semibold' :'bg-gray-100 hover:bg-white text-gray-600' ">
+        <i class="fa-solid fa-store px-2"></i>
+        <span class="pr-8">Store</span>
+    </div>
+    <div (click)="onClick('tags')" class="space-x-2 py-2 rounded-lg hover:bg-white transition-all duration-300 ease-in-out" 
+    [ngClass]="selected() === 'tags' ? 'bg-white shadow-md font-semibold' :'bg-gray-100 hover:bg-white text-gray-600' ">
+        <i class="fa-solid fa-tag px-2"></i>
+        <span class="pr-8">Tags</span>
+    </div>
+
+
+
+</div>

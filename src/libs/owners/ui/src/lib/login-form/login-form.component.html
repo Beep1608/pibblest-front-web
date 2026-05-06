@@ -1,57 +1,73 @@
 <form
-[formGroup]="form"
-(ngSubmit) = "onSubmit()"
-class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white  rounded-lg"
 >
+  <h2 class="text-4xl font-bold mb-4">{{ 'login.form.title' | translate }}</h2>
 
-<h2 class="text-4xl font-bold mb-4">{{'login.form.title' | translate}}</h2>
-
-<div>
+  <!--<div>
     <div class="text-sm font-medium">
-        <span>{{'login.form.open.account' | translate}}</span>
+      <span>{{ 'login.form.open.account' | translate }}</span>
     </div>
-    
-</div>
-<hr class="border-t-4 border-gray-100">
+  </div>
+  <hr class="border-t-4 border-gray-100" />-->
 
+  <div class="flex flex-col">
+    <!--<div class="text-sm font-medium">
+      <span>{{ 'login.form.normal.account' | translate }}</span>
+    </div>-->
+    <div class=" bg-gray-100  flex items-center rounded-lg">
+       <i class="fa-regular fa-envelope p-2 text-gray-600  "></i>
 
-<div class="flex flex-col">
+      <input
+        type="email"
+        formControlName="email"
+        class=" py-2 outline-none bg-transparent w-full "
+        placeholder="hola@example.com"
+      />
 
-     <div class="text-sm font-medium">
-        <span>{{'login.form.normal.account' | translate}}</span>
+     
     </div>
-    <label for="" class="text-sm font-semibold mb-1">Email</label>
-    <input type="email" formControlName="email"  class="rounded border p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-    placeholder="hola@pibble.com">
-
-    @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+     @if (
+        form.controls.email.hasError('email') && form.controls.email.touched
+      ) {
         <span class="text-red-500 text-xs mt-1"> Ingresa un correo válido</span>
-    }
+      }
+  </div>
 
-</div>
+
+  <div class="flex flex-col">
+
+    <div class=" bg-gray-100  flex items-center rounded-lg">
+       <i class="fa-solid fa-lock   p-2 text-gray-600"></i>
+
+      <input
+        type="password"
+        formControlName="password"
+        class=" py-2 outline-none bg-transparent w-full "
+        placeholder="*********"
+      />
+
+     
+    </div>
+  </div>
 
 
-<div class="flex flex-col">
-    <label for="" class="text-sm font-semibold mb-1">Contraseña</label>
-    <input type="password" formControlName="password"  class="rounded border p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-    placeholder="*********">
-
-</div>
-
-<button
-type="submit"
-[disabled]="form.invalid || isLoading"
-class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-400 disabled:bg-gray-400 transition-colors">
+  <button
+    type="submit"
+    [disabled]="form.invalid || isLoading"
+    class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-400 disabled:bg-gray-400 transition-colors"
+  >
     @if (isLoading) {
-Iniciando sesión...
-}@else {
-Entrar al POS
-}
-</button>
+      {{'login.button.login.message' | translate}}
+    } @else {
+     {{'login.button.message' | translate}}
+    }
+  </button>
 
-
-<div class="text-center mt-2 text-sm text-gray-600">
-    No tienes una cuenta ? <a href="/register-owner" class="text-blue-600 hover:underline">Registrate aquí</a>
-
-</div>
+  <div class="text-center mt-2 text-sm text-gray-600">
+    {{"login.doesnt.have.account" | translate}}
+    <a href="/register-owner" class="text-blue-600 hover:underline">{{"login.register.link" | translate}}</a
+    >
+  </div>
 </form>

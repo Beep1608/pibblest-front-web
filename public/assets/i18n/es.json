@@ -6,5 +6,9 @@
 
     "login.form.title": "Iniciar sesión",
     "login.form.open.account": "Inicia sesión con Open account",
-    "login.form.normal.account": "O continua con email"
+    "login.form.normal.account": "O continua con email",
+    "login.doesnt.have.account": "¿No tienes una cuenta?",
+    "login.register.link":"Registrate",
+    "login.button.message":"Entrar a mi POS!",
+    "login.button.login.message": "Validando sus credenciales.."
 }

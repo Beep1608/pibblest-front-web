@@ -1,9 +1,11 @@
 {
-    "login.page.welcome": "Welcome back !",
+  "login.page.welcome": "Welcome back !",
 
-    
-
-    "login.form.title": "Sign in",
-    "login.form.open.account": "Sign in with Open account",
-    "login.form.normal.account": "Or continue with email address"
+  "login.form.title": "Sign in",
+  "login.form.open.account": "Sign in with Open account",
+  "login.form.normal.account": "Or continue with email address",
+  "login.doesnt.have.account": "Dont have an acount?",
+  "login.register.link": "Sign up",
+  "login.button.message": "Start my POS",
+  "login.button.login.message": "Validating credentials.."
 }
