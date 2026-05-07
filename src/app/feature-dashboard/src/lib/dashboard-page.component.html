@@ -1,11 +1,13 @@
-<div class="flex ">
-  <app-dashboard-side-bar (viewChange)="changeView($event)"></app-dashboard-side-bar>
+<div class="grid md:grid-cols-[1fr_4fr] lg:grid-cols-[1fr_6fr]  min-h-screen">
+  <app-dashboard-side-bar (viewChange)="changeView($event)" class="md:col-start-1 md:col-end-2 lg:col-start-1 lg:col-end-2 ">
+
+  </app-dashboard-side-bar>
 
   <div>
       @switch (currentView()) {
     @case ('store') {
 
-        <app-store-view-all-page></app-store-view-all-page>
+        <app-store-view-all-page class="col-span-full"></app-store-view-all-page>
     }
     @case ('tags') {
 
