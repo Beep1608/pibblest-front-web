@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
 import { StorePreview } from "../../../../data-access/lib/models/store.model";
+import { StoreStore } from "../../../../data-access/lib/store/store.store";
 
 
 @Component({
@@ -10,42 +11,10 @@ import { StorePreview } from "../../../../data-access/lib/models/store.model";
   templateUrl: './viewAll.component.html',
 })
 export class StoreViewAllPage {
-  stores = signal<StorePreview[]>([
-    {
-      name: 'Abarrote',
-      growthFromStart: 80.2,
-      employees: 2,
-      salesOfToday: 26,
-      createdAt: '01/02/2026',
-      totalProducts: 100,
-      currentQuantityOfProducts: 50,
-    },
-    {
-      name: 'Abarrote',
-      growthFromStart: 80.2,
-      employees: 2,
-      salesOfToday: 26,
-      createdAt: '01/02/2026',
-      totalProducts: 100,
-      currentQuantityOfProducts: 50,
-    },
-    {
-      name: 'Abarrote',
-      growthFromStart: 80.2,
-      employees: 2,
-      salesOfToday: 26,
-      createdAt: '01/02/2026',
-      totalProducts: 100,
-      currentQuantityOfProducts: 50,
-    },
-    {
-      name: 'Abarrote',
-      growthFromStart: 80.2,
-      employees: 2,
-      salesOfToday: 26,
-      createdAt: '01/02/2026',
-      totalProducts: 100,
-      currentQuantityOfProducts: 50,
-    },
-  ]);
+
+  store = inject(StoreStore);
+
+  ngOnInit(){
+    this.store.getAllStores({page:0, size:10, sort:'id,desc'});
+  }
 }
