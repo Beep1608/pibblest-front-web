@@ -1,17 +1,17 @@
 <div
-  class="grid grid-cols-[6fr_1fr] grid-rows-[1fr_2fr_1fr] bg-gray-300 w-80 h-52 rounded-md hover:shadow-md"
+  class="grid grid-cols-[6fr_1fr] grid-rows-[1fr_2fr_1fr] border-2  border-gray-100 bg-transparent w-80  rounded-md hover:shadow-md"
 >
   <div class="my-2">
     <span
       class="text-xs text-amber-400 font-bold bg-amber-100 mx-2 px-3 py-1 rounded-md border box-border border-amber-400"
-      >01/02/2026</span
+      >{{ storePreview().operatinTime }}</span
     >
   </div>
   <div
     class="flex flex-col gap-3 items-center justify-center col-start-1 row-start-2 row-end-3"
   >
     <i class="fa-solid fa-shop text-5xl"></i>
-    <span>Nombre tienda</span>
+    <span>{{ storePreview().name }}</span>
   </div>
 
   <div class="col-start-1 flex flex-col gap-2 py-2">
@@ -22,7 +22,9 @@
         <i
           class="fa-solid fa-arrow-up text-sm self-baseline text-green-600"
         ></i>
-        <span class="text-xs text-green-600 font-bold box-border">80.0%</span>
+        <span class="text-xs text-green-600 font-bold box-border">{{
+          storePreview().growthFromStart
+        }}</span>
       </div>
 
       <div
@@ -31,7 +33,9 @@
         <i
           class="fa-solid fa-user-tie text-sm self-baseline text-slate-600"
         ></i>
-        <span class="text-xs text-slate-600 font-bold box-border">2</span>
+        <span class="text-xs text-slate-600 font-bold box-border">{{
+          storePreview().employees
+        }}</span>
       </div>
 
       <div
@@ -40,22 +44,32 @@
         <i
           class="fa-solid fa-dollar-sign text-sm self-baseline text-green-600"
         ></i>
-        <span class="text-xs text-green-600 font-bold box-border">1853.02</span>
+        <span class="text-xs text-green-600 font-bold box-border">{{
+          storePreview().salesOfToday
+        }}</span>
       </div>
     </div>
 
-    <div class="mx-2 grid grid-cols-1 grid-rows-1">
-      <div class="mx-2 w-full bg-blue-100 h-6 rounded-md overflow-hidden">
-        <!-- Barra indicadora (La que se llena/vacía) -->
+    <div class="mx-2 flex flex-col">
+      <div class="flex justify-end">
+        <span class="label">{{ percentageOfProducts() }} %</span>
+      </div>
+      <div class="w-full bg-blue-100 h-4 rounded-md overflow-hidden">
         <div
           id="mi-barra"
           class="bg-blue-600 h-full transition-all duration-500 ease-in-out rounded-md"
           style="width: 90%"
         ></div>
       </div>
+      <div>
+        <span class="label">{{
+          storePreview().currentQuantityOfProducts
+        }}/</span>
+       
+        <span class="label">{{ storePreview().totalProducts }}</span>
+      </div>
     </div>
   </div>
-
 
   <div class="col-start-2 row-start-1 row-end-4 py-4 mx-4">
     <div class="h-4 w-4 bg-red-500 rounded-full"></div>

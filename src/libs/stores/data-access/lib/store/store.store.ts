@@ -49,6 +49,7 @@ export const StoreStore = signalStore(
 
                         tapResponse({
                             next: (response) => {
+                                console.log(response);
                                 patchState (store, {
                                     isLoading:  false,
                                     isSuccess:  true,

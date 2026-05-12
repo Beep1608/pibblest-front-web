@@ -2,16 +2,17 @@ import { PageRequest } from "../../../../shared/data-access/models/sort.model";
 
 
 export interface StorePreview {
-  id: number; 
+  id: number;
   name: string;
-  address: string; 
+  address: string;
   status: string;
-  growthFromStart?: number;
-  employees?: number;
-  salesOfToday?: number;
-  createdAt: string;
-  totalProducts?: number;
-  currentQuantityOfProducts?: number;
+  totalProducts: number;
+  currentQuantityOfProducts: number;
+  salesOfToday: number;
+  totalSalesRevenue: number;
+  operatinTime: string;
+  growthFromStart: number;
+  employees: number;
 }
 
 export interface StorePaginationResponse{
