@@ -7,8 +7,8 @@
   </div>
 
   @if (store.storesPage(); as page) {
-    @for (store of page.stores; track $index) {
-      <app-store-preview-component [storePreview]="store"></app-store-preview-component>
+    @for (item of page.stores; track item.id) {
+      <app-store-preview-component [storePreview]="item"></app-store-preview-component>
     }
   }
 </div>

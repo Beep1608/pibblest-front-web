@@ -45,9 +45,12 @@
           <i
             class="fa-solid fa-dollar-sign text-sm self-baseline text-green-600"
           ></i>
-          <span class="text-xs text-green-600 font-bold box-border">{{
-            storePreview().salesOfToday
-          }}</span>
+          <span
+            #salesSpan
+            class="text-xs text-green-600 font-bold box-border inline-block"
+          >
+            {{ storePreview().salesOfToday }}
+          </span>
         </div>
       </div>
 
@@ -57,9 +60,8 @@
         </div>
         <div class="w-full bg-blue-100 h-4 rounded-md overflow-hidden">
           <div
-            id="mi-barra"
             class="bg-blue-600 h-full transition-all duration-500 ease-in-out rounded-md"
-            style="width: 80%"
+            [style.width.%]="percentageOfProducts()"
           ></div>
         </div>
         <div>

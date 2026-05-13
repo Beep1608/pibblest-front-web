@@ -5,7 +5,7 @@ import { Router } from "@angular/router";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { PageRequest } from "../../../../shared/data-access/models/sort.model";
 import { StorePaginationResponse, StorePreview } from "../models/store.model";
-import { catchError, pipe, switchMap, tap } from "rxjs";
+import { catchError, EMPTY, pipe, switchMap, tap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { tapResponse } from "@ngrx/operators";
 
@@ -70,6 +70,39 @@ export const StoreStore = signalStore(
                      
                     )
 
+                )
+
+            ),
+            listenToStoreUpdates: rxMethod<void>(
+                pipe(
+                    switchMap(() => {
+                        const currentToken = localStorage.getItem('pibblest_token');
+
+                        if(!currentToken){
+                            console.warn('No se puede conectar al sse ya que no hay token');
+                            return EMPTY;
+                        }
+
+
+                        return api.listenToStoreStream(currentToken).pipe(
+                            tap((storeUpdate) => {
+                                if(!storeUpdate.id) return;
+                                patchState(store, (state) => {
+                                    if(!state.storesPage) return state;
+                                    const updatedStores = state.storesPage.stores.map((tiendaActual) => 
+                                        tiendaActual.id === storeUpdate.id ? {...tiendaActual, ...storeUpdate}: tiendaActual
+                                    );
+                                    
+                                    return {
+                                        storesPage: {
+                                            ...state.storesPage,
+                                            stores: updatedStores
+                                        }
+                                    }
+                                })
+                            })
+                        )
+                    })
                 )
 
             )

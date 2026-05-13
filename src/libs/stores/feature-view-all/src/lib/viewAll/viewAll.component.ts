@@ -17,5 +17,7 @@ export class StoreViewAllPage {
 
   ngOnInit(){
     this.store.getAllStores({page:0, size:10, sort:'id,desc'});
+
+    this.store.listenToStoreUpdates();
   }
 }
