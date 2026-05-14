@@ -1,19 +1,91 @@
-<div class="grid md:grid-cols-[1fr_4fr] lg:grid-cols-[1fr_6fr]  min-h-screen">
-  <app-dashboard-side-bar (viewChange)="changeView($event)" class="md:col-start-1 md:col-end-2 lg:col-start-1 lg:col-end-2 ">
+<div class="drawer lg:drawer-open">
+  <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content">
 
-  </app-dashboard-side-bar>
 
-  <div>
-      @switch (currentView()) {
-    @case ('store') {
+    <!-- Navbar -->
+    <nav class="navbar w-full ">
+      <label
+        for="my-drawer-4"
+        aria-label="open sidebar"
+        class=" btn-ghost"
+      >
+        <!-- Sidebar toggle icon -->
+      <i class="fa-solid fa-caret-right transition-transform duration-300 caret-icon"></i>
+      </label>
+      
+    </nav>
 
-        <app-store-view-all-page class="col-span-full"></app-store-view-all-page>
-    }
-    @case ('tags') {
 
-    }
-  }
-    
+    <!-- Page content here -->
+    <div class="p-4">
+      <div>
+        @switch (dashboardStore.currentView()) {
+          @case ('store') {
+            <app-store-view-all-page
+              class="col-span-full"
+            ></app-store-view-all-page>
+          }
+          @case ('create-store') {
+            <app-create-store-page></app-create-store-page>
+          }
+          @case ('tags') {}
+        }
+      </div>
+    </div>
   </div>
 
+  <div class="drawer-side is-drawer-close:overflow-visible">
+    <label
+      for="my-drawer-4"
+      aria-label="close sidebar"
+      class="drawer-overlay"
+    ></label>
+    <div
+      class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64"
+    >
+      <ul class="menu w-full grow">
+        <!-- List item -->
+        <li>
+          <button
+            class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+            [attr.data-tip]="'dashboard.sidebar.overview' | translate"
+          >
+            <!-- Home icon -->
+            <i class="fa-solid fa-house"></i>
+            <span class="is-drawer-close:hidden">{{
+              'dashboard.sidebar.overview' | translate
+            }}</span>
+          </button>
+        </li>
+
+        <!-- List item -->
+        <li>
+          <button
+            class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+            [attr.data-tip]="'dashboard.sidebar.stores' | translate"
+          >
+            <!-- Settings icon -->
+            <i class="fa-solid fa-store"></i>
+            <span class="is-drawer-close:hidden">{{
+              'dashboard.sidebar.stores' | translate
+            }}</span>
+          </button>
+        </li>
+
+        <li>
+          <button
+            class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+            [attr.data-tip]="'dashboard.sidebar.tags' | translate"
+          >
+            <!-- Settings icon -->
+            <i class="fa-solid fa-tag"></i>
+            <span class="is-drawer-close:hidden">{{
+              'dashboard.sidebar.tags' | translate
+            }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

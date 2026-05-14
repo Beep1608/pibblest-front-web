@@ -10,5 +10,8 @@
     "login.doesnt.have.account": "¿No tienes una cuenta?",
     "login.register.link":"Registrate",
     "login.button.message":"Entrar a mi POS!",
-    "login.button.login.message": "Validando sus credenciales.."
+    "login.button.login.message": "Validando sus credenciales..",
+    "dashboard.sidebar.overview":"Overview",
+    "dashboard.sidebar.stores":"Tiendas",
+    "dashboard.sidebar.tags":"Tags"
 }

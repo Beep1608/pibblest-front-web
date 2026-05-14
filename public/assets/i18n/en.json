@@ -7,5 +7,9 @@
   "login.doesnt.have.account": "Dont have an acount?",
   "login.register.link": "Sign up",
   "login.button.message": "Start my POS",
-  "login.button.login.message": "Validating credentials.."
+  "login.button.login.message": "Validating credentials..",
+
+  "dashboard.sidebar.overview":"Overview",
+  "dashboard.sidebar.stores":"Stores",
+  "dashboard.sidebar.tags":"Tags"
 }

@@ -1,0 +1,3 @@
+#my-drawer-4:checked ~ .drawer-content .caret-icon {
+  transform: rotate(180deg);
+}
