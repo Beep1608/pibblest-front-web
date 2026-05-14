@@ -11,5 +11,17 @@
 
   "dashboard.sidebar.overview":"Overview",
   "dashboard.sidebar.stores":"Stores",
-  "dashboard.sidebar.tags":"Tags"
+  "dashboard.sidebar.tags":"Tags",
+  "stores.create.title": "Create New Store",
+  "stores.form.nameLabel": "Store Name",
+  "stores.form.namePlaceholder": "e.g. Downtown Branch",
+  "stores.form.addressLabel": "Address",
+  "stores.form.addressPlaceholder": "123 Main Street",
+  "stores.form.statusLabel": "Status",
+  "stores.form.cancel": "Cancel",
+  "stores.form.submit": "Save Store",
+  "stores.status.active": "active",
+  "stores.status.closed": "closed",
+  "stores.status.maintenance": "maintenance",
+  "stores.status.pre-active": "pre-active"
 }

@@ -7,7 +7,7 @@ type UiState = {
     currentView: DashboardPage;
 }
 const initialState: UiState = {
-  currentView: 'create-store',
+  currentView: 'store',
 };
 
 export const DashboardStore = signalStore(
@@ -21,6 +21,4 @@ export const DashboardStore = signalStore(
 
 
     }))
-
-
 )

@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { NxWelcome } from './nx-welcome';
 import { LoginFormComponent, OwnerFormComponent } from "../libs/owners/ui/src";
 import { TranslateService } from '@ngx-translate/core';
+import { UIStore } from '../libs/shared/data-access/store/ui.store';
 
 @Component({
   imports: [NxWelcome, RouterModule, OwnerFormComponent,LoginFormComponent],
@@ -14,6 +15,8 @@ export class App {
   protected title = 'pibblest-front-web';
 
   private translate = inject(TranslateService);
+
+  uiStore = inject(UIStore);
 
   constructor(){
     this.translate.setFallbackLang('en');

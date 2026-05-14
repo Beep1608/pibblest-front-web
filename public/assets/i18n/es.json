@@ -13,5 +13,17 @@
     "login.button.login.message": "Validando sus credenciales..",
     "dashboard.sidebar.overview":"Overview",
     "dashboard.sidebar.stores":"Tiendas",
-    "dashboard.sidebar.tags":"Tags"
+    "dashboard.sidebar.tags":"Tags",
+    "stores.create.title": "Crear Nueva Tienda",
+    "stores.form.nameLabel": "Nombre de la Tienda",
+    "stores.form.namePlaceholder": "Ej. Sucursal Centro",
+    "stores.form.addressLabel": "Dirección",
+    "stores.form.addressPlaceholder": "Calle Principal #123",
+    "stores.form.statusLabel": "Estado",
+    "stores.form.cancel": "Cancelar",
+    "stores.form.submit": "Guardar Tienda",
+    "stores.status.active": "activa",
+    "stores.status.closed": "cerrada",
+    "stores.status.maintenance": "mantenimiento",
+    "stores.status.pre-active": "pre-activa"
 }

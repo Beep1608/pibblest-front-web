@@ -1,0 +1,90 @@
+<!-- src/libs/stores/ui/src/lib/store-form/store-form.component.html -->
+<div class="card bg-base-100 border border-base-200/60 shadow-sm max-w-2xl mx-auto">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="card-body gap-5">
+    
+    <div class="pb-2 border-b border-base-200">
+      <h3 class="text-lg font-semibold text-base-content">
+        {{ 'stores.form.title' | translate }}
+      </h3>
+      <p class="text-xs text-base-content/60 mt-0.5">
+        {{ 'stores.form.subtitle' | translate }}
+      </p>
+    </div>
+
+    <div class="form-control">
+      <label class="label pb-1.5">
+        <span class="label-text font-medium text-base-content/80">
+          {{ 'stores.form.nameLabel' | translate }}
+        </span>
+      </label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-store absolute left-4 text-base-content/40 text-sm z-10"></i>
+        <input
+          type="text"
+          formControlName="name"
+          [placeholder]="'stores.form.namePlaceholder' | translate"
+          class="input input-bordered pl-10 w-full transition-all duration-200 focus:input-primary focus:outline-none"
+        />
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="label pb-1.5">
+        <span class="label-text font-medium text-base-content/80">
+          {{ 'stores.form.addressLabel' | translate }}
+        </span>
+      </label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-location-dot absolute left-4 text-base-content/40 text-sm z-10"></i>
+        <input
+          type="text"
+          formControlName="address"
+          [placeholder]="'stores.form.addressPlaceholder' | translate"
+          class="input input-bordered pl-10 w-full transition-all duration-200 focus:input-primary focus:outline-none"
+        />
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="label pb-1.5">
+        <span class="label-text font-medium text-base-content/80">
+          {{ 'stores.form.statusLabel' | translate }}
+        </span>
+      </label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-circle-half-stroke absolute left-4 text-base-content/40 text-sm z-10"></i>
+        <select 
+          formControlName="status" 
+          class="select select-bordered pl-10 w-full appearance-none transition-all duration-200 focus:select-primary focus:outline-none"
+        >
+          <option value="" disabled selected>
+            {{ 'stores.form.statusPlaceholder' | translate }}
+          </option>
+          @for (status of storeStatuses; track status) {
+            <option [value]="status">
+              {{ 'stores.status.' + status | translate | titlecase }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="card-actions justify-end gap-3 mt-4 pt-4 border-t border-base-200/60">
+      <button 
+        type="button" 
+        class="btn btn-ghost hover:bg-base-200/50" 
+        (click)="cancel.emit()"
+      >
+        {{ 'stores.form.cancel' | translate }}
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary px-6 shadow-sm" 
+        [disabled]="form.invalid"
+      >
+        {{ 'stores.form.submit' | translate }}
+      </button>
+    </div>
+    
+  </form>
+</div>

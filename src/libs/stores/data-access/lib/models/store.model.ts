@@ -1,5 +1,25 @@
+// src/libs/stores/data-access/lib/models/store.model.ts
 import { PageRequest } from "../../../../shared/data-access/models/sort.model";
 
+export enum StoreStatus {
+  ACTIVE = 'active',
+  CLOSED = 'closed',
+  MAINTENANCE = 'maintenance',
+  PRE_ACTIVE = 'pre-active',
+}
+
+export interface Store {
+  id: number;
+  name: string;
+  address: string;
+  status: StoreStatus;
+}
+
+export interface CreateStoreDto {
+  name: string;
+  address: string;
+  status: StoreStatus;
+}
 
 export interface StorePreview {
   id: number;

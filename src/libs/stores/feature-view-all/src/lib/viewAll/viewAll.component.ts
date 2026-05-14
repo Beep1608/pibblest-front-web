@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, signal } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
-import { StorePreview } from "../../../../data-access/lib/models/store.model";
 import { StoreStore } from "../../../../data-access/lib/store/store.store";
 import { StorePreviewComponent } from "../../../../ui/src/store-component/store-preview.component";
 import { DashboardStore } from "../../../../../../app/feature-dashboard/src/lib/data-access/store/dashboard.store";

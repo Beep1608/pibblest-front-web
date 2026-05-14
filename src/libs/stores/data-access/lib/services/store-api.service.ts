@@ -1,8 +1,9 @@
+// src/libs/stores/data-access/lib/services/store-api.service.ts
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SpringPage } from '../../../../shared/data-access/models/sort.model';
-import { StorePaginationResponse, StorePreview } from '../models/store.model';
+import { CreateStoreDto, Store, StorePaginationResponse, StorePreview } from '../models/store.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,10 @@ export class StoreApiService {
     return this.http.get<StorePaginationResponse>(`${this.base_url}/all`, {
       params,
     });
+  }
+
+  createStore(dto: CreateStoreDto): Observable<Store> {
+    return this.http.post<Store>(`${this.base_url}/create`, dto);
   }
 
   listenToStoreStream(token: string): Observable<Partial<StorePreview>> {

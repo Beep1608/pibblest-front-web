@@ -27,7 +27,7 @@
             ></app-store-view-all-page>
           }
           @case ('create-store') {
-            <app-create-store-page></app-create-store-page>
+            <app-store-create-page></app-store-create-page>
           }
           @case ('tags') {}
         }
@@ -62,6 +62,7 @@
         <!-- List item -->
         <li>
           <button
+           
             class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
             [attr.data-tip]="'dashboard.sidebar.stores' | translate"
           >
