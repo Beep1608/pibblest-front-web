@@ -1,5 +1,6 @@
-import { Component, computed, effect, ElementRef, input, signal, viewChild } from "@angular/core";
+import { Component, computed, effect, ElementRef, inject, input, signal, viewChild } from "@angular/core";
 import { StorePreview } from "../../../data-access/lib/models/store.model";
+import { DashboardStore } from "../../../../../app/feature-dashboard/src/lib/data-access/store/dashboard.store";
 
 
 @Component({
@@ -12,6 +13,7 @@ import { StorePreview } from "../../../data-access/lib/models/store.model";
 export class StorePreviewComponent {
   storePreview = input.required<StorePreview>();
 
+  dashBoardStore = inject(DashboardStore);
   
   salesSpan = viewChild<ElementRef<HTMLSpanElement>>('salesSpan');
 

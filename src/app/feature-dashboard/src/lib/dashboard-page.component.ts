@@ -7,6 +7,7 @@ import { StoreViewAllPage } from "../../../../libs/stores/feature-view-all/src";
 import { DashboardStore } from "./data-access/store/dashboard.store";
 import { TranslatePipe } from "@ngx-translate/core";
 import { StoreCreateComponent } from "../../../../libs/stores/feature-create/src";
+import { StorePage } from "../../../../libs/stores/feature-page";
 
 @Component({
   selector: 'app-dashboard-owner-page',
@@ -16,6 +17,7 @@ import { StoreCreateComponent } from "../../../../libs/stores/feature-create/src
     DashboardSideBarComponent,
     StoreViewAllPage,
     StoreCreateComponent,
+    StorePage,
     TranslatePipe,
   ],
   templateUrl: './dashboard-page.component.html',

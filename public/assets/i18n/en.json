@@ -9,9 +9,9 @@
   "login.button.message": "Start my POS",
   "login.button.login.message": "Validating credentials..",
 
-  "dashboard.sidebar.overview":"Overview",
-  "dashboard.sidebar.stores":"Stores",
-  "dashboard.sidebar.tags":"Tags",
+  "dashboard.sidebar.overview": "Overview",
+  "dashboard.sidebar.stores": "Stores",
+  "dashboard.sidebar.tags": "Tags",
   "stores.create.title": "Create New Store",
   "stores.form.nameLabel": "Store Name",
   "stores.form.namePlaceholder": "e.g. Downtown Branch",
@@ -23,5 +23,7 @@
   "stores.status.active": "active",
   "stores.status.closed": "closed",
   "stores.status.maintenance": "maintenance",
-  "stores.status.pre-active": "pre-active"
+  "stores.status.pre-active": "pre-active",
+  "stores.sale": "Vender",
+  "stores.products": "Productos"
 }

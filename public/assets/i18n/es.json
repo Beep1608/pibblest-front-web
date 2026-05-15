@@ -25,5 +25,8 @@
     "stores.status.active": "activa",
     "stores.status.closed": "cerrada",
     "stores.status.maintenance": "mantenimiento",
-    "stores.status.pre-active": "pre-activa"
+    "stores.status.pre-active": "pre-activa",
+    "stores.sale":"Vender",
+    "stores.products": "Productos"
+
 }

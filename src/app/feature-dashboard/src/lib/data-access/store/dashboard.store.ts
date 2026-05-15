@@ -1,7 +1,7 @@
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
 
 
-export type DashboardPage =  'overview'  | 'store' | 'tags' | 'create-store';
+export type DashboardPage =  'overview'  | 'store' | 'tags' | 'create-store' | 'store-page';
 
 type UiState = {
     currentView: DashboardPage;
