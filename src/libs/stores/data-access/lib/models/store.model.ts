@@ -1,4 +1,5 @@
 // src/libs/stores/data-access/lib/models/store.model.ts
+import { Product } from "../../../../products/data-access/lib/models/product.model";
 import { PageRequest } from "../../../../shared/data-access/models/sort.model";
 
 export enum StoreStatus {
@@ -43,3 +44,4 @@ export interface StorePaginationResponse{
     totalPages: number,
     stores: StorePreview[]
 }
+
