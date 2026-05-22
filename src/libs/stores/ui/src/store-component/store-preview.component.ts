@@ -1,6 +1,7 @@
 import { Component, computed, effect, ElementRef, inject, input, signal, viewChild } from "@angular/core";
 import { StorePreview } from "../../../data-access/lib/models/store.model";
 import { DashboardStore } from "../../../../../app/feature-dashboard/src/lib/data-access/store/dashboard.store";
+import { StoreStore } from "../../../data-access";
 
 
 @Component({
@@ -13,7 +14,7 @@ import { DashboardStore } from "../../../../../app/feature-dashboard/src/lib/dat
 export class StorePreviewComponent {
   storePreview = input.required<StorePreview>();
 
-  dashBoardStore = inject(DashboardStore);
+  store = inject(StoreStore);
   
   salesSpan = viewChild<ElementRef<HTMLSpanElement>>('salesSpan');
 
@@ -36,6 +37,12 @@ export class StorePreviewComponent {
   }
 
 
+  selectStore(storeId: number){
+    this.store.setSelectedStore(storeId);
+    this.store.setView('store-page');
+    console.log('id');
+    console.log(storeId);
+  }
   percentageOfProducts = computed(() => {
     const current = this.storePreview().currentQuantityOfProducts || 0;
     const total = this.storePreview().totalProducts || 0;

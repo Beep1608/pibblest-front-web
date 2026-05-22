@@ -1,0 +1,58 @@
+<div class="card bg-base-100 w-96 shadow-sm h-full">
+	<figure>
+		<img
+			class="object-cover w-full h-full"
+			[src]="`https://placehold.co/400x300/e2e8f0/64748b?text=${product().name}`"
+			[alt]="product().name"
+		/>
+	</figure>
+	<div class="card-body">
+		<h2 class="card-title">{{ product().name }}</h2>
+		<span class="text-xl">$ {{ product().basePrice }}</span>
+		<div class="flex space-x-2">
+			<div class="flex gap-1.5">
+				<span class="label">{{ 'inventory.product.brand' | translate }}:</span>
+				<span>{{ product().brand }}</span>
+			</div>
+			<div class="flex gap-1.5">
+				<span class="label">{{ 'inventory.product.barcode' | translate }}:</span>
+				<span>{{ product().barcode }}</span>
+			</div>
+		</div>
+		<div>
+			<span class="label line-clamp-3 text-sm">{{ product().description }}</span>
+			<div class="flex items-center gap-2">
+				<progress class="progress progress-secondary w-56" value="{{product().currentQuantity}}" max="{{product().desiredQuantity}}"></progress>
+				<span class="label">{{product().currentQuantity}}/{{product().desiredQuantity}}</span>	
+			</div>
+			
+		</div>
+
+		<div class="card-actions justify-end">
+			@if (product().tags) {
+				@for (tag of product().tags; track $index) {
+					@if ($index < 5) {
+						<div class="badge badge-outline badge-primary">{{ tag.name }}</div>
+					}
+				}
+				@if (product().tags.length) {
+					<div class="badge badge-outline">...</div>
+				}
+			}
+		</div>
+
+		<div class="card-actions justify-end mt-auto">
+			@if (store.selectedSubMenu() === 'products') {
+				<button class="btn btn-primary" (click)="store.setView('product-info')">
+					{{ 'inventory.product.edit' | translate }}
+				</button>
+			}
+
+			@if (store.selectedSubMenu() === 'sale') {
+				<button class="btn btn-primary" (click)="cart.addToCart(product())">
+					{{ 'inventory.sale.add.cart' | translate }}
+				</button>
+			}
+		</div>
+	</div>
+</div>

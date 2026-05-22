@@ -1,0 +1,22 @@
+@if (tagStore.tagsPage(); as page) {
+	<input
+		class="btn"
+		[checked]="activeCategories().length === 0"
+		(change)="selectAll()"
+		type="checkbox"
+		name="frameworks"
+		aria-label="{{ 'categoryList.All' | translate }}"
+	/>
+
+	@for (tag of page.tags; track tag.id) {
+		<input
+			class="btn"
+			#checkbox
+			[attr.aria-label]="tag.name"
+			[checked]="activeCategories().includes(tag.id)"
+			(change)="onTagToggle(tag.id, checkbox.checked)"
+			type="checkbox"
+			name="frameworks"
+		/>
+	}
+}

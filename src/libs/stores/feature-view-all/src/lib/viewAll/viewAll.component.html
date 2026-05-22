@@ -1,15 +1,15 @@
 <div class="grid grid-cols-[max-content_max-content_max-content] gap-4">
-  <div
-    
-    class="card card-lg card-dash flex items-center justify-center w-96 bg-transparent h-64 hover:bg-gray-300"
-  (click)="dashboardStore.setView('create-store')">
-    <i class="fa-solid fa-plus text-4xl"></i>
-    <label for="" class="label">Crea una nueva tienda!</label>
-  </div>
+	<div
+		class="card card-lg card-dash flex items-center justify-center w-96 bg-transparent h-64 hover:bg-gray-300"
+		(click)="store.setView('create-store')"
+	>
+		<i class="fa-solid fa-plus text-4xl"></i>
+		<label class="label" for="">Crea una nueva tienda!</label>
+	</div>
 
-  @if (store.storesPage(); as page) {
-    @for (item of page.stores; track item.id) {
-      <app-store-preview-component [storePreview]="item"></app-store-preview-component>
-    }
-  }
+	@if (store.storesPage(); as page) {
+		@for (item of page.stores; track item.id) {
+			<app-store-preview-component [storePreview]="item"></app-store-preview-component>
+		}
+	}
 </div>

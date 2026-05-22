@@ -22,15 +22,12 @@
       <div>
         @switch (dashboardStore.currentView()) {
           @case ('store') {
-            <app-store-view-all-page
-              class="col-span-full"
-            ></app-store-view-all-page>
+            <app-store-main-page></app-store-main-page>
           }
           @case ('create-store') {
             <app-store-create-page></app-store-create-page>
           }
           @case ('tags') {}
-          @case ('store-page') {<app-store-page></app-store-page>}
         }
       </div>
     </div>
@@ -65,6 +62,7 @@
           <button
            
             class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+            (click)="setStores()"
             [attr.data-tip]="'dashboard.sidebar.stores' | translate"
           >
             <!-- Settings icon -->

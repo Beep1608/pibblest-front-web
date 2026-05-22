@@ -12,8 +12,6 @@ import { DashboardStore } from "../../../../../../app/feature-dashboard/src/lib/
   templateUrl: './viewAll.component.html',
 })
 export class StoreViewAllPage {
-
-  dashboardStore = inject(DashboardStore);
   store = inject(StoreStore);
 
   ngOnInit(){

@@ -14,8 +14,3 @@ export interface SaleCreateResponse{
     message: string
 }
 
-
-export interface CartItem {
-	product: Product;
-	quantity: number;
-}

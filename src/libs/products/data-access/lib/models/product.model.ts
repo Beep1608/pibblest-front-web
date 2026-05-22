@@ -10,6 +10,8 @@ export interface Product{
     basePrice: number,
     cost: number,
     quantity: number,
+    desiredQuantity:number,
+    currentQuantity: number,
     tags: Tag[]
 
 }

@@ -14,13 +14,14 @@ import {  CreateStoreDto, StorePaginationResponse } from '../models/store.model'
 import { StoreApiService } from '../services/store-api.service';
 
 export type StoreSubmenu = 'products' | 'sale' | 'sale-history';
-export type StoreView = 'product-info' | 'sale-info' | null;
+export type StoreView =  'view-all'| 'create-store'|'store-page'| 'product-info' | 'sale-info' | null;
 interface StoreState {
 	isLoading: boolean;
 	error: string | null;
 	isSuccess: boolean;
 	token: string | null;
 	message: string | null;
+	selectedStore: number | null,
 	selectedSubMenu: StoreSubmenu;
 	selectedView: StoreView;
 	storesPage: StorePaginationResponse | null;
@@ -32,8 +33,9 @@ const initialState: StoreState = {
 	isSuccess: false,
 	token: null,
 	message: null,
+	selectedStore:null,
 	selectedSubMenu: 'sale',
-	selectedView: null,
+	selectedView: 'view-all',
 	storesPage: null,
 };
 
@@ -153,7 +155,12 @@ export const StoreStore = signalStore(
 
 			setView(view: StoreView) {
 				patchState(store, { selectedView: view });
+				console.log('cambio la view a ', view);
 			},
+
+			setSelectedStore(storeId: number){
+				patchState(store, { selectedStore: storeId});
+			}
 
 		}),
 	),
