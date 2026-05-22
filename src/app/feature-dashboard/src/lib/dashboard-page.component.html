@@ -21,11 +21,11 @@
     <div class="p-4">
       <div>
         @switch (dashboardStore.currentView()) {
-          @case ('store') {
+          @case ('stores') {
             <app-store-main-page></app-store-main-page>
           }
-          @case ('create-store') {
-            <app-store-create-page></app-store-create-page>
+          @case ('products') {
+            <app-product-invetory-page></app-product-invetory-page>
           }
           @case ('tags') {}
         }
@@ -62,13 +62,28 @@
           <button
            
             class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-            (click)="setStores()"
+            (click)="dashboardStore.setView('stores')"
             [attr.data-tip]="'dashboard.sidebar.stores' | translate"
           >
             <!-- Settings icon -->
             <i class="fa-solid fa-store"></i>
             <span class="is-drawer-close:hidden">{{
               'dashboard.sidebar.stores' | translate
+            }}</span>
+          </button>
+        </li>
+
+        <li>
+          <button
+           
+            class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+            (click)="dashboardStore.setView('products')"
+            [attr.data-tip]="'dashboard.sidebar.products' | translate"
+          >
+            <!-- Settings icon -->
+            <i class="fa-solid fa-warehouse"></i>
+            <span class="is-drawer-close:hidden">{{
+              'dashboard.sidebar.products' | translate
             }}</span>
           </button>
         </li>

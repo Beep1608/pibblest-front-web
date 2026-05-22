@@ -66,8 +66,6 @@ export const StoreStore = signalStore(
 									patchState(store, { isLoading: false, isSuccess: true });
 
 									ui.showToast('Tienda creada con exito');
-
-									dashboardStore.setView('store');
 								},
 								error: (error: HttpErrorResponse) => {
 									patchState(store, {
@@ -103,7 +101,7 @@ export const StoreStore = signalStore(
 										isSuccess: true,
 										storesPage: response,
 									});
-									dashboardStore.setView('store');
+									
 								},
 								error: (error: any) => {
 									patchState(store, {

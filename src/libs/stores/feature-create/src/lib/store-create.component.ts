@@ -23,7 +23,5 @@ export class StoreCreateComponent {
     this.store.createStore(dto);
   }
 
-  onCancel() {
-    this.dashboardStore.setView('store');
-  }
+  
 }

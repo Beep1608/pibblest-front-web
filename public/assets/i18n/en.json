@@ -11,6 +11,7 @@
 
 	"dashboard.sidebar.overview": "Overview",
 	"dashboard.sidebar.stores": "Stores",
+	"dashboard.sidebar.products":"Products",
 	"dashboard.sidebar.tags": "Tags",
 	"stores.create.title": "Create New Store",
 	"stores.form.nameLabel": "Store Name",

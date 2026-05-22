@@ -10,6 +10,7 @@
 	"login.button.login.message": "Validando sus credenciales..",
 	"dashboard.sidebar.overview": "Overview",
 	"dashboard.sidebar.stores": "Tiendas",
+	"dashboard.sidebar.products": "Productos",
 	"dashboard.sidebar.tags": "Tags",
 	"stores.create.title": "Crear Nueva Tienda",
 	"stores.form.nameLabel": "Nombre de la Tienda",
@@ -33,5 +34,5 @@
 	"inventory.product.barcode": "Código de barras",
 	"inventory.sale.add.cart": "Añadir al carrito",
 	"inventory.sale.cart.title": "Carrito",
-	"sale.pay.button":"Pagar"
+	"sale.pay.button": "Pagar"
 }

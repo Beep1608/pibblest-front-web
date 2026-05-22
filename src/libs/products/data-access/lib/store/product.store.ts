@@ -43,7 +43,7 @@ export const ProductStore = signalStore(
 			});
 		}),
 	})),
-	withMethods((product, api = inject(ProductApiService), store = inject(StoreStore)) => ({
+	withMethods((product, api = inject(ProductApiService)) => ({
 		getAllProducts: rxMethod<string | null>(
 			pipe(
 				tap(() =>
@@ -53,8 +53,8 @@ export const ProductStore = signalStore(
 						isSuccess: false,
 					}),
 				),
-				switchMap(keyword => {
-					const storeId: number = store.selectedStore() ?? 0;
+				switchMap((keyword, storeId: number) => {
+					
 					return api.getAllProducts(storeId, keyword).pipe(
 						tapResponse({
 							next: response => {

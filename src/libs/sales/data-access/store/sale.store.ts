@@ -64,12 +64,16 @@ export const SaleStore = signalStore(
 		setLastSoldItems: (items: CartItem[]) => {
 			patchState(store, { lastSoldItems: items });
 		},
+		
 
 		resetAlerts: () => {
 			console.log('miau');
 			patchState(store, {
 				isSuccess: false,
+				isLoading:false,
 				error: null,
+				message:null,
+				lastSoldItems:[]
 			});
 		},
 	})),

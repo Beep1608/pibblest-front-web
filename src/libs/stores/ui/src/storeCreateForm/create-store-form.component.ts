@@ -30,6 +30,6 @@ export class CreateStoreFormComponent {
 
     const newStoreData = this.storeForm.getRawValue();
 
-    this.dashbordStore.setView('store');
+
   }
 }
