@@ -11,7 +11,7 @@ export class ProductApiService {
 
 	private readonly baseUrl = 'http://localhost:8081/api/products';
 
-	getAllProducts(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
+	getAllProductsFromStore(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
 		let params = new HttpParams();
 
 		if (keyword?.trim()) {
@@ -25,5 +25,19 @@ export class ProductApiService {
 		params = params.set('size', size.toString());
 
 		return this.http.get<ProductPageResponse>(`${this.baseUrl}/${storeId.toString()}`, { params });
+	}
+
+
+	getAllProducts(keyword: string | null, page = 0, size = 0): Observable<ProductPageResponse>{
+		let params = new HttpParams();
+
+		if(keyword?.trim()){
+			params = params.set('keyword', keyword);
+		}
+
+		params.set('page', page);
+		params.set('size', size);
+
+		return this.http.get<ProductPageResponse>(`${this.baseUrl}/all`,{params});
 	}
 }

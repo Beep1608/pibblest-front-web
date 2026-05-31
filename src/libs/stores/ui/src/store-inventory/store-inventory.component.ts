@@ -19,11 +19,11 @@ export class StoreInventoryComponent implements OnInit {
 	product = inject(ProductStore);
 
 	ngOnInit() {
-		//Llamar a los endpoint tag y product para que sean especificos por tienda
+		this.tag.getAllTagsForProducts('');
+		this.product.getAllProductsFromStore({storeId: this.store.selectedStore() ?? 0, keyword: null});
 	}
 
-	buscarEnTienda(keyword: string) {
-		const currentStoreId = this.store.selectedStore();
-		this.product.getAllProducts( keyword, currentStoreId);
+	searchOnStore(keyword: string) {
+		this.product.getAllProductsFromStore( {storeId: this.store.selectedStore() ?? 0, keyword: keyword});
 	}
 }

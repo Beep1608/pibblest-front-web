@@ -1,5 +1,5 @@
-import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
+import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
@@ -44,7 +44,7 @@ export const ProductStore = signalStore(
 		}),
 	})),
 	withMethods((product, api = inject(ProductApiService)) => ({
-		getAllProducts: rxMethod<string | null>(
+		getAllProductsFromStore: rxMethod<{storeId: number; keyword: string | null}>(
 			pipe(
 				tap(() =>
 					patchState(product, {
@@ -53,9 +53,9 @@ export const ProductStore = signalStore(
 						isSuccess: false,
 					}),
 				),
-				switchMap((keyword, storeId: number) => {
+				switchMap(({ storeId, keyword }) => {
 					
-					return api.getAllProducts(storeId, keyword).pipe(
+					return api.getAllProductsFromStore(storeId, keyword).pipe(
 						tapResponse({
 							next: response => {
 								patchState(product, {
@@ -99,5 +99,42 @@ export const ProductStore = signalStore(
 				};
 			});
 		},
+
+
+		getAllProducts: rxMethod<string | null>(
+			pipe(
+				tap(() =>
+					patchState(product, {
+						isLoading: true,
+						error: null,
+						isSuccess: false,
+					}),
+				),
+				switchMap((keyword) => {
+					
+					return api.getAllProducts( keyword).pipe(
+						tapResponse({
+							next: response => {
+								patchState(product, {
+									isLoading: false,
+									isSuccess: true,
+									productsPage: response,
+								});
+								console.log('respuesta');
+								console.log(response);
+							},
+							error: (errr: any) => {
+								console.log('error');
+								patchState(product, {
+									isLoading: false,
+									isSuccess: false,
+									error: errr.message || 'Hay un error nihao',
+								});
+							},
+						}),
+					);
+				}),
+			),
+		),
 	})),
 );
