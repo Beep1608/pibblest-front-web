@@ -34,5 +34,8 @@
 	"inventory.product.barcode": "Código de barras",
 	"inventory.sale.add.cart": "Añadir al carrito",
 	"inventory.sale.cart.title": "Carrito",
-	"sale.pay.button": "Pagar"
+	"sale.pay.button": "Pagar",
+	"admin.inventory.search.placeholder": "Buscar en todo el universo de productos...",
+	"admin.inventory.search.button": "Buscar",
+	"admin.inventory.empty": "No se encontraron productos en el universo global."
 }

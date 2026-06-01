@@ -13,17 +13,17 @@ import { ProductStore } from '../../../../products/data-access/lib/store/product
 	imports: [CheckoutComponent, ProductInventoryPage],
 	templateUrl: './store-inventory.component.html',
 })
-export class StoreInventoryComponent implements OnInit {
+export class StoreInventoryComponent  {
 	store = inject(StoreStore);
 	tag = inject(TagStore);
 	product = inject(ProductStore);
 
-	ngOnInit() {
-		//Llamar a los endpoint tag y product para que sean especificos por tienda
-	}
+	//ngOnInit() {
+	//	//Llamar a los endpoint tag y product para que sean especificos por tienda
+	//}
 
 	buscarEnTienda(keyword: string) {
 		const currentStoreId = this.store.selectedStore();
-		this.product.getAllProducts( keyword, currentStoreId);
+		//this.product.getAllProducts( keyword, currentStoreId);
 	}
 }

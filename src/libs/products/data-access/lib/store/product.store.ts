@@ -1,3 +1,4 @@
+// src/libs/products/data-access/lib/store/product.store.ts
 import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
@@ -79,6 +80,40 @@ export const ProductStore = signalStore(
 				}),
 			),
 		),
+
+		// NUEVO MÉTODO: Gestiona la obtención del universo global de productos
+		getGlobalProducts: rxMethod<string | null>(
+			pipe(
+				tap(() =>
+					patchState(product, {
+						isLoading: true,
+						error: null,
+						isSuccess: false,
+					}),
+				),
+				switchMap((keyword) => {
+					return api.getUniverseProducts(keyword).pipe(
+						tapResponse({
+							next: response => {
+								patchState(product, {
+									isLoading: false,
+									isSuccess: true,
+									productsPage: response,
+								});
+							},
+							error: (errr: any) => {
+								patchState(product, {
+									isLoading: false,
+									isSuccess: false,
+									error: errr.message || 'Error al cargar el universo de productos',
+								});
+							},
+						}),
+					);
+				}),
+			),
+		),
+
 		setActiveTags: (tagIds: number[]) => {
 			patchState(product, { activeTagIds: tagIds });
 		},
