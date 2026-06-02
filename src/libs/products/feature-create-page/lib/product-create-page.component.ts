@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, effect, inject } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ProductStore } from "../../data-access/lib/store/product.store";
@@ -23,6 +23,17 @@ export class ProductCreatePageComponent {
 		description: ['', [Validators.required]]
 	});
 
+	constructor() {
+		// Redirección reactiva al confirmar el éxito de la operación
+		effect(() => {
+			if (this.product.isSuccess()) {
+				setTimeout(() => {
+					this.goBack();
+				}, 1500); // 1.5s para permitir visualizar la alerta de éxito
+			}
+		});
+	}
+
 	onSubmit() {
 		if (this.productForm.valid) {
 			this.product.addProduct(this.productForm.getRawValue());
@@ -32,7 +43,6 @@ export class ProductCreatePageComponent {
 	}
 
 	goBack() {
-		// Regresamos al inventario de admin usando el store interno
 		this.product.setProductView('admin-inventory');
 	}
 }

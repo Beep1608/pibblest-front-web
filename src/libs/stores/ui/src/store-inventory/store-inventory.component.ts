@@ -13,17 +13,23 @@ import { ProductStore } from '../../../../products/data-access/lib/store/product
 	imports: [CheckoutComponent, ProductInventoryPage],
 	templateUrl: './store-inventory.component.html',
 })
-export class StoreInventoryComponent  {
+export class StoreInventoryComponent implements OnInit {
 	store = inject(StoreStore);
 	tag = inject(TagStore);
 	product = inject(ProductStore);
 
-	//ngOnInit() {
-	//	//Llamar a los endpoint tag y product para que sean especificos por tienda
-	//}
+	ngOnInit() {
+		const currentStoreId = this.store.selectedStore();
+		if (currentStoreId) {
+			this.product.getAllProducts({ storeId: currentStoreId, keyword: null });
+		}
+		this.tag.getAllTagsForProducts('');
+	}
 
 	buscarEnTienda(keyword: string) {
 		const currentStoreId = this.store.selectedStore();
-		//this.product.getAllProducts( keyword, currentStoreId);
+		if (currentStoreId) {
+			this.product.getAllProducts({ storeId: currentStoreId, keyword: keyword || null });
+		}
 	}
 }

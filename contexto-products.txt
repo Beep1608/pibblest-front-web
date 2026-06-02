@@ -32,7 +32,7 @@ The content is organized as follows:
 <notes>
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Only files matching these patterns are included: src/libs/products/feature-info-page/**/*.{ts,html}, src/libs/products/**/*.{ts,html}
+- Only files matching these patterns are included: src/libs/products/**/*.{ts,html}
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -62,10 +62,160 @@ src/libs/products/feature-shell/lib/products-shell.component.ts
 src/libs/products/ui/src/index.ts
 src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html
 src/libs/products/ui/src/lib/product-preview-component/product-preview.component.ts
+src/libs/products/ui/src/lib/product-table-component/product-table.component.html
+src/libs/products/ui/src/lib/product-table-component/product-table.component.ts
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/libs/products/ui/src/lib/product-table-component/product-table.component.html">
+<div class="overflow-x-auto bg-base-100 rounded-box shadow-sm border border-base-200/50">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>{{ 'admin.product.fields.name' | translate }}</th>
+                <th>{{ 'admin.product.fields.brand' | translate }}</th>
+                <th>{{ 'admin.product.fields.basePrice' | translate }}</th>
+                <th>{{ 'admin.product.fields.quantity' | translate }}</th>
+                <th class="text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of products(); track item.id) {
+                <tr>
+                    <td>
+                        <div class="font-bold">{{ item.name }}</div>
+                        <div class="text-xs opacity-50">{{ item.sku }}</div>
+                    </td>
+                    <td>{{ item.brand }}</td>
+                    <td class="font-bold text-primary">$ {{ item.basePrice }}</td>
+                    <td>
+                        @if (item.currentQuantity !== undefined && item.desiredQuantity !== undefined) {
+                            <div class="flex items-center gap-2">
+                                <progress class="progress progress-secondary w-20" value="{{item.currentQuantity}}" max="{{item.desiredQuantity}}"></progress>
+                                <span class="text-xs">{{item.currentQuantity}}/{{item.desiredQuantity}}</span>
+                            </div>
+                        } @else {
+                            <div class="badge badge-neutral badge-sm">
+                                <i class="fa-solid fa-globe mr-1.5"></i>
+                                {{ 'inventory.product.global' | translate }}
+                            </div>
+                        }
+                    </td>
+                    <td class="text-right">
+                        @switch (viewMode()) {
+                            @case ('admin') {
+                                <div class="flex justify-end gap-2">
+                                    <button class="btn btn-sm btn-primary" (click)="goToEdit(item.id)">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-error" (click)="openDeleteModal(item)">
+                                        <i class="fa-solid fa-trash text-error-content"></i>
+                                    </button>
+                                </div>
+                            }
+                            @case ('employee') {
+                                <button class="btn btn-sm btn-secondary" (click)="cart.addToCart(item)">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            } @empty {
+                <tr>
+                    <td colspan="5" class="text-center py-8 text-base-content/50">
+                        <i class="fa-solid fa-box-open text-4xl mb-2"></i>
+                        <p>{{ 'admin.inventory.empty' | translate }}</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<dialog #deleteModalTable class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg text-error flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            {{ 'inventory.product.delete.title' | translate }}
+        </h3>
+        <p class="py-4 text-base">
+            {{ 'inventory.product.delete.message' | translate }} 
+            <span class="font-bold text-base-content">"{{ selectedProductForDelete?.name }}"</span>?
+        </p>
+        <div class="modal-action">
+            <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">
+                {{ 'inventory.product.delete.cancel' | translate }}
+            </button>
+            <button class="btn btn-error" (click)="confirmDelete()" [disabled]="productStore.isSubmitting()">
+                @if (productStore.isSubmitting()) {
+                    <span class="loading loading-spinner"></span>
+                } @else {
+                    <i class="fa-solid fa-trash mr-1"></i>
+                    {{ 'inventory.product.delete.confirm' | translate }}
+                }
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">close</button>
+    </form>
+</dialog>
+</file>
+
+<file path="src/libs/products/ui/src/lib/product-table-component/product-table.component.ts">
+import { Component, ElementRef, inject, input, viewChild } from "@angular/core";
+import { Product } from "../../../../data-access/lib/models/product.model";
+import { TranslatePipe } from "@ngx-translate/core";
+import { SaleStore } from "../../../../../sales/data-access";
+import { CartStore } from "../../../../../cart/data-access/lib/store/cart.store";
+import { ProductStore } from "../../../../data-access/lib/store/product.store";
+
+@Component({
+    selector:'app-product-table-component',
+    imports:[TranslatePipe],
+    templateUrl:'./product-table.component.html'
+})
+export class ProductTableComponent {
+    products = input.required<Product[]>();
+    viewMode = input<'admin' | 'employee'>('employee'); 
+    
+    sale = inject(SaleStore);
+    cart = inject(CartStore);
+    productStore = inject(ProductStore);
+
+    deleteModalTable = viewChild<ElementRef<HTMLDialogElement>>('deleteModalTable');
+    selectedProductForDelete: Product | null = null;
+
+    goToEdit(id: number) {
+        this.productStore.setSelectedProductId(id);
+        this.productStore.setProductView('info');
+    }
+
+    openDeleteModal(product: Product) {
+        this.selectedProductForDelete = product;
+        this.deleteModalTable()?.nativeElement.showModal();
+    }
+
+    closeDeleteModal() {
+        this.selectedProductForDelete = null;
+        this.deleteModalTable()?.nativeElement.close();
+    }
+
+    confirmDelete() {
+        if(this.selectedProductForDelete) {
+            this.productStore.deleteProduct(this.selectedProductForDelete.id);
+        }
+        this.closeDeleteModal();
+    }
+}
+</file>
+
+<file path="src/libs/products/feature-admin-inventory-page/index.ts">
+
+</file>
 
 <file path="src/libs/products/feature-create-page/index.ts">
 export * from './lib/product-create-page.component';
@@ -152,8 +302,8 @@ export * from './lib/product-create-page.component';
 					<i class="fa-solid fa-arrow-left mr-1"></i>
 					{{ 'admin.product.create.cancel' | translate }}
 				</button>
-				<button type="submit" class="btn btn-primary" [disabled]="product.isLoading()">
-					@if (product.isLoading()) {
+				<button type="submit" class="btn btn-primary" [disabled]="product.isSubmitting()">
+					@if (product.isSubmitting()) {
 						<span class="loading loading-spinner"></span>
 					} @else {
 						<i class="fa-solid fa-save mr-1"></i>
@@ -167,7 +317,7 @@ export * from './lib/product-create-page.component';
 </file>
 
 <file path="src/libs/products/feature-create-page/lib/product-create-page.component.ts">
-import { Component, inject } from "@angular/core";
+import { Component, effect, inject } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ProductStore } from "../../data-access/lib/store/product.store";
@@ -192,6 +342,17 @@ export class ProductCreatePageComponent {
 		description: ['', [Validators.required]]
 	});
 
+	constructor() {
+		// Redirección reactiva al confirmar el éxito de la operación
+		effect(() => {
+			if (this.product.isSuccess()) {
+				setTimeout(() => {
+					this.goBack();
+				}, 1500); // 1.5s para permitir visualizar la alerta de éxito
+			}
+		});
+	}
+
 	onSubmit() {
 		if (this.productForm.valid) {
 			this.product.addProduct(this.productForm.getRawValue());
@@ -201,10 +362,13 @@ export class ProductCreatePageComponent {
 	}
 
 	goBack() {
-		// Regresamos al inventario de admin usando el store interno
 		this.product.setProductView('admin-inventory');
 	}
 }
+</file>
+
+<file path="src/libs/products/feature-inventory-page/index.ts">
+
 </file>
 
 <file path="src/libs/products/feature-shell/index.ts">
@@ -262,7 +426,7 @@ export class ProductsShellComponent implements OnInit {
 }
 </file>
 
-<file path="src/libs/products/feature-admin-inventory-page/index.ts">
+<file path="src/libs/products/ui/src/index.ts">
 
 </file>
 
@@ -356,8 +520,8 @@ export * from './lib/product-info-page.component';
 						<i class="fa-solid fa-arrow-left mr-1"></i>
 						{{ 'admin.product.create.cancel' | translate }}
 					</button>
-					<button type="submit" class="btn btn-primary" [disabled]="productStore.isLoading()">
-						@if (productStore.isLoading()) {
+					<button type="submit" class="btn btn-primary" [disabled]="productStore.isSubmitting()">
+						@if (productStore.isSubmitting()) {
 							<span class="loading loading-spinner"></span>
 						} @else {
 							<i class="fa-solid fa-save mr-1"></i>
@@ -414,6 +578,15 @@ export class ProductInfoPage implements OnInit {
 				});
 			}
 		});
+
+		// Redirección reactiva al confirmar el éxito de la operación
+		effect(() => {
+			if (this.productStore.isSuccess()) {
+				setTimeout(() => {
+					this.goBack();
+				}, 1500);
+			}
+		});
 	}
 
 	ngOnInit() {
@@ -421,7 +594,6 @@ export class ProductInfoPage implements OnInit {
 		if (id) {
 			this.productStore.loadProductDetails(id);
 		} else {
-			// Si el usuario recargó o entró por error y no hay ID, vuelve al listado
 			this.goBack();
 		}
 	}
@@ -444,37 +616,99 @@ export class ProductInfoPage implements OnInit {
 }
 </file>
 
-<file path="src/libs/products/feature-inventory-page/index.ts">
-
-</file>
-
 <file path="src/libs/products/feature-inventory-page/lib/product-inventory-page.component.html">
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="menuList">
-	<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-		<label class="input w-full outline-0 flex items-center gap-2">
-			<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
-			<input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
-			<kbd class="kbd kbd-sm">Enter</kbd>
-		</label>
-		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">
-			<i class="fa-solid fa-search"></i> Buscar
-		</button>
-	</div>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
+        <label class="input w-full outline-0 flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+            <input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
+            <kbd class="kbd kbd-sm">Enter</kbd>
+        </label>
+        
+        <div class="flex w-full md:w-auto gap-2">
+            <button class="btn btn-neutral w-full md:w-auto" (click)="onSearch(searchInput.value)">
+                <i class="fa-solid fa-search"></i> Buscar
+            </button>
+            
+            <div class="join hidden md:flex">
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'grid'" (click)="product.setDisplayMode('grid')">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'table'" (click)="product.setDisplayMode('table')">
+                    <i class="fa-solid fa-table"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
-		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
-	</div>
+    <div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
+        <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+    </div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-		@for (productItem of product.filteredProducts(); track productItem.id) {
-			<app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
-		}
-	</div>
+    @if (product.displayMode() === 'grid') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (productItem of product.filteredProducts(); track productItem.id) {
+                <app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
+            }
+        </div>
+    } @else {
+        <app-product-table-component [products]="product.filteredProducts()" [viewMode]="'employee'"></app-product-table-component>
+    }
+
+    @if (product.productsPage()) {
+        <div class="flex justify-center mt-8">
+            <div class="join">
+                <button class="join-item btn" (click)="changePage(-1)" [disabled]="product.productsPage()?.pageNo === 0 || product.isLoading()">
+                    <i class="fa-solid fa-chevron-left mr-1"></i>
+                    {{ 'inventory.pagination.prev' | translate }}
+                </button>
+                <button class="join-item btn pointer-events-none">
+                    {{ 'inventory.pagination.page' | translate }} {{ (product.productsPage()?.pageNo ?? 0) + 1 }} {{ 'inventory.pagination.of' | translate }} {{ product.productsPage()?.totalPages || 1 }}
+                </button>
+                <button class="join-item btn" (click)="changePage(1)" [disabled]="product.productsPage()?.last || product.isLoading()">
+                    {{ 'inventory.pagination.next' | translate }}
+                    <i class="fa-solid fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    }
 </div>
 </file>
 
-<file path="src/libs/products/ui/src/index.ts">
+<file path="src/libs/products/feature-inventory-page/lib/product-inventory-page.component.ts">
+// src/libs/products/feature-inventory-page/lib/product-inventory-page.component.ts
+import { Component, inject, output } from '@angular/core';
+import { TagButtonsComponent } from '../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component';
+import { ProductStore } from '../../data-access/lib/store/product.store';
+import { ProductPreviewComponent } from '../../ui/src/lib/product-preview-component/product-preview.component';
+import { ProductTableComponent } from "../../ui/src/lib/product-table-component/product-table.component";
+import { TranslatePipe } from '@ngx-translate/core';
 
+@Component({
+    selector: 'app-product-invetory-page',
+    imports: [ProductPreviewComponent, ProductTableComponent, TagButtonsComponent, TranslatePipe],
+    templateUrl: './product-inventory-page.component.html',
+})
+export class ProductInventoryPage {
+    product = inject(ProductStore);
+    searchKeyword = output<string>();
+
+    lastKeyword = '';
+
+    onSearch(keyword: string) {
+        const cleanKeyword = keyword.trim();
+        this.lastKeyword = cleanKeyword;
+        this.product.setPage(0); // Reseteo paginación
+        this.searchKeyword.emit(cleanKeyword);
+    }
+
+    changePage(delta: number) {
+        const currentPage = this.product.currentPage();
+        this.product.setPage(currentPage + delta);
+        // Re-emitimos evento para que el shell cargue la data con la nueva página
+        this.searchKeyword.emit(this.lastKeyword);
+    }
+}
 </file>
 
 <file path="src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html">
@@ -535,10 +769,15 @@ export class ProductInfoPage implements OnInit {
 		<div class="card-actions justify-end border-t border-base-200 pt-4">
 			@switch (viewMode()) {
 				@case ('admin') {
-					<button class="btn btn-primary w-full" (click)="goToEdit()">
-						<i class="fa-solid fa-pen mr-1"></i>
-						{{ 'inventory.product.edit' | translate }}
-					</button>
+					<div class="flex gap-2 w-full">
+						<button class="btn btn-primary flex-1" (click)="goToEdit()">
+							<i class="fa-solid fa-pen mr-1"></i>
+							{{ 'inventory.product.edit' | translate }}
+						</button>
+						<button class="btn btn-error btn-square" (click)="openDeleteModal()" [title]="'inventory.product.delete.title' | translate">
+							<i class="fa-solid fa-trash text-error-content"></i>
+						</button>
+					</div>
 				}
 				@case ('employee') {
 					<button class="btn btn-secondary w-full" (click)="cart.addToCart(product())">
@@ -550,10 +789,39 @@ export class ProductInfoPage implements OnInit {
 		</div>
 	</div>
 </div>
+
+<dialog #deleteModal class="modal">
+	<div class="modal-box">
+		<h3 class="font-bold text-lg text-error flex items-center gap-2">
+			<i class="fa-solid fa-triangle-exclamation"></i>
+			{{ 'inventory.product.delete.title' | translate }}
+		</h3>
+		<p class="py-4 text-base">
+			{{ 'inventory.product.delete.message' | translate }} 
+			<span class="font-bold text-base-content">"{{ product().name }}"</span>?
+		</p>
+		<div class="modal-action">
+			<button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">
+				{{ 'inventory.product.delete.cancel' | translate }}
+			</button>
+			<button class="btn btn-error" (click)="confirmDelete()" [disabled]="productStore.isSubmitting()">
+				@if (productStore.isSubmitting()) {
+					<span class="loading loading-spinner"></span>
+				} @else {
+					<i class="fa-solid fa-trash mr-1"></i>
+					{{ 'inventory.product.delete.confirm' | translate }}
+				}
+			</button>
+		</div>
+	</div>
+	<form method="dialog" class="modal-backdrop">
+		<button (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">close</button>
+	</form>
+</dialog>
 </file>
 
 <file path="src/libs/products/ui/src/lib/product-preview-component/product-preview.component.ts">
-import { Component, inject, input } from "@angular/core";
+import { Component, ElementRef, inject, input, viewChild } from "@angular/core";
 import { Product } from "../../../../data-access/lib/models/product.model";
 import { TranslatePipe } from "@ngx-translate/core";
 import { SaleStore } from "../../../../../sales/data-access";
@@ -573,10 +841,25 @@ export class ProductPreviewComponent {
 	cart = inject(CartStore);
 	productStore = inject(ProductStore);
 
-	// NUEVO MÉTODO: Setea el ID en el store antes de navegar
+	// Referencia estricta al modal nativo de DaisyUI usando signals
+	deleteModal = viewChild<ElementRef<HTMLDialogElement>>('deleteModal');
+
 	goToEdit() {
 		this.productStore.setSelectedProductId(this.product().id);
 		this.productStore.setProductView('info');
+	}
+
+	openDeleteModal() {
+		this.deleteModal()?.nativeElement.showModal();
+	}
+
+	closeDeleteModal() {
+		this.deleteModal()?.nativeElement.close();
+	}
+
+	confirmDelete() {
+		this.productStore.deleteProduct(this.product().id);
+		this.closeDeleteModal();
 	}
 }
 </file>
@@ -597,7 +880,6 @@ export interface Product{
     desiredQuantity:number,
     currentQuantity: number,
     tags: Tag[]
-
 }
 
 export interface ProductPageResponse{
@@ -605,11 +887,10 @@ export interface ProductPageResponse{
     pageSize: number,
     totalElements: number,
     totalPages: number,
-    lats: boolean,
+    last: boolean,
     products: Product[]
 }
 
-// NUEVAS INTERFACES AÑADIDAS
 export interface CreateProductRequest {
     name: string;
     sku: string;
@@ -626,7 +907,6 @@ export interface CreateProductResponse {
     message: string;
 }
 
-// NUEVAS INTERFACES AÑADIDAS PARA EDICIÓN
 export interface UpdateProductRequest {
     name: string;
     sku: string;
@@ -642,6 +922,10 @@ export interface UpdateProductResponse {
     id: number;
     message: string;
 }
+
+export interface DeleteProductResponse {
+    message?: string;
+}
 </file>
 
 <file path="src/libs/products/data-access/lib/services/product-api.service.ts">
@@ -652,6 +936,7 @@ import { Observable } from 'rxjs';
 import { 
     CreateProductRequest, 
     CreateProductResponse, 
+    DeleteProductResponse,
     Product, 
     ProductPageResponse, 
     UpdateProductRequest, 
@@ -709,44 +994,80 @@ export class ProductApiService {
 	editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
 		return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
 	}
+
+	// NUEVO MÉTODO DE BORRADO
+	deleteProduct(id: number): Observable<DeleteProductResponse> {
+		return this.http.delete<DeleteProductResponse>(`${this.baseUrl}/${id}`);
+	}
 }
 </file>
 
 <file path="src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.html">
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="adminMenuList">
-	<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
-		<div class="flex w-full lg:w-auto grow gap-2">
-			<label class="input w-full outline-0 flex items-center gap-2">
-				<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
-				<input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
-				<kbd class="kbd kbd-sm">Enter</kbd>
-			</label>
-			<button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
-				<i class="fa-solid fa-search"></i>
-				{{ 'admin.inventory.search.button' | translate }}
-			</button>
-		</div>
-		
-		<button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
-			<i class="fa-solid fa-plus"></i>
-			{{ 'admin.inventory.actions.new' | translate }}
-		</button>
-	</div>
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
+        <div class="flex w-full lg:w-auto grow gap-2">
+            <label class="input w-full outline-0 flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+                <input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
+                <kbd class="kbd kbd-sm">Enter</kbd>
+            </label>
+            <button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
+                <i class="fa-solid fa-search"></i>
+                {{ 'admin.inventory.search.button' | translate }}
+            </button>
+            
+            <div class="join hidden md:flex">
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'grid'" (click)="product.setDisplayMode('grid')">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'table'" (click)="product.setDisplayMode('table')">
+                    <i class="fa-solid fa-table"></i>
+                </button>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
+            <i class="fa-solid fa-plus"></i>
+            {{ 'admin.inventory.actions.new' | translate }}
+        </button>
+    </div>
 
-	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
-		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
-	</div>
+    <div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
+        <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+    </div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-		@for (productItem of product.filteredProducts(); track productItem.id) {
-			<app-product-preview-component [product]="productItem" [viewMode]="'admin'"></app-product-preview-component>
-		} @empty {
-			<div class="col-span-full flex flex-col items-center justify-center p-12 text-base-content/50">
-				<i class="fa-solid fa-box-open text-6xl mb-4"></i>
-				<p class="text-xl">{{ 'admin.inventory.empty' | translate }}</p>
-			</div>
-		}
-	</div>
+    @if (product.displayMode() === 'grid') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (productItem of product.filteredProducts(); track productItem.id) {
+                <app-product-preview-component [product]="productItem" [viewMode]="'admin'"></app-product-preview-component>
+            } @empty {
+                <div class="col-span-full flex flex-col items-center justify-center p-12 text-base-content/50">
+                    <i class="fa-solid fa-box-open text-6xl mb-4"></i>
+                    <p class="text-xl">{{ 'admin.inventory.empty' | translate }}</p>
+                </div>
+            }
+        </div>
+    } @else {
+        <app-product-table-component [products]="product.filteredProducts()" [viewMode]="'admin'"></app-product-table-component>
+    }
+
+    @if (product.productsPage()) {
+        <div class="flex justify-center mt-8">
+            <div class="join">
+                <button class="join-item btn" (click)="changePage(-1)" [disabled]="product.productsPage()?.pageNo === 0 || product.isLoading()">
+                    <i class="fa-solid fa-chevron-left mr-1"></i>
+                    {{ 'inventory.pagination.prev' | translate }}
+                </button>
+                <button class="join-item btn pointer-events-none">
+                    {{ 'inventory.pagination.page' | translate }} {{ (product.productsPage()?.pageNo ?? 0) + 1 }} {{ 'inventory.pagination.of' | translate }} {{ product.productsPage()?.totalPages || 1 }}
+                </button>
+                <button class="join-item btn" (click)="changePage(1)" [disabled]="product.productsPage()?.last || product.isLoading()">
+                    {{ 'inventory.pagination.next' | translate }}
+                    <i class="fa-solid fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    }
 </div>
 </file>
 
@@ -756,78 +1077,45 @@ import { Component, inject, OnInit } from "@angular/core";
 import { TagStore } from "../../../tags/data-access/store/tag.store";
 import { ProductStore } from "../../data-access/lib/store/product.store";
 import { ProductPreviewComponent } from "../../ui/src/lib/product-preview-component/product-preview.component";
+import { ProductTableComponent } from "../../ui/src/lib/product-table-component/product-table.component";
 import { TagButtonsComponent } from "../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component";
 import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
-	selector: 'app-product-admin-inventory-page',
-	imports: [ProductPreviewComponent, TagButtonsComponent, TranslatePipe],
-	templateUrl: './product-admin-inventory-page.component.html'
+    selector: 'app-product-admin-inventory-page',
+    imports: [ProductPreviewComponent, ProductTableComponent, TagButtonsComponent, TranslatePipe],
+    templateUrl: './product-admin-inventory-page.component.html'
 })
 export class ProductAdminInventoryPage implements OnInit {
-	tag = inject(TagStore);
-	product = inject(ProductStore);
+    tag = inject(TagStore);
+    product = inject(ProductStore);
 
-	lastKeyword = '';
+    lastKeyword = '';
 
-	ngOnInit() {
-		this.product.getGlobalProducts(null);
-	}
+    ngOnInit() {
+        this.product.getGlobalProducts(null);
+    }
 
-	searchAsAdmin(keyword: string) {
-		const cleanKeyword = keyword.trim();
+    searchAsAdmin(keyword: string) {
+        const cleanKeyword = keyword.trim();
+        this.lastKeyword = cleanKeyword;
+        this.product.setPage(0); // Reseteo paginación antes de llamar
+        this.product.getGlobalProducts(cleanKeyword);
+    }
 
-		if (cleanKeyword === this.lastKeyword) {
-			return;
-		}
+    changePage(delta: number) {
+        const currentPage = this.product.currentPage();
+        this.product.setPage(currentPage + delta);
+        this.product.getGlobalProducts(this.lastKeyword);
+    }
 
-		this.lastKeyword = cleanKeyword;
-		
-		this.product.getGlobalProducts(cleanKeyword);
-	}
-
-	navigateToCreate() {
-		// Usamos el estado del módulo en vez del global
-		this.product.setProductView('create');
-	}
-}
-</file>
-
-<file path="src/libs/products/feature-inventory-page/lib/product-inventory-page.component.ts">
-import { Component, inject, output } from '@angular/core';
-import { TagButtonsComponent } from '../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component';
-import { ProductStore } from '../../data-access/lib/store/product.store';
-import { ProductPreviewComponent } from '../../ui/src/lib/product-preview-component/product-preview.component';
-
-//Todo hacer tonto este componente
-@Component({
-	selector: 'app-product-invetory-page',
-	imports: [ProductPreviewComponent, TagButtonsComponent],
-	templateUrl: './product-inventory-page.component.html',
-})
-export class ProductInventoryPage {
-	product = inject(ProductStore);
-
-	searchKeyword = output<string>();
-
-	lastKeyword = '';
-
-	onSearch(keyword: string) {
-		const cleanKeyword = keyword.trim();
-
-		if (cleanKeyword === this.lastKeyword) {
-			return;
-		}
-
-		this.lastKeyword = cleanKeyword;
-
-		this.searchKeyword.emit(cleanKeyword);
-	}
+    navigateToCreate() {
+        this.product.setProductView('create');
+    }
 }
 </file>
 
 <file path="src/libs/products/data-access/lib/store/product.store.ts">
-// src/libs/products/data-access/lib/store/product.store.ts
 import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
@@ -838,41 +1126,50 @@ import { ProductApiService } from '../services/product-api.service';
 import { CartItem } from '../../../../cart/data-access/lib/models/cart.model';
 
 export type ProductView = 'admin-inventory' | 'inventory' | 'create' | 'info' | 'edit';
+export type DisplayMode = 'grid' | 'table';
 
 interface ProductState {
-	isLoading: boolean;
-	error: string | null;
-	isSuccess: boolean;
-	message: string | null;
-	productsPage: ProductPageResponse | null;
-	activeTagIds: number[];
-	currentView: ProductView;
-	selectedProductId: number | null; // NUEVO: Contexto de selección
-	selectedProduct: Product | null;  // NUEVO: Detalle del producto a editar
+    isLoading: boolean;
+    isSubmitting: boolean;
+    error: string | null;
+    isSuccess: boolean;
+    message: string | null;
+    productsPage: ProductPageResponse | null;
+    activeTagIds: number[];
+    currentView: ProductView;
+    selectedProductId: number | null;
+    selectedProduct: Product | null;
+    currentPage: number; // NUEVO
+    pageSize: number;    // NUEVO
+    displayMode: DisplayMode; // NUEVO
 }
 
 const initialState: ProductState = {
-	isLoading: false,
-	error: null,
-	isSuccess: false,
-	message: null,
-	productsPage: null,
-	activeTagIds: [],
-	currentView: 'admin-inventory',
-	selectedProductId: null,
-	selectedProduct: null
+    isLoading: false,
+    isSubmitting: false,
+    error: null,
+    isSuccess: false,
+    message: null,
+    productsPage: null,
+    activeTagIds: [],
+    currentView: 'admin-inventory',
+    selectedProductId: null,
+    selectedProduct: null,
+    currentPage: 0,
+    pageSize: 10,
+    displayMode: 'grid'
 };
 
 export const ProductStore = signalStore(
-	{ providedIn: 'root' },
-	withState(initialState),
-	withComputed(({ productsPage, activeTagIds }) => ({
-		filteredProducts: computed(() => {
-			const allProducts = productsPage()?.products || [];
-			const selectedTags = activeTagIds();
+    { providedIn: 'root' },
+    withState(initialState),
+    withComputed(({ productsPage, activeTagIds }) => ({
+        filteredProducts: computed(() => {
+            const allProducts = productsPage()?.products || [];
+            const selectedTags = activeTagIds();
 
-			if (selectedTags.length === 0) {
-				return allProducts;
+            if (selectedTags.length === 0) {
+                return allProducts;
 			}
 
 			return allProducts.filter(product => {
@@ -883,15 +1180,25 @@ export const ProductStore = signalStore(
 	withMethods((product, api = inject(ProductApiService)) => ({
 		
 		setProductView: (view: ProductView) => {
-			patchState(product, { currentView: view });
+			patchState(product, { currentView: view, isSuccess: false, error: null, message: null });
 		},
 
-		// NUEVO MÉTODO: Mutación inmutable de la selección de producto
+		setDisplayMode: (mode: DisplayMode) => {
+			patchState(product, { displayMode: mode });
+		},
+
+		setPage: (page: number) => {
+			patchState(product, { currentPage: page });
+		},
+
+		setPageSize: (size: number) => {
+			patchState(product, { pageSize: size, currentPage: 0 }); // Reset a página 0 al cambiar tamaño
+		},
+
 		setSelectedProductId: (id: number | null) => {
 			patchState(product, { selectedProductId: id });
 		},
 
-		// NUEVO MÉTODO: Cargar detalle del producto seleccionado
 		loadProductDetails: rxMethod<number>(
 			pipe(
 				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, selectedProduct: null })),
@@ -904,19 +1211,18 @@ export const ProductStore = signalStore(
 			)
 		),
 
-		// NUEVO MÉTODO: Actualizar producto existente
 		updateProduct: rxMethod<{id: number, request: UpdateProductRequest}>(
 			pipe(
-				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })),
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
 				exhaustMap(({id, request}) => api.editProduct(id, request).pipe(
 					tapResponse({
 						next: (res) => patchState(product, {
-							isLoading: false,
+							isSubmitting: false,
 							isSuccess: true,
 							message: res.message || 'Producto actualizado correctamente'
 						}),
 						error: (err: any) => patchState(product, {
-							isLoading: false,
+							isSubmitting: false,
 							isSuccess: false,
 							error: err.error?.message || err.message || 'Error al actualizar el producto'
 						})
@@ -925,24 +1231,42 @@ export const ProductStore = signalStore(
 			)
 		),
 
-		getAllProducts: rxMethod<string | null>(
+		deleteProduct: rxMethod<number>(
 			pipe(
-				tap(() =>
-					patchState(product, {
-						isLoading: true,
-						error: null,
-						isSuccess: false,
-					}),
-				),
-				switchMap((keyword, storeId: number) => {
-					return api.getAllProducts(storeId, keyword).pipe(
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
+				exhaustMap((id) => api.deleteProduct(id).pipe(
+					tapResponse({
+						next: (res) => patchState(product, (state) => {
+							if (!state.productsPage) return { isSubmitting: false, isSuccess: true };
+							
+							const updatedProducts = state.productsPage.products.filter(p => p.id !== id);
+							
+							return {
+								isSubmitting: false,
+								isSuccess: true,
+								message: res.message || 'Producto eliminado exitosamente',
+								productsPage: { ...state.productsPage, products: updatedProducts }
+							};
+						}),
+						error: (err: any) => patchState(product, {
+							isSubmitting: false,
+							isSuccess: false,
+							error: err.error?.message || err.message || 'Error al eliminar el producto'
+						})
+					})
+				))
+			)
+		),
+
+		getAllProducts: rxMethod<{ storeId: number; keyword: string | null }>(
+			pipe(
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false })),
+				switchMap(({ storeId, keyword }) => {
+					// Extraemos estado de paginación
+					return api.getAllProducts(storeId, keyword, product.currentPage(), product.pageSize()).pipe(
 						tapResponse({
-							next: response => {
-								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
-							},
-							error: (errr: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error de conexión' });
-							},
+							next: response => patchState(product, { isLoading: false, isSuccess: true, productsPage: response }),
+							error: (err: any) => patchState(product, { isLoading: false, isSuccess: false, error: err.message || 'Error de conexión' }),
 						}),
 					);
 				}),
@@ -951,22 +1275,13 @@ export const ProductStore = signalStore(
 
 		getGlobalProducts: rxMethod<string | null>(
 			pipe(
-				tap(() =>
-					patchState(product, {
-						isLoading: true,
-						error: null,
-						isSuccess: false,
-					}),
-				),
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false })),
 				switchMap((keyword) => {
-					return api.getUniverseProducts(keyword).pipe(
+					// Extraemos estado de paginación
+					return api.getUniverseProducts(keyword, product.currentPage(), product.pageSize()).pipe(
 						tapResponse({
-							next: response => {
-								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
-							},
-							error: (errr: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error al cargar' });
-							},
+							next: response => patchState(product, { isLoading: false, isSuccess: true, productsPage: response }),
+							error: (err: any) => patchState(product, { isLoading: false, isSuccess: false, error: err.message || 'Error al cargar' }),
 						}),
 					);
 				}),
@@ -975,18 +1290,12 @@ export const ProductStore = signalStore(
 
 		addProduct: rxMethod<CreateProductRequest>(
 			pipe(
-				tap(() =>
-					patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })
-				),
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
 				exhaustMap((request) => {
 					return api.createProduct(request).pipe(
 						tapResponse({
-							next: (response) => {
-								patchState(product, { isLoading: false, isSuccess: true, message: response.message || 'Creado' });
-							},
-							error: (err: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: err.error?.message || err.message });
-							}
+							next: (response) => patchState(product, { isSubmitting: false, isSuccess: true, message: response.message || 'Creado' }),
+							error: (err: any) => patchState(product, { isSubmitting: false, isSuccess: false, error: err.error?.message || err.message })
 						})
 					);
 				})

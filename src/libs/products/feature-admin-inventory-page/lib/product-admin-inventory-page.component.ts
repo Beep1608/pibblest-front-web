@@ -3,38 +3,39 @@ import { Component, inject, OnInit } from "@angular/core";
 import { TagStore } from "../../../tags/data-access/store/tag.store";
 import { ProductStore } from "../../data-access/lib/store/product.store";
 import { ProductPreviewComponent } from "../../ui/src/lib/product-preview-component/product-preview.component";
+import { ProductTableComponent } from "../../ui/src/lib/product-table-component/product-table.component";
 import { TagButtonsComponent } from "../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component";
 import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
-	selector: 'app-product-admin-inventory-page',
-	imports: [ProductPreviewComponent, TagButtonsComponent, TranslatePipe],
-	templateUrl: './product-admin-inventory-page.component.html'
+    selector: 'app-product-admin-inventory-page',
+    imports: [ProductPreviewComponent, ProductTableComponent, TagButtonsComponent, TranslatePipe],
+    templateUrl: './product-admin-inventory-page.component.html'
 })
 export class ProductAdminInventoryPage implements OnInit {
-	tag = inject(TagStore);
-	product = inject(ProductStore);
+    tag = inject(TagStore);
+    product = inject(ProductStore);
 
-	lastKeyword = '';
+    lastKeyword = '';
 
-	ngOnInit() {
-		this.product.getGlobalProducts(null);
-	}
+    ngOnInit() {
+        this.product.getGlobalProducts(null);
+    }
 
-	searchAsAdmin(keyword: string) {
-		const cleanKeyword = keyword.trim();
+    searchAsAdmin(keyword: string) {
+        const cleanKeyword = keyword.trim();
+        this.lastKeyword = cleanKeyword;
+        this.product.setPage(0); // Reseteo paginación antes de llamar
+        this.product.getGlobalProducts(cleanKeyword);
+    }
 
-		if (cleanKeyword === this.lastKeyword) {
-			return;
-		}
+    changePage(delta: number) {
+        const currentPage = this.product.currentPage();
+        this.product.setPage(currentPage + delta);
+        this.product.getGlobalProducts(this.lastKeyword);
+    }
 
-		this.lastKeyword = cleanKeyword;
-		
-		this.product.getGlobalProducts(cleanKeyword);
-	}
-
-	navigateToCreate() {
-		// Usamos el estado del módulo en vez del global
-		this.product.setProductView('create');
-	}
+    navigateToCreate() {
+        this.product.setProductView('create');
+    }
 }

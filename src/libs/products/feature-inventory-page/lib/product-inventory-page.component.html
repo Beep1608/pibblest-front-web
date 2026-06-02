@@ -1,22 +1,56 @@
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="menuList">
-	<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-		<label class="input w-full outline-0 flex items-center gap-2">
-			<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
-			<input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
-			<kbd class="kbd kbd-sm">Enter</kbd>
-		</label>
-		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">
-			<i class="fa-solid fa-search"></i> Buscar
-		</button>
-	</div>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
+        <label class="input w-full outline-0 flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+            <input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
+            <kbd class="kbd kbd-sm">Enter</kbd>
+        </label>
+        
+        <div class="flex w-full md:w-auto gap-2">
+            <button class="btn btn-neutral w-full md:w-auto" (click)="onSearch(searchInput.value)">
+                <i class="fa-solid fa-search"></i> Buscar
+            </button>
+            
+            <div class="join hidden md:flex">
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'grid'" (click)="product.setDisplayMode('grid')">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'table'" (click)="product.setDisplayMode('table')">
+                    <i class="fa-solid fa-table"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
-		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
-	</div>
+    <div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
+        <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+    </div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-		@for (productItem of product.filteredProducts(); track productItem.id) {
-			<app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
-		}
-	</div>
+    @if (product.displayMode() === 'grid') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (productItem of product.filteredProducts(); track productItem.id) {
+                <app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
+            }
+        </div>
+    } @else {
+        <app-product-table-component [products]="product.filteredProducts()" [viewMode]="'employee'"></app-product-table-component>
+    }
+
+    @if (product.productsPage()) {
+        <div class="flex justify-center mt-8">
+            <div class="join">
+                <button class="join-item btn" (click)="changePage(-1)" [disabled]="product.productsPage()?.pageNo === 0 || product.isLoading()">
+                    <i class="fa-solid fa-chevron-left mr-1"></i>
+                    {{ 'inventory.pagination.prev' | translate }}
+                </button>
+                <button class="join-item btn pointer-events-none">
+                    {{ 'inventory.pagination.page' | translate }} {{ (product.productsPage()?.pageNo ?? 0) + 1 }} {{ 'inventory.pagination.of' | translate }} {{ product.productsPage()?.totalPages || 1 }}
+                </button>
+                <button class="join-item btn" (click)="changePage(1)" [disabled]="product.productsPage()?.last || product.isLoading()">
+                    {{ 'inventory.pagination.next' | translate }}
+                    <i class="fa-solid fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    }
 </div>

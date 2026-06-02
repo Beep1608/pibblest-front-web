@@ -13,7 +13,6 @@ export interface Product{
     desiredQuantity:number,
     currentQuantity: number,
     tags: Tag[]
-
 }
 
 export interface ProductPageResponse{
@@ -21,11 +20,10 @@ export interface ProductPageResponse{
     pageSize: number,
     totalElements: number,
     totalPages: number,
-    lats: boolean,
+    last: boolean,
     products: Product[]
 }
 
-// NUEVAS INTERFACES AÑADIDAS
 export interface CreateProductRequest {
     name: string;
     sku: string;
@@ -42,7 +40,6 @@ export interface CreateProductResponse {
     message: string;
 }
 
-// NUEVAS INTERFACES AÑADIDAS PARA EDICIÓN
 export interface UpdateProductRequest {
     name: string;
     sku: string;
@@ -59,7 +56,6 @@ export interface UpdateProductResponse {
     message: string;
 }
 
-// NUEVA INTERFAZ PARA BORRADO
 export interface DeleteProductResponse {
     message?: string;
 }

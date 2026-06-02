@@ -1,35 +1,66 @@
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="adminMenuList">
-	<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
-		<div class="flex w-full lg:w-auto grow gap-2">
-			<label class="input w-full outline-0 flex items-center gap-2">
-				<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
-				<input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
-				<kbd class="kbd kbd-sm">Enter</kbd>
-			</label>
-			<button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
-				<i class="fa-solid fa-search"></i>
-				{{ 'admin.inventory.search.button' | translate }}
-			</button>
-		</div>
-		
-		<button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
-			<i class="fa-solid fa-plus"></i>
-			{{ 'admin.inventory.actions.new' | translate }}
-		</button>
-	</div>
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
+        <div class="flex w-full lg:w-auto grow gap-2">
+            <label class="input w-full outline-0 flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+                <input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
+                <kbd class="kbd kbd-sm">Enter</kbd>
+            </label>
+            <button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
+                <i class="fa-solid fa-search"></i>
+                {{ 'admin.inventory.search.button' | translate }}
+            </button>
+            
+            <div class="join hidden md:flex">
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'grid'" (click)="product.setDisplayMode('grid')">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'table'" (click)="product.setDisplayMode('table')">
+                    <i class="fa-solid fa-table"></i>
+                </button>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
+            <i class="fa-solid fa-plus"></i>
+            {{ 'admin.inventory.actions.new' | translate }}
+        </button>
+    </div>
 
-	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
-		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
-	</div>
+    <div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
+        <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+    </div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-		@for (productItem of product.filteredProducts(); track productItem.id) {
-			<app-product-preview-component [product]="productItem" [viewMode]="'admin'"></app-product-preview-component>
-		} @empty {
-			<div class="col-span-full flex flex-col items-center justify-center p-12 text-base-content/50">
-				<i class="fa-solid fa-box-open text-6xl mb-4"></i>
-				<p class="text-xl">{{ 'admin.inventory.empty' | translate }}</p>
-			</div>
-		}
-	</div>
+    @if (product.displayMode() === 'grid') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (productItem of product.filteredProducts(); track productItem.id) {
+                <app-product-preview-component [product]="productItem" [viewMode]="'admin'"></app-product-preview-component>
+            } @empty {
+                <div class="col-span-full flex flex-col items-center justify-center p-12 text-base-content/50">
+                    <i class="fa-solid fa-box-open text-6xl mb-4"></i>
+                    <p class="text-xl">{{ 'admin.inventory.empty' | translate }}</p>
+                </div>
+            }
+        </div>
+    } @else {
+        <app-product-table-component [products]="product.filteredProducts()" [viewMode]="'admin'"></app-product-table-component>
+    }
+
+    @if (product.productsPage()) {
+        <div class="flex justify-center mt-8">
+            <div class="join">
+                <button class="join-item btn" (click)="changePage(-1)" [disabled]="product.productsPage()?.pageNo === 0 || product.isLoading()">
+                    <i class="fa-solid fa-chevron-left mr-1"></i>
+                    {{ 'inventory.pagination.prev' | translate }}
+                </button>
+                <button class="join-item btn pointer-events-none">
+                    {{ 'inventory.pagination.page' | translate }} {{ (product.productsPage()?.pageNo ?? 0) + 1 }} {{ 'inventory.pagination.of' | translate }} {{ product.productsPage()?.totalPages || 1 }}
+                </button>
+                <button class="join-item btn" (click)="changePage(1)" [disabled]="product.productsPage()?.last || product.isLoading()">
+                    {{ 'inventory.pagination.next' | translate }}
+                    <i class="fa-solid fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    }
 </div>

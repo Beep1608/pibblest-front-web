@@ -1,4 +1,3 @@
-// src/libs/products/data-access/lib/store/product.store.ts
 import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
@@ -9,41 +8,50 @@ import { ProductApiService } from '../services/product-api.service';
 import { CartItem } from '../../../../cart/data-access/lib/models/cart.model';
 
 export type ProductView = 'admin-inventory' | 'inventory' | 'create' | 'info' | 'edit';
+export type DisplayMode = 'grid' | 'table';
 
 interface ProductState {
-	isLoading: boolean;
-	error: string | null;
-	isSuccess: boolean;
-	message: string | null;
-	productsPage: ProductPageResponse | null;
-	activeTagIds: number[];
-	currentView: ProductView;
-	selectedProductId: number | null; // NUEVO: Contexto de selección
-	selectedProduct: Product | null;  // NUEVO: Detalle del producto a editar
+    isLoading: boolean;
+    isSubmitting: boolean;
+    error: string | null;
+    isSuccess: boolean;
+    message: string | null;
+    productsPage: ProductPageResponse | null;
+    activeTagIds: number[];
+    currentView: ProductView;
+    selectedProductId: number | null;
+    selectedProduct: Product | null;
+    currentPage: number; // NUEVO
+    pageSize: number;    // NUEVO
+    displayMode: DisplayMode; // NUEVO
 }
 
 const initialState: ProductState = {
-	isLoading: false,
-	error: null,
-	isSuccess: false,
-	message: null,
-	productsPage: null,
-	activeTagIds: [],
-	currentView: 'admin-inventory',
-	selectedProductId: null,
-	selectedProduct: null
+    isLoading: false,
+    isSubmitting: false,
+    error: null,
+    isSuccess: false,
+    message: null,
+    productsPage: null,
+    activeTagIds: [],
+    currentView: 'admin-inventory',
+    selectedProductId: null,
+    selectedProduct: null,
+    currentPage: 0,
+    pageSize: 10,
+    displayMode: 'grid'
 };
 
 export const ProductStore = signalStore(
-	{ providedIn: 'root' },
-	withState(initialState),
-	withComputed(({ productsPage, activeTagIds }) => ({
-		filteredProducts: computed(() => {
-			const allProducts = productsPage()?.products || [];
-			const selectedTags = activeTagIds();
+    { providedIn: 'root' },
+    withState(initialState),
+    withComputed(({ productsPage, activeTagIds }) => ({
+        filteredProducts: computed(() => {
+            const allProducts = productsPage()?.products || [];
+            const selectedTags = activeTagIds();
 
-			if (selectedTags.length === 0) {
-				return allProducts;
+            if (selectedTags.length === 0) {
+                return allProducts;
 			}
 
 			return allProducts.filter(product => {
@@ -54,15 +62,25 @@ export const ProductStore = signalStore(
 	withMethods((product, api = inject(ProductApiService)) => ({
 		
 		setProductView: (view: ProductView) => {
-			patchState(product, { currentView: view });
+			patchState(product, { currentView: view, isSuccess: false, error: null, message: null });
 		},
 
-		// NUEVO MÉTODO: Mutación inmutable de la selección de producto
+		setDisplayMode: (mode: DisplayMode) => {
+			patchState(product, { displayMode: mode });
+		},
+
+		setPage: (page: number) => {
+			patchState(product, { currentPage: page });
+		},
+
+		setPageSize: (size: number) => {
+			patchState(product, { pageSize: size, currentPage: 0 }); // Reset a página 0 al cambiar tamaño
+		},
+
 		setSelectedProductId: (id: number | null) => {
 			patchState(product, { selectedProductId: id });
 		},
 
-		// NUEVO MÉTODO: Cargar detalle del producto seleccionado
 		loadProductDetails: rxMethod<number>(
 			pipe(
 				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, selectedProduct: null })),
@@ -75,19 +93,18 @@ export const ProductStore = signalStore(
 			)
 		),
 
-		// NUEVO MÉTODO: Actualizar producto existente
 		updateProduct: rxMethod<{id: number, request: UpdateProductRequest}>(
 			pipe(
-				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })),
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
 				exhaustMap(({id, request}) => api.editProduct(id, request).pipe(
 					tapResponse({
 						next: (res) => patchState(product, {
-							isLoading: false,
+							isSubmitting: false,
 							isSuccess: true,
 							message: res.message || 'Producto actualizado correctamente'
 						}),
 						error: (err: any) => patchState(product, {
-							isLoading: false,
+							isSubmitting: false,
 							isSuccess: false,
 							error: err.error?.message || err.message || 'Error al actualizar el producto'
 						})
@@ -96,27 +113,25 @@ export const ProductStore = signalStore(
 			)
 		),
 
-		// NUEVO MÉTODO: Borrado inmutable
 		deleteProduct: rxMethod<number>(
 			pipe(
-				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })),
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
 				exhaustMap((id) => api.deleteProduct(id).pipe(
 					tapResponse({
 						next: (res) => patchState(product, (state) => {
-							if (!state.productsPage) return { isLoading: false, isSuccess: true };
+							if (!state.productsPage) return { isSubmitting: false, isSuccess: true };
 							
-							// Eliminación inmutable del producto de la lista en memoria
 							const updatedProducts = state.productsPage.products.filter(p => p.id !== id);
 							
 							return {
-								isLoading: false,
+								isSubmitting: false,
 								isSuccess: true,
 								message: res.message || 'Producto eliminado exitosamente',
 								productsPage: { ...state.productsPage, products: updatedProducts }
 							};
 						}),
 						error: (err: any) => patchState(product, {
-							isLoading: false,
+							isSubmitting: false,
 							isSuccess: false,
 							error: err.error?.message || err.message || 'Error al eliminar el producto'
 						})
@@ -125,24 +140,15 @@ export const ProductStore = signalStore(
 			)
 		),
 
-		getAllProducts: rxMethod<string | null>(
+		getAllProducts: rxMethod<{ storeId: number; keyword: string | null }>(
 			pipe(
-				tap(() =>
-					patchState(product, {
-						isLoading: true,
-						error: null,
-						isSuccess: false,
-					}),
-				),
-				switchMap((keyword, storeId: number) => {
-					return api.getAllProducts(storeId, keyword).pipe(
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false })),
+				switchMap(({ storeId, keyword }) => {
+					// Extraemos estado de paginación
+					return api.getAllProducts(storeId, keyword, product.currentPage(), product.pageSize()).pipe(
 						tapResponse({
-							next: response => {
-								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
-							},
-							error: (errr: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error de conexión' });
-							},
+							next: response => patchState(product, { isLoading: false, isSuccess: true, productsPage: response }),
+							error: (err: any) => patchState(product, { isLoading: false, isSuccess: false, error: err.message || 'Error de conexión' }),
 						}),
 					);
 				}),
@@ -151,22 +157,13 @@ export const ProductStore = signalStore(
 
 		getGlobalProducts: rxMethod<string | null>(
 			pipe(
-				tap(() =>
-					patchState(product, {
-						isLoading: true,
-						error: null,
-						isSuccess: false,
-					}),
-				),
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false })),
 				switchMap((keyword) => {
-					return api.getUniverseProducts(keyword).pipe(
+					// Extraemos estado de paginación
+					return api.getUniverseProducts(keyword, product.currentPage(), product.pageSize()).pipe(
 						tapResponse({
-							next: response => {
-								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
-							},
-							error: (errr: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error al cargar' });
-							},
+							next: response => patchState(product, { isLoading: false, isSuccess: true, productsPage: response }),
+							error: (err: any) => patchState(product, { isLoading: false, isSuccess: false, error: err.message || 'Error al cargar' }),
 						}),
 					);
 				}),
@@ -175,18 +172,12 @@ export const ProductStore = signalStore(
 
 		addProduct: rxMethod<CreateProductRequest>(
 			pipe(
-				tap(() =>
-					patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })
-				),
+				tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
 				exhaustMap((request) => {
 					return api.createProduct(request).pipe(
 						tapResponse({
-							next: (response) => {
-								patchState(product, { isLoading: false, isSuccess: true, message: response.message || 'Creado' });
-							},
-							error: (err: any) => {
-								patchState(product, { isLoading: false, isSuccess: false, error: err.error?.message || err.message });
-							}
+							next: (response) => patchState(product, { isSubmitting: false, isSuccess: true, message: response.message || 'Creado' }),
+							error: (err: any) => patchState(product, { isSubmitting: false, isSuccess: false, error: err.error?.message || err.message })
 						})
 					);
 				})

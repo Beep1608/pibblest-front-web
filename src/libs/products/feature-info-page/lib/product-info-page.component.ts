@@ -40,6 +40,15 @@ export class ProductInfoPage implements OnInit {
 				});
 			}
 		});
+
+		// Redirección reactiva al confirmar el éxito de la operación
+		effect(() => {
+			if (this.productStore.isSuccess()) {
+				setTimeout(() => {
+					this.goBack();
+				}, 1500);
+			}
+		});
 	}
 
 	ngOnInit() {
@@ -47,7 +56,6 @@ export class ProductInfoPage implements OnInit {
 		if (id) {
 			this.productStore.loadProductDetails(id);
 		} else {
-			// Si el usuario recargó o entró por error y no hay ID, vuelve al listado
 			this.goBack();
 		}
 	}

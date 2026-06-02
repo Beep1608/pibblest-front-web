@@ -78,8 +78,8 @@
 					<i class="fa-solid fa-arrow-left mr-1"></i>
 					{{ 'admin.product.create.cancel' | translate }}
 				</button>
-				<button type="submit" class="btn btn-primary" [disabled]="product.isLoading()">
-					@if (product.isLoading()) {
+				<button type="submit" class="btn btn-primary" [disabled]="product.isSubmitting()">
+					@if (product.isSubmitting()) {
 						<span class="loading loading-spinner"></span>
 					} @else {
 						<i class="fa-solid fa-save mr-1"></i>
