@@ -18,21 +18,23 @@ export class ProductAdminInventoryPage implements OnInit {
 	lastKeyword = '';
 
 	ngOnInit() {
-		// Llamar al endpoint global de búsqueda sin keyword inicial
 		this.product.getGlobalProducts(null);
 	}
 
 	searchAsAdmin(keyword: string) {
 		const cleanKeyword = keyword.trim();
 
-		// Evitar peticiones redundantes
 		if (cleanKeyword === this.lastKeyword) {
 			return;
 		}
 
 		this.lastKeyword = cleanKeyword;
 		
-		// Despachar la búsqueda al store usando el nuevo método
 		this.product.getGlobalProducts(cleanKeyword);
+	}
+
+	navigateToCreate() {
+		// Usamos el estado del módulo en vez del global
+		this.product.setProductView('create');
 	}
 }

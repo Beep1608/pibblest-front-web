@@ -2,7 +2,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProductPageResponse } from '../models/product.model';
+import { 
+    CreateProductRequest, 
+    CreateProductResponse, 
+    DeleteProductResponse,
+    Product, 
+    ProductPageResponse, 
+    UpdateProductRequest, 
+    UpdateProductResponse 
+} from '../models/product.model';
 
 @Injectable({
 	providedIn: 'root',
@@ -40,5 +48,24 @@ export class ProductApiService {
 
 		// Apuntamos al endpoint global /api/products/all según el controlador backend
 		return this.http.get<ProductPageResponse>(`${this.baseUrl}/all`, { params });
+	}
+
+	// NUEVO MÉTODO: POST para crear un producto
+	createProduct(request: CreateProductRequest): Observable<CreateProductResponse> {
+		return this.http.post<CreateProductResponse>(this.baseUrl, request);
+	}
+
+	// NUEVOS MÉTODOS DE EDICIÓN
+	getProductById(id: number): Observable<Product> {
+		return this.http.get<Product>(`${this.baseUrl}/detail/${id}`);
+	}
+
+	editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
+		return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
+	}
+
+	// NUEVO MÉTODO DE BORRADO
+	deleteProduct(id: number): Observable<DeleteProductResponse> {
+		return this.http.delete<DeleteProductResponse>(`${this.baseUrl}/${id}`);
 	}
 }

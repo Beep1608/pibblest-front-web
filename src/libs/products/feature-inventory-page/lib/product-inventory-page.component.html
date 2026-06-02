@@ -1,19 +1,22 @@
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="menuList">
 	<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-		<label class="input w-full outline-0">
+		<label class="input w-full outline-0 flex items-center gap-2">
+			<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
 			<input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
 			<kbd class="kbd kbd-sm">Enter</kbd>
 		</label>
-		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">Buscar</button>
+		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">
+			<i class="fa-solid fa-search"></i> Buscar
+		</button>
 	</div>
 
 	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
 		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
 	</div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-[1fr_1fr_1fr] gap-6">
-		@for (product of product.filteredProducts(); track product.id) {
-			<app-product-preview-component [product]="product"></app-product-preview-component>
+	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+		@for (productItem of product.filteredProducts(); track productItem.id) {
+			<app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
 		}
 	</div>
 </div>

@@ -11,6 +11,7 @@ import { StoreMainPage } from "../../../../libs/stores/feature-main/src/lib/stor
 import { StoreStore } from "../../../../libs/stores/data-access";
 import { ProductInventoryPage } from "../../../../libs/products/feature-inventory-page/lib/product-inventory-page.component";
 import { ProductAdminInventoryPage } from "../../../../libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component";
+import { ProductsShellComponent } from "../../../../libs/products/feature-shell";
 
 @Component({
   selector: 'app-dashboard-owner-page',
@@ -23,7 +24,7 @@ import { ProductAdminInventoryPage } from "../../../../libs/products/feature-adm
     StoreMainPage,
     TranslatePipe,
     ProductInventoryPage,
-    ProductAdminInventoryPage
+    ProductsShellComponent
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css',

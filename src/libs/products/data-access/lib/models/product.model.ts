@@ -24,3 +24,42 @@ export interface ProductPageResponse{
     lats: boolean,
     products: Product[]
 }
+
+// NUEVAS INTERFACES AÑADIDAS
+export interface CreateProductRequest {
+    name: string;
+    sku: string;
+    barcode: string;
+    description: string;
+    brand: string;
+    basePrice: number;
+    cost: number;
+    quantity: number;
+}
+
+export interface CreateProductResponse {
+    id: number;
+    message: string;
+}
+
+// NUEVAS INTERFACES AÑADIDAS PARA EDICIÓN
+export interface UpdateProductRequest {
+    name: string;
+    sku: string;
+    barcode: string;
+    description: string;
+    brand: string;
+    basePrice: number;
+    cost: number;
+    quantity: number;
+}
+
+export interface UpdateProductResponse {
+    id: number;
+    message: string;
+}
+
+// NUEVA INTERFAZ PARA BORRADO
+export interface DeleteProductResponse {
+    message?: string;
+}

@@ -1,4 +1,4 @@
-This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
 
 <file_summary>
 This section contains a summary of this file.
@@ -32,8 +32,7 @@ The content is organized as follows:
 <notes>
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Only files matching these patterns are included: src/libs/products/**/*.{ts,html}
-- Files matching these patterns are excluded: **/*.spec.ts
+- Only files matching these patterns are included: src/libs/products/feature-info-page/**/*.{ts,html}, src/libs/products/**/*.{ts,html}
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -48,12 +47,18 @@ src/libs/products/data-access/lib/store/product.store.ts
 src/libs/products/feature-admin-inventory-page/index.ts
 src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.html
 src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.ts
+src/libs/products/feature-create-page/index.ts
+src/libs/products/feature-create-page/lib/product-create-page.component.html
+src/libs/products/feature-create-page/lib/product-create-page.component.ts
 src/libs/products/feature-info-page/index.ts
 src/libs/products/feature-info-page/lib/product-info-page.component.html
 src/libs/products/feature-info-page/lib/product-info-page.component.ts
 src/libs/products/feature-inventory-page/index.ts
 src/libs/products/feature-inventory-page/lib/product-inventory-page.component.html
 src/libs/products/feature-inventory-page/lib/product-inventory-page.component.ts
+src/libs/products/feature-shell/index.ts
+src/libs/products/feature-shell/lib/products-shell.component.html
+src/libs/products/feature-shell/lib/products-shell.component.ts
 src/libs/products/ui/src/index.ts
 src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html
 src/libs/products/ui/src/lib/product-preview-component/product-preview.component.ts
@@ -62,34 +67,197 @@ src/libs/products/ui/src/lib/product-preview-component/product-preview.component
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/libs/products/data-access/lib/services/product-api.service.ts">
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ProductPageResponse } from '../models/product.model';
+<file path="src/libs/products/feature-create-page/index.ts">
+export * from './lib/product-create-page.component';
+</file>
 
-@Injectable({
-	providedIn: 'root',
-})
-export class ProductApiService {
-	private http = inject(HttpClient);
-
-	private readonly baseUrl = 'http://localhost:8081/api/products';
-
-	getAllProducts(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
-		let params = new HttpParams();
-
-		if (keyword?.trim()) {
-			console.log('Llegó la keyword:', keyword);
-			// ¡IMPORTANTE: reasignar la variable!
-			params = params.set('keyword', keyword);
+<file path="src/libs/products/feature-create-page/lib/product-create-page.component.html">
+<div class="card bg-base-100 shadow-sm border border-base-200/50 max-w-4xl mx-auto mt-6">
+	<div class="card-body">
+		<h2 class="card-title text-2xl font-bold mb-6">
+			<i class="fa-solid fa-box-open mr-2"></i>
+			{{ 'admin.product.create.title' | translate }}
+		</h2>
+		
+		@if (product.isSuccess() && product.message()) {
+			<div class="alert alert-success mb-6">
+				<i class="fa-solid fa-circle-check"></i>
+				<span>{{ product.message() }}</span>
+			</div>
 		}
 
-		// Reasignar también aquí
-		params = params.set('page', page.toString());
-		params = params.set('size', size.toString());
+		@if (product.error()) {
+			<div class="alert alert-error mb-6">
+				<i class="fa-solid fa-circle-exclamation"></i>
+				<span>{{ product.error() }}</span>
+			</div>
+		}
 
-		return this.http.get<ProductPageResponse>(`${this.baseUrl}/${storeId.toString()}`, { params });
+		<form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.name' | translate }}</span></div>
+				<input type="text" formControlName="name" class="input input-bordered w-full" 
+					   [class.input-error]="productForm.controls.name.invalid && productForm.controls.name.touched" />
+			</label>
+
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.brand' | translate }}</span></div>
+				<input type="text" formControlName="brand" class="input input-bordered w-full" 
+					   [class.input-error]="productForm.controls.brand.invalid && productForm.controls.brand.touched" />
+			</label>
+
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.sku' | translate }}</span></div>
+				<input type="text" formControlName="sku" class="input input-bordered w-full" 
+					   [class.input-error]="productForm.controls.sku.invalid && productForm.controls.sku.touched" />
+			</label>
+
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.barcode' | translate }}</span></div>
+				<input type="text" formControlName="barcode" class="input input-bordered w-full" 
+					   [class.input-error]="productForm.controls.barcode.invalid && productForm.controls.barcode.touched" />
+			</label>
+
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.basePrice' | translate }}</span></div>
+				<label class="input input-bordered flex items-center gap-2" [class.input-error]="productForm.controls.basePrice.invalid && productForm.controls.basePrice.touched">
+					<i class="fa-solid fa-dollar-sign text-base-content/50"></i>
+					<input type="number" formControlName="basePrice" class="grow" />
+				</label>
+			</label>
+
+			<label class="form-control w-full">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.cost' | translate }}</span></div>
+				<label class="input input-bordered flex items-center gap-2" [class.input-error]="productForm.controls.cost.invalid && productForm.controls.cost.touched">
+					<i class="fa-solid fa-dollar-sign text-base-content/50"></i>
+					<input type="number" formControlName="cost" class="grow" />
+				</label>
+			</label>
+
+			<label class="form-control w-full md:col-span-2">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.quantity' | translate }}</span></div>
+				<input type="number" formControlName="quantity" class="input input-bordered w-full" 
+					   [class.input-error]="productForm.controls.quantity.invalid && productForm.controls.quantity.touched" />
+			</label>
+
+			<label class="form-control w-full md:col-span-2">
+				<div class="label"><span class="label-text">{{ 'admin.product.fields.description' | translate }}</span></div>
+				<textarea formControlName="description" class="textarea textarea-bordered h-24 w-full" 
+						  [class.textarea-error]="productForm.controls.description.invalid && productForm.controls.description.touched"></textarea>
+			</label>
+
+			<div class="md:col-span-2 flex justify-end gap-3 mt-4">
+				<button type="button" class="btn btn-ghost" (click)="goBack()">
+					<i class="fa-solid fa-arrow-left mr-1"></i>
+					{{ 'admin.product.create.cancel' | translate }}
+				</button>
+				<button type="submit" class="btn btn-primary" [disabled]="product.isLoading()">
+					@if (product.isLoading()) {
+						<span class="loading loading-spinner"></span>
+					} @else {
+						<i class="fa-solid fa-save mr-1"></i>
+						{{ 'admin.product.create.submit' | translate }}
+					}
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+</file>
+
+<file path="src/libs/products/feature-create-page/lib/product-create-page.component.ts">
+import { Component, inject } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { TranslatePipe } from "@ngx-translate/core";
+import { ProductStore } from "../../data-access/lib/store/product.store";
+
+@Component({
+	selector: 'app-product-create-page',
+	imports: [ReactiveFormsModule, TranslatePipe],
+	templateUrl: './product-create-page.component.html'
+})
+export class ProductCreatePageComponent {
+	private fb = inject(FormBuilder);
+	product = inject(ProductStore);
+
+	productForm = this.fb.nonNullable.group({
+		name: ['', [Validators.required]],
+		sku: ['', [Validators.required]],
+		barcode: ['', [Validators.required]],
+		brand: ['', [Validators.required]],
+		basePrice: [0, [Validators.required, Validators.min(0)]],
+		cost: [0, [Validators.required, Validators.min(0)]],
+		quantity: [0, [Validators.required, Validators.min(0)]],
+		description: ['', [Validators.required]]
+	});
+
+	onSubmit() {
+		if (this.productForm.valid) {
+			this.product.addProduct(this.productForm.getRawValue());
+		} else {
+			this.productForm.markAllAsTouched();
+		}
+	}
+
+	goBack() {
+		// Regresamos al inventario de admin usando el store interno
+		this.product.setProductView('admin-inventory');
+	}
+}
+</file>
+
+<file path="src/libs/products/feature-shell/index.ts">
+export * from './lib/products-shell.component';
+</file>
+
+<file path="src/libs/products/feature-shell/lib/products-shell.component.html">
+<div class="products-module-shell w-full h-full">
+	@switch (product.currentView()) {
+		@case ('admin-inventory') {
+			<app-product-admin-inventory-page></app-product-admin-inventory-page>
+		}
+		@case ('create') {
+			<app-product-create-page></app-product-create-page>
+		}
+		@case ('inventory') {
+			<app-product-invetory-page></app-product-invetory-page>
+		}
+		@case ('info') {
+			<app-product-info-page></app-product-info-page>
+		}
+		@default {
+			<app-product-admin-inventory-page></app-product-admin-inventory-page>
+		}
+	}
+</div>
+</file>
+
+<file path="src/libs/products/feature-shell/lib/products-shell.component.ts">
+import { Component, inject, OnInit } from '@angular/core';
+import { ProductStore } from '../../data-access/lib/store/product.store';
+import { ProductAdminInventoryPage } from '../../feature-admin-inventory-page/lib/product-admin-inventory-page.component';
+import { ProductCreatePageComponent } from '../../feature-create-page/lib/product-create-page.component';
+import { ProductInventoryPage } from '../../feature-inventory-page/lib/product-inventory-page.component';
+import { ProductInfoPage } from '../../feature-info-page/lib/product-info-page.component';
+
+@Component({
+	selector: 'app-products-shell',
+	imports: [
+		ProductAdminInventoryPage,
+		ProductCreatePageComponent,
+		ProductInventoryPage,
+		ProductInfoPage
+	],
+	templateUrl: './products-shell.component.html'
+})
+export class ProductsShellComponent implements OnInit {
+	product = inject(ProductStore);
+
+	ngOnInit() {
+		// NOTA: Aquí se podría inyectar el store de autenticación/roles
+		// para definir la vista por defecto:
+		// if (auth.isEmployee()) { this.product.setProductView('inventory'); }
 	}
 }
 </file>
@@ -98,56 +266,181 @@ export class ProductApiService {
 
 </file>
 
-<file path="src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.html">
-
-</file>
-
-<file path="src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.ts">
-import { Component, inject, OnInit } from "@angular/core";
-import { TagStore } from "../../../tags/data-access/store/tag.store";
-import { ProductStore } from "../../data-access/lib/store/product.store";
-
-@Component({
-    selector:'app-product-admin-inventory-page',
-    imports:[],
-    templateUrl:'./product-admin-inventory-page.component.html'
-})
-export class ProductAdminInvertoryPage implements OnInit{
-    tag = inject(TagStore);
-    product = inject(ProductStore);
-
-    ngOnInit(){
-        //llamar al endpoint de busqueda
-    }
-
-    searchAsAdmin(keword: stirng){
-        //busqueda de admin
-    }
-    
-}
-</file>
-
 <file path="src/libs/products/feature-info-page/index.ts">
-
+export * from './lib/product-info-page.component';
 </file>
 
 <file path="src/libs/products/feature-info-page/lib/product-info-page.component.html">
+<div class="card bg-base-100 shadow-sm border border-base-200/50 max-w-4xl mx-auto mt-6">
+	<div class="card-body">
+		<h2 class="card-title text-2xl font-bold mb-6">
+			<i class="fa-solid fa-pen-to-square mr-2"></i>
+			{{ 'admin.product.edit.title' | translate }}
+		</h2>
+		
+		@if (productStore.isSuccess() && productStore.message()) {
+			<div class="alert alert-success mb-6">
+				<i class="fa-solid fa-circle-check"></i>
+				<span>{{ productStore.message() }}</span>
+			</div>
+		}
 
+		@if (productStore.error()) {
+			<div class="alert alert-error mb-6">
+				<i class="fa-solid fa-circle-exclamation"></i>
+				<span>{{ productStore.error() }}</span>
+			</div>
+		}
+
+		@if (productStore.isLoading() && !productStore.selectedProduct()) {
+			<div class="flex justify-center items-center py-12">
+				<span class="loading loading-spinner loading-lg text-primary"></span>
+			</div>
+		} @else {
+			<form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.name' | translate }}</span></div>
+					<input type="text" formControlName="name" class="input input-bordered w-full" 
+						   [class.input-error]="productForm.controls.name.invalid && productForm.controls.name.touched" />
+				</label>
+
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.brand' | translate }}</span></div>
+					<input type="text" formControlName="brand" class="input input-bordered w-full" 
+						   [class.input-error]="productForm.controls.brand.invalid && productForm.controls.brand.touched" />
+				</label>
+
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.sku' | translate }}</span></div>
+					<input type="text" formControlName="sku" class="input input-bordered w-full" 
+						   [class.input-error]="productForm.controls.sku.invalid && productForm.controls.sku.touched" />
+				</label>
+
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.barcode' | translate }}</span></div>
+					<input type="text" formControlName="barcode" class="input input-bordered w-full" 
+						   [class.input-error]="productForm.controls.barcode.invalid && productForm.controls.barcode.touched" />
+				</label>
+
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.basePrice' | translate }}</span></div>
+					<label class="input input-bordered flex items-center gap-2" [class.input-error]="productForm.controls.basePrice.invalid && productForm.controls.basePrice.touched">
+						<i class="fa-solid fa-dollar-sign text-base-content/50"></i>
+						<input type="number" formControlName="basePrice" class="grow" />
+					</label>
+				</label>
+
+				<label class="form-control w-full">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.cost' | translate }}</span></div>
+					<label class="input input-bordered flex items-center gap-2" [class.input-error]="productForm.controls.cost.invalid && productForm.controls.cost.touched">
+						<i class="fa-solid fa-dollar-sign text-base-content/50"></i>
+						<input type="number" formControlName="cost" class="grow" />
+					</label>
+				</label>
+
+				<label class="form-control w-full md:col-span-2">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.quantity' | translate }}</span></div>
+					<input type="number" formControlName="quantity" class="input input-bordered w-full" 
+						   [class.input-error]="productForm.controls.quantity.invalid && productForm.controls.quantity.touched" />
+				</label>
+
+				<label class="form-control w-full md:col-span-2">
+					<div class="label"><span class="label-text">{{ 'admin.product.fields.description' | translate }}</span></div>
+					<textarea formControlName="description" class="textarea textarea-bordered h-24 w-full" 
+							  [class.textarea-error]="productForm.controls.description.invalid && productForm.controls.description.touched"></textarea>
+				</label>
+
+				<div class="md:col-span-2 flex justify-end gap-3 mt-4">
+					<button type="button" class="btn btn-ghost" (click)="goBack()">
+						<i class="fa-solid fa-arrow-left mr-1"></i>
+						{{ 'admin.product.create.cancel' | translate }}
+					</button>
+					<button type="submit" class="btn btn-primary" [disabled]="productStore.isLoading()">
+						@if (productStore.isLoading()) {
+							<span class="loading loading-spinner"></span>
+						} @else {
+							<i class="fa-solid fa-save mr-1"></i>
+							{{ 'admin.product.edit.submit' | translate }}
+						}
+					</button>
+				</div>
+			</form>
+		}
+	</div>
+</div>
 </file>
 
 <file path="src/libs/products/feature-info-page/lib/product-info-page.component.ts">
-import { Component } from "@angular/core";
-
-
+import { Component, effect, inject, OnInit } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { TranslatePipe } from "@ngx-translate/core";
+import { ProductStore } from "../../data-access/lib/store/product.store";
 
 @Component({
-    selector:'app-product-info-page',
-    imports:[],
-    templateUrl:'./product-info-page.component.html'
+	selector: 'app-product-info-page',
+	imports: [ReactiveFormsModule, TranslatePipe],
+	templateUrl: './product-info-page.component.html'
 })
+export class ProductInfoPage implements OnInit {
+	private fb = inject(FormBuilder);
+	productStore = inject(ProductStore);
 
-export class ProductInfoPage{
-    
+	productForm = this.fb.nonNullable.group({
+		name: ['', [Validators.required]],
+		sku: ['', [Validators.required]],
+		barcode: ['', [Validators.required]],
+		brand: ['', [Validators.required]],
+		basePrice: [0, [Validators.required, Validators.min(0)]],
+		cost: [0, [Validators.required, Validators.min(0)]],
+		quantity: [0, [Validators.required, Validators.min(0)]],
+		description: ['', [Validators.required]]
+	});
+
+	constructor() {
+		// Inicializa el formulario cuando el store obtenga el producto seleccionado
+		effect(() => {
+			const product = this.productStore.selectedProduct();
+			if (product) {
+				this.productForm.patchValue({
+					name: product.name,
+					sku: product.sku,
+					barcode: product.barcode,
+					brand: product.brand,
+					basePrice: product.basePrice,
+					cost: product.cost,
+					quantity: product.quantity, 
+					description: product.description
+				});
+			}
+		});
+	}
+
+	ngOnInit() {
+		const id = this.productStore.selectedProductId();
+		if (id) {
+			this.productStore.loadProductDetails(id);
+		} else {
+			// Si el usuario recargó o entró por error y no hay ID, vuelve al listado
+			this.goBack();
+		}
+	}
+
+	onSubmit() {
+		if (this.productForm.valid) {
+			const id = this.productStore.selectedProductId();
+			if (id) {
+				this.productStore.updateProduct({ id, request: this.productForm.getRawValue() });
+			}
+		} else {
+			this.productForm.markAllAsTouched();
+		}
+	}
+
+	goBack() {
+		this.productStore.setSelectedProductId(null);
+		this.productStore.setProductView('admin-inventory');
+	}
 }
 </file>
 
@@ -158,20 +451,23 @@ export class ProductInfoPage{
 <file path="src/libs/products/feature-inventory-page/lib/product-inventory-page.component.html">
 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="menuList">
 	<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-		<label class="input w-full outline-0">
+		<label class="input w-full outline-0 flex items-center gap-2">
+			<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
 			<input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" placeholder="Search" />
 			<kbd class="kbd kbd-sm">Enter</kbd>
 		</label>
-		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">Buscar</button>
+		<button class="btn btn-neutral" (click)="onSearch(searchInput.value)">
+			<i class="fa-solid fa-search"></i> Buscar
+		</button>
 	</div>
 
 	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
 		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
 	</div>
 
-	<div class="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-[1fr_1fr_1fr] gap-6">
-		@for (product of product.filteredProducts(); track product.id) {
-			<app-product-preview-component [product]="product"></app-product-preview-component>
+	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+		@for (productItem of product.filteredProducts(); track productItem.id) {
+			<app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
 		}
 	</div>
 </div>
@@ -182,60 +478,74 @@ export class ProductInfoPage{
 </file>
 
 <file path="src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html">
-<div class="card bg-base-100 w-96 shadow-sm h-full">
+<div class="card bg-base-100 w-96 shadow-sm h-full flex flex-col">
 	<figure>
 		<img
-			class="object-cover w-full h-full"
+			class="object-cover w-full h-48"
 			[src]="`https://placehold.co/400x300/e2e8f0/64748b?text=${product().name}`"
 			[alt]="product().name"
 		/>
 	</figure>
-	<div class="card-body">
+	<div class="card-body flex-grow flex flex-col">
 		<h2 class="card-title">{{ product().name }}</h2>
-		<span class="text-xl">$ {{ product().basePrice }}</span>
-		<div class="flex space-x-2">
-			<div class="flex gap-1.5">
-				<span class="label">{{ 'inventory.product.brand' | translate }}:</span>
+		<span class="text-xl font-bold text-primary">$ {{ product().basePrice }}</span>
+		
+		<div class="flex flex-col space-y-1 mb-2">
+			<div class="flex gap-1.5 text-sm">
+				<span class="font-semibold text-base-content/70">{{ 'inventory.product.brand' | translate }}:</span>
 				<span>{{ product().brand }}</span>
 			</div>
-			<div class="flex gap-1.5">
-				<span class="label">{{ 'inventory.product.barcode' | translate }}:</span>
+			<div class="flex gap-1.5 text-sm">
+				<span class="font-semibold text-base-content/70">{{ 'inventory.product.barcode' | translate }}:</span>
 				<span>{{ product().barcode }}</span>
 			</div>
 		</div>
-		<div>
-			<span class="label line-clamp-3 text-sm">{{ product().description }}</span>
-			<div class="flex items-center gap-2">
-				<progress class="progress progress-secondary w-56" value="{{product().currentQuantity}}" max="{{product().desiredQuantity}}"></progress>
-				<span class="label">{{product().currentQuantity}}/{{product().desiredQuantity}}</span>	
-			</div>
+		
+		<div class="mb-4">
+			<span class="line-clamp-3 text-sm text-base-content/80 mb-3">{{ product().description }}</span>
 			
+			@if (product().currentQuantity !== undefined && product().desiredQuantity !== undefined) {
+				<div class="flex items-center gap-3">
+					<progress class="progress progress-secondary w-full" value="{{product().currentQuantity}}" max="{{product().desiredQuantity}}"></progress>
+					<span class="text-xs font-medium whitespace-nowrap">{{product().currentQuantity}}/{{product().desiredQuantity}}</span>	
+				</div>
+			} @else {
+				<div class="mt-2">
+					<div class="badge badge-neutral badge-sm">
+						<i class="fa-solid fa-globe mr-1.5"></i>
+						{{ 'inventory.product.global' | translate }}
+					</div>
+				</div>
+			}
 		</div>
 
-		<div class="card-actions justify-end">
+		<div class="flex flex-wrap gap-1 mb-4 mt-auto">
 			@if (product().tags) {
 				@for (tag of product().tags; track $index) {
-					@if ($index < 5) {
-						<div class="badge badge-outline badge-primary">{{ tag.name }}</div>
+					@if ($index < 4) {
+						<div class="badge badge-outline badge-primary text-xs">{{ tag.name }}</div>
 					}
 				}
-				@if (product().tags.length) {
-					<div class="badge badge-outline">...</div>
+				@if (product().tags.length > 4) {
+					<div class="badge badge-outline text-xs">...</div>
 				}
 			}
 		</div>
 
-		<div class="card-actions justify-end mt-auto">
-			@if (store.selectedSubMenu() === 'products') {
-				<button class="btn btn-primary" (click)="store.setView('product-info')">
-					{{ 'inventory.product.edit' | translate }}
-				</button>
-			}
-
-			@if (store.selectedSubMenu() === 'sale') {
-				<button class="btn btn-primary" (click)="cart.addToCart(product())">
-					{{ 'inventory.sale.add.cart' | translate }}
-				</button>
+		<div class="card-actions justify-end border-t border-base-200 pt-4">
+			@switch (viewMode()) {
+				@case ('admin') {
+					<button class="btn btn-primary w-full" (click)="goToEdit()">
+						<i class="fa-solid fa-pen mr-1"></i>
+						{{ 'inventory.product.edit' | translate }}
+					</button>
+				}
+				@case ('employee') {
+					<button class="btn btn-secondary w-full" (click)="cart.addToCart(product())">
+						<i class="fa-solid fa-cart-plus mr-1"></i>
+						{{ 'inventory.sale.add.cart' | translate }}
+					</button>
+				}
 			}
 		</div>
 	</div>
@@ -245,22 +555,29 @@ export class ProductInfoPage{
 <file path="src/libs/products/ui/src/lib/product-preview-component/product-preview.component.ts">
 import { Component, inject, input } from "@angular/core";
 import { Product } from "../../../../data-access/lib/models/product.model";
-import { StoreStore } from "../../../../../stores/data-access";
 import { TranslatePipe } from "@ngx-translate/core";
 import { SaleStore } from "../../../../../sales/data-access";
 import { CartStore } from "../../../../../cart/data-access/lib/store/cart.store";
+import { ProductStore } from "../../../../data-access/lib/store/product.store";
 
 @Component({
-    selector:'app-product-preview-component',
-    imports:[TranslatePipe],
-    templateUrl:'./product-preview.component.html'
+	selector:'app-product-preview-component',
+	imports:[TranslatePipe],
+	templateUrl:'./product-preview.component.html'
 })
-export class ProductPreviewComponent{
-    product  = input.required<Product>();
-    store = inject(StoreStore);
-    sale = inject(SaleStore);
-    cart = inject(CartStore);
+export class ProductPreviewComponent {
+	product = input.required<Product>();
+	viewMode = input<'admin' | 'employee'>('employee'); 
+	
+	sale = inject(SaleStore);
+	cart = inject(CartStore);
+	productStore = inject(ProductStore);
 
+	// NUEVO MÉTODO: Setea el ID en el store antes de navegar
+	goToEdit() {
+		this.productStore.setSelectedProductId(this.product().id);
+		this.productStore.setProductView('info');
+	}
 }
 </file>
 
@@ -290,6 +607,189 @@ export interface ProductPageResponse{
     totalPages: number,
     lats: boolean,
     products: Product[]
+}
+
+// NUEVAS INTERFACES AÑADIDAS
+export interface CreateProductRequest {
+    name: string;
+    sku: string;
+    barcode: string;
+    description: string;
+    brand: string;
+    basePrice: number;
+    cost: number;
+    quantity: number;
+}
+
+export interface CreateProductResponse {
+    id: number;
+    message: string;
+}
+
+// NUEVAS INTERFACES AÑADIDAS PARA EDICIÓN
+export interface UpdateProductRequest {
+    name: string;
+    sku: string;
+    barcode: string;
+    description: string;
+    brand: string;
+    basePrice: number;
+    cost: number;
+    quantity: number;
+}
+
+export interface UpdateProductResponse {
+    id: number;
+    message: string;
+}
+</file>
+
+<file path="src/libs/products/data-access/lib/services/product-api.service.ts">
+// src/libs/products/data-access/lib/services/product-api.service.ts
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { 
+    CreateProductRequest, 
+    CreateProductResponse, 
+    Product, 
+    ProductPageResponse, 
+    UpdateProductRequest, 
+    UpdateProductResponse 
+} from '../models/product.model';
+
+@Injectable({
+	providedIn: 'root',
+})
+export class ProductApiService {
+	private http = inject(HttpClient);
+
+	private readonly baseUrl = 'http://localhost:8081/api/products';
+
+	getAllProducts(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
+		let params = new HttpParams();
+
+		if (keyword?.trim()) {
+			console.log('Llegó la keyword:', keyword);
+			// ¡IMPORTANTE: reasignar la variable!
+			params = params.set('keyword', keyword);
+		}
+
+		// Reasignar también aquí
+		params = params.set('page', page.toString());
+		params = params.set('size', size.toString());
+
+		return this.http.get<ProductPageResponse>(`${this.baseUrl}/${storeId.toString()}`, { params });
+	}
+
+	getUniverseProducts(keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
+		let params = new HttpParams();
+
+		if (keyword?.trim()) {
+			params = params.set('keyword', keyword);
+		}
+
+		params = params.set('page', page.toString());
+		params = params.set('size', size.toString());
+
+		// Apuntamos al endpoint global /api/products/all según el controlador backend
+		return this.http.get<ProductPageResponse>(`${this.baseUrl}/all`, { params });
+	}
+
+	// NUEVO MÉTODO: POST para crear un producto
+	createProduct(request: CreateProductRequest): Observable<CreateProductResponse> {
+		return this.http.post<CreateProductResponse>(this.baseUrl, request);
+	}
+
+	// NUEVOS MÉTODOS DE EDICIÓN
+	getProductById(id: number): Observable<Product> {
+		return this.http.get<Product>(`${this.baseUrl}/detail/${id}`);
+	}
+
+	editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
+		return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
+	}
+}
+</file>
+
+<file path="src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.html">
+<div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="adminMenuList">
+	<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
+		<div class="flex w-full lg:w-auto grow gap-2">
+			<label class="input w-full outline-0 flex items-center gap-2">
+				<i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+				<input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
+				<kbd class="kbd kbd-sm">Enter</kbd>
+			</label>
+			<button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
+				<i class="fa-solid fa-search"></i>
+				{{ 'admin.inventory.search.button' | translate }}
+			</button>
+		</div>
+		
+		<button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
+			<i class="fa-solid fa-plus"></i>
+			{{ 'admin.inventory.actions.new' | translate }}
+		</button>
+	</div>
+
+	<div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
+		<app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+	</div>
+
+	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+		@for (productItem of product.filteredProducts(); track productItem.id) {
+			<app-product-preview-component [product]="productItem" [viewMode]="'admin'"></app-product-preview-component>
+		} @empty {
+			<div class="col-span-full flex flex-col items-center justify-center p-12 text-base-content/50">
+				<i class="fa-solid fa-box-open text-6xl mb-4"></i>
+				<p class="text-xl">{{ 'admin.inventory.empty' | translate }}</p>
+			</div>
+		}
+	</div>
+</div>
+</file>
+
+<file path="src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.ts">
+// src/libs/products/feature-admin-inventory-page/lib/product-admin-inventory-page.component.ts
+import { Component, inject, OnInit } from "@angular/core";
+import { TagStore } from "../../../tags/data-access/store/tag.store";
+import { ProductStore } from "../../data-access/lib/store/product.store";
+import { ProductPreviewComponent } from "../../ui/src/lib/product-preview-component/product-preview.component";
+import { TagButtonsComponent } from "../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component";
+import { TranslatePipe } from "@ngx-translate/core";
+
+@Component({
+	selector: 'app-product-admin-inventory-page',
+	imports: [ProductPreviewComponent, TagButtonsComponent, TranslatePipe],
+	templateUrl: './product-admin-inventory-page.component.html'
+})
+export class ProductAdminInventoryPage implements OnInit {
+	tag = inject(TagStore);
+	product = inject(ProductStore);
+
+	lastKeyword = '';
+
+	ngOnInit() {
+		this.product.getGlobalProducts(null);
+	}
+
+	searchAsAdmin(keyword: string) {
+		const cleanKeyword = keyword.trim();
+
+		if (cleanKeyword === this.lastKeyword) {
+			return;
+		}
+
+		this.lastKeyword = cleanKeyword;
+		
+		this.product.getGlobalProducts(cleanKeyword);
+	}
+
+	navigateToCreate() {
+		// Usamos el estado del módulo en vez del global
+		this.product.setProductView('create');
+	}
 }
 </file>
 
@@ -327,15 +827,17 @@ export class ProductInventoryPage {
 </file>
 
 <file path="src/libs/products/data-access/lib/store/product.store.ts">
+// src/libs/products/data-access/lib/store/product.store.ts
 import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import { StoreStore } from '../../../../stores/data-access';
-import { ProductPageResponse } from '../models/product.model';
+import { exhaustMap, pipe, switchMap, tap } from 'rxjs';
+import { CreateProductRequest, Product, ProductPageResponse, UpdateProductRequest } from '../models/product.model';
 import { ProductApiService } from '../services/product-api.service';
 import { CartItem } from '../../../../cart/data-access/lib/models/cart.model';
+
+export type ProductView = 'admin-inventory' | 'inventory' | 'create' | 'info' | 'edit';
 
 interface ProductState {
 	isLoading: boolean;
@@ -343,7 +845,10 @@ interface ProductState {
 	isSuccess: boolean;
 	message: string | null;
 	productsPage: ProductPageResponse | null;
-	activeTagIds: number[]; 
+	activeTagIds: number[];
+	currentView: ProductView;
+	selectedProductId: number | null; // NUEVO: Contexto de selección
+	selectedProduct: Product | null;  // NUEVO: Detalle del producto a editar
 }
 
 const initialState: ProductState = {
@@ -353,6 +858,9 @@ const initialState: ProductState = {
 	message: null,
 	productsPage: null,
 	activeTagIds: [],
+	currentView: 'admin-inventory',
+	selectedProductId: null,
+	selectedProduct: null
 };
 
 export const ProductStore = signalStore(
@@ -373,6 +881,50 @@ export const ProductStore = signalStore(
 		}),
 	})),
 	withMethods((product, api = inject(ProductApiService)) => ({
+		
+		setProductView: (view: ProductView) => {
+			patchState(product, { currentView: view });
+		},
+
+		// NUEVO MÉTODO: Mutación inmutable de la selección de producto
+		setSelectedProductId: (id: number | null) => {
+			patchState(product, { selectedProductId: id });
+		},
+
+		// NUEVO MÉTODO: Cargar detalle del producto seleccionado
+		loadProductDetails: rxMethod<number>(
+			pipe(
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, selectedProduct: null })),
+				switchMap((id) => api.getProductById(id).pipe(
+					tapResponse({
+						next: (res) => patchState(product, { isLoading: false, selectedProduct: res }),
+						error: (err: any) => patchState(product, { isLoading: false, error: err.message || 'Error al cargar detalles' })
+					})
+				))
+			)
+		),
+
+		// NUEVO MÉTODO: Actualizar producto existente
+		updateProduct: rxMethod<{id: number, request: UpdateProductRequest}>(
+			pipe(
+				tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })),
+				exhaustMap(({id, request}) => api.editProduct(id, request).pipe(
+					tapResponse({
+						next: (res) => patchState(product, {
+							isLoading: false,
+							isSuccess: true,
+							message: res.message || 'Producto actualizado correctamente'
+						}),
+						error: (err: any) => patchState(product, {
+							isLoading: false,
+							isSuccess: false,
+							error: err.error?.message || err.message || 'Error al actualizar el producto'
+						})
+					})
+				))
+			)
+		),
+
 		getAllProducts: rxMethod<string | null>(
 			pipe(
 				tap(() =>
@@ -383,37 +935,69 @@ export const ProductStore = signalStore(
 					}),
 				),
 				switchMap((keyword, storeId: number) => {
-					
 					return api.getAllProducts(storeId, keyword).pipe(
 						tapResponse({
 							next: response => {
-								patchState(product, {
-									isLoading: false,
-									isSuccess: true,
-									productsPage: response,
-								});
-								console.log('respuesta');
-								console.log(response);
+								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
 							},
 							error: (errr: any) => {
-								console.log('error');
-								patchState(product, {
-									isLoading: false,
-									isSuccess: false,
-									error: errr.message || 'Hay un error nihao',
-								});
+								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error de conexión' });
 							},
 						}),
 					);
 				}),
 			),
 		),
+
+		getGlobalProducts: rxMethod<string | null>(
+			pipe(
+				tap(() =>
+					patchState(product, {
+						isLoading: true,
+						error: null,
+						isSuccess: false,
+					}),
+				),
+				switchMap((keyword) => {
+					return api.getUniverseProducts(keyword).pipe(
+						tapResponse({
+							next: response => {
+								patchState(product, { isLoading: false, isSuccess: true, productsPage: response });
+							},
+							error: (errr: any) => {
+								patchState(product, { isLoading: false, isSuccess: false, error: errr.message || 'Error al cargar' });
+							},
+						}),
+					);
+				}),
+			),
+		),
+
+		addProduct: rxMethod<CreateProductRequest>(
+			pipe(
+				tap(() =>
+					patchState(product, { isLoading: true, error: null, isSuccess: false, message: null })
+				),
+				exhaustMap((request) => {
+					return api.createProduct(request).pipe(
+						tapResponse({
+							next: (response) => {
+								patchState(product, { isLoading: false, isSuccess: true, message: response.message || 'Creado' });
+							},
+							error: (err: any) => {
+								patchState(product, { isLoading: false, isSuccess: false, error: err.error?.message || err.message });
+							}
+						})
+					);
+				})
+			)
+		),
+
 		setActiveTags: (tagIds: number[]) => {
 			patchState(product, { activeTagIds: tagIds });
 		},
 
 		reduceStockLocally: (soldItems: CartItem[]) => {
-			console.log(soldItems);
 			patchState(product, state => {
 				if (!state.productsPage) return state;
 				const updatedProducts = state.productsPage.products.map(product => {
@@ -423,9 +1007,7 @@ export const ProductStore = signalStore(
 					}
 					return product;
 				});
-				return {
-					productsPage: { ...state.productsPage, products: updatedProducts },
-				};
+				return { productsPage: { ...state.productsPage, products: updatedProducts } };
 			});
 		},
 	})),

@@ -1,0 +1,19 @@
+<div class="products-module-shell w-full h-full">
+	@switch (product.currentView()) {
+		@case ('admin-inventory') {
+			<app-product-admin-inventory-page></app-product-admin-inventory-page>
+		}
+		@case ('create') {
+			<app-product-create-page></app-product-create-page>
+		}
+		@case ('inventory') {
+			<app-product-invetory-page></app-product-invetory-page>
+		}
+		@case ('info') {
+			<app-product-info-page></app-product-info-page>
+		}
+		@default {
+			<app-product-admin-inventory-page></app-product-admin-inventory-page>
+		}
+	}
+</div>

@@ -37,7 +37,7 @@ Actúa como un desarrollador Frontend Senior experto en Angular 21, NgRx SignalS
 **TAREA DE ANÁLISIS FRONTEND (FASE 1)**
 
 A continuación, te proporcionaré el código del módulo frontend extraído con repomix. 
-Tu objetivo es revisar este código buscando específicamente: **[Elige uno: Fugas de memoria en suscripciones / Problemas de reactividad con Signals / Acoplamiento indebido en Dumb Components / Errores de UI o accesibilidad]**.
+Tu objetivo es revisar este código buscando para implementar o mejorar específicamente: **[Elige uno: Fugas de memoria en suscripciones / Problemas de reactividad con Signals / Acoplamiento indebido en Dumb Components / Errores de UI o accesibilidad]**.
 
 REGLAS DE EJECUCIÓN PARA ESTA FASE:
 1. NO GENERES CÓDIGO HTML NI TYPESCRIPT COMPLETO.
