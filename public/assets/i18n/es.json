@@ -54,6 +54,8 @@
 	"admin.product.fields.cost": "Costo",
 	"admin.product.fields.quantity": "Cantidad Inicial",
 	"admin.product.fields.description": "Descripción",
+	"admin.product.fields.tags": "Etiquetas del Producto",
+	"admin.product.fields.tags.hint": "Mantén presionado Ctrl (o Cmd en Mac) para seleccionar múltiples etiquetas.",
 	"admin.inventory.actions.new": "Nuevo Producto",
 	"admin.inventory.actions.title": "Acciones",
 	"admin.product.create.cancel": "Cancelar",

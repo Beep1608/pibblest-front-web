@@ -1,7 +1,9 @@
+// src/libs/products/feature-info-page/lib/product-info-page.component.ts
 import { Component, effect, inject, OnInit } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ProductStore } from "../../data-access/lib/store/product.store";
+import { TagStore } from "../../../tags/data-access/store/tag.store";
 
 @Component({
 	selector: 'app-product-info-page',
@@ -11,6 +13,7 @@ import { ProductStore } from "../../data-access/lib/store/product.store";
 export class ProductInfoPage implements OnInit {
 	private fb = inject(FormBuilder);
 	productStore = inject(ProductStore);
+	tagStore = inject(TagStore);
 
 	productForm = this.fb.nonNullable.group({
 		name: ['', [Validators.required]],
@@ -20,11 +23,11 @@ export class ProductInfoPage implements OnInit {
 		basePrice: [0, [Validators.required, Validators.min(0)]],
 		cost: [0, [Validators.required, Validators.min(0)]],
 		quantity: [0, [Validators.required, Validators.min(0)]],
-		description: ['', [Validators.required]]
+		description: ['', [Validators.required]],
+		tagsId: [[] as number[]]
 	});
 
 	constructor() {
-		// Inicializa el formulario cuando el store obtenga el producto seleccionado
 		effect(() => {
 			const product = this.productStore.selectedProduct();
 			if (product) {
@@ -36,12 +39,12 @@ export class ProductInfoPage implements OnInit {
 					basePrice: product.basePrice,
 					cost: product.cost,
 					quantity: product.quantity, 
-					description: product.description
+					description: product.description,
+					tagsId: product.tags ? product.tags.map(t => t.id) : []
 				});
 			}
 		});
 
-		// Redirección reactiva al confirmar el éxito de la operación
 		effect(() => {
 			if (this.productStore.isSuccess()) {
 				setTimeout(() => {
@@ -52,12 +55,21 @@ export class ProductInfoPage implements OnInit {
 	}
 
 	ngOnInit() {
+		this.tagStore.loadProductTags();
+		
 		const id = this.productStore.selectedProductId();
 		if (id) {
 			this.productStore.loadProductDetails(id);
 		} else {
 			this.goBack();
 		}
+	}
+
+	onTagsChange(event: Event) {
+		const selectElement = event.target as HTMLSelectElement;
+		const selectedOptions = Array.from(selectElement.selectedOptions);
+		const selectedIds = selectedOptions.map(option => Number(option.value));
+		this.productForm.controls.tagsId.setValue(selectedIds);
 	}
 
 	onSubmit() {

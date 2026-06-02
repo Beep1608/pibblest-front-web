@@ -11,3 +11,12 @@ export interface TagPageResponse {
   totalElements: number;
   totalPages: number;
 }
+
+export interface TagForProductDto {
+    name: string;
+    id: number;
+}
+
+export interface GetAllProductTagsListResponse {
+    tags: TagForProductDto[];
+}

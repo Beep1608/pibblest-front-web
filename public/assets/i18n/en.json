@@ -55,6 +55,8 @@
 	"admin.product.fields.cost": "Cost",
 	"admin.product.fields.quantity": "Initial Quantity",
 	"admin.product.fields.description": "Description",
+	"admin.product.fields.tags": "Product Tags",
+	"admin.product.fields.tags.hint": "Hold down Ctrl (or Cmd on Mac) to select multiple tags.",
 	"admin.inventory.actions.new": "New Product",
 	"admin.inventory.actions.title": "Actions",
 	"admin.product.create.cancel": "Cancel",

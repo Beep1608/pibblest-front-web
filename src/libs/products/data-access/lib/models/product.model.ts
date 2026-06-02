@@ -33,6 +33,7 @@ export interface CreateProductRequest {
     basePrice: number;
     cost: number;
     quantity: number;
+    tagsId: number[]; // NUEVA PROPIEDAD
 }
 
 export interface CreateProductResponse {
@@ -49,6 +50,7 @@ export interface UpdateProductRequest {
     basePrice: number;
     cost: number;
     quantity: number;
+    tagsId: number[]; // NUEVA PROPIEDAD
 }
 
 export interface UpdateProductResponse {
