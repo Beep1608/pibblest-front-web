@@ -1,6 +1,8 @@
+// src/libs/tags/data-access/models/tag.model.ts
 export interface Tag {
-  name: string;
   id: number;
+  name: string;
+  usageCount: number;
 }
 
 export interface TagPageResponse {
@@ -12,11 +14,6 @@ export interface TagPageResponse {
   totalPages: number;
 }
 
-export interface TagForProductDto {
-    name: string;
-    id: number;
-}
-
-export interface GetAllProductTagsListResponse {
-    tags: TagForProductDto[];
+export interface CreateTagRequest {
+  name: string;
 }

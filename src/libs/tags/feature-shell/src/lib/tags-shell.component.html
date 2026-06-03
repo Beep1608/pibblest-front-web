@@ -1,0 +1,17 @@
+<!-- src/libs/tags/feature-shell/src/lib/tags-shell.component.html -->
+<div class="w-full h-full">
+  @switch (tagStore.currentView()) {
+    @case ('list') {
+      <app-tags-list-page></app-tags-list-page>
+    }
+    @case ('create') {
+      <app-tags-form-page></app-tags-form-page>
+    }
+    @case ('edit') {
+      <app-tags-form-page></app-tags-form-page>
+    }
+    @default {
+      <app-tags-list-page></app-tags-list-page>
+    }
+  }
+</div>

@@ -1,0 +1,74 @@
+<!-- src/libs/tags/ui/src/lib/tag-table/tag-table.component.html -->
+<div class="overflow-x-auto bg-base-100 rounded-box shadow-sm border border-base-200/50">
+  <table class="table table-zebra w-full">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>{{ 'tags.table.name' | translate }}</th>
+        <th>{{ 'tags.table.usage' | translate }}</th>
+        <th class="text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of tags(); track item.id) {
+        <tr>
+          <td class="font-mono text-xs opacity-50">#{{ item.id }}</td>
+          <td>
+            <div class="font-bold text-base-content">{{ item.name }}</div>
+          </td>
+          <td>
+            <div class="badge" [class.badge-primary]="item.usageCount > 0" [class.badge-ghost]="item.usageCount === 0">
+              <i class="fa-solid fa-link mr-1.5"></i> {{ item.usageCount }} {{ 'tags.table.uses' | translate }}
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="flex justify-end gap-2">
+              <button class="btn btn-sm btn-primary" (click)="goToEdit(item)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-error" (click)="openDeleteModal(item)">
+                <i class="fa-solid fa-trash text-error-content"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4" class="text-center py-8 text-base-content/50">
+            <i class="fa-solid fa-tags text-4xl mb-2"></i>
+            <p>{{ 'tags.table.empty' | translate }}</p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<dialog #deleteModal class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ 'tags.delete.title' | translate }}
+    </h3>
+    <p class="py-4 text-base">
+      {{ 'tags.delete.message' | translate }} 
+      <span class="font-bold text-base-content">"{{ selectedTag?.name }}"</span>?
+    </p>
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="tagStore.isSubmitting()">
+        {{ 'stores.delete.cancel' | translate }}
+      </button>
+      <button class="btn btn-error" (click)="confirmDelete()" [disabled]="tagStore.isSubmitting()">
+        @if (tagStore.isSubmitting()) {
+          <span class="loading loading-spinner"></span>
+        } @else {
+          <i class="fa-solid fa-trash mr-1"></i>
+          {{ 'stores.delete.confirm' | translate }}
+        }
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeDeleteModal()" [disabled]="tagStore.isSubmitting()">close</button>
+  </form>
+</dialog>
