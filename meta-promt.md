@@ -34,6 +34,8 @@ Actúa como un desarrollador Frontend Senior experto en Angular 21, NgRx SignalS
 ## 2. PLANTILLA FASE A: DIAGNÓSTICO FRONTEND
 *Úsala para revisar un módulo (exportado con repomix) antes de que la IA genere código.*
 
+implementa el codigo que te pasare, olvidate de los test y la compilacion, si hay traducciones realizalas en los dos
+archivos de idiomas
 **TAREA DE ANÁLISIS FRONTEND (FASE 1)**
 
 A continuación, te proporcionaré el código del módulo frontend extraído con repomix. 

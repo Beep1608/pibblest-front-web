@@ -1,13 +1,13 @@
-// src/libs/stores/feature-create/src/lib/store-create.component.ts
+// src/libs/stores/feature-edit/src/lib/store-edit.component.ts
 import { Component, inject, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreStore } from '../../../data-access/lib/store/store.store';
 import { StoreFormComponent } from '../../../ui/src/lib/store-form/store-form.component';
-import { CreateStoreDto } from '../../../data-access/lib/models/store.model';
+import { UpdateStoreRequest } from '../../../data-access/lib/models/store.model';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-store-create-page',
+  selector: 'app-store-edit-page',
   standalone: true,
   imports: [CommonModule, StoreFormComponent, TranslateModule],
   template: `
@@ -16,7 +16,7 @@ import { TranslateModule } from '@ngx-translate/core';
         <button class="btn btn-ghost btn-circle" (click)="goBack()">
           <i class="fa-solid fa-arrow-left text-lg"></i>
         </button>
-        <h1 class="text-2xl font-bold">{{ 'stores.create.title' | translate }}</h1>
+        <h1 class="text-2xl font-bold">{{ 'stores.edit.title' | translate }}</h1>
       </div>
 
       @if (store.isSuccess() && store.message()) {
@@ -28,13 +28,18 @@ import { TranslateModule } from '@ngx-translate/core';
 
       <div class="card bg-base-100 shadow-xl border border-base-200">
         <div class="card-body p-0 sm:p-6">
-          <app-store-form (submitForm)="onCreateStore($event)" (cancel)="goBack()" [isSubmitting]="store.isSubmitting()"></app-store-form>
+          <app-store-form 
+             [initialData]="store.selectedStoreDetails()" 
+             [isSubmitting]="store.isSubmitting()"
+             (submitForm)="onUpdateStore($event)" 
+             (cancel)="goBack()">
+          </app-store-form>
         </div>
       </div>
     </div>
   `
 })
-export class StoreCreateComponent implements OnInit {
+export class StoreEditComponent implements OnInit {
   readonly store = inject(StoreStore);
 
   constructor() {
@@ -47,13 +52,20 @@ export class StoreCreateComponent implements OnInit {
 
   ngOnInit() {
     this.store.resetAlerts();
+    if (!this.store.selectedStoreDetails()) {
+      this.goBack();
+    }
   }
 
-  onCreateStore(dto: CreateStoreDto) {
-    this.store.createStore(dto);
+  onUpdateStore(dto: UpdateStoreRequest) {
+    const details = this.store.selectedStoreDetails();
+    if (details) {
+      this.store.updateStore({ id: details.id, request: dto });
+    }
   }
 
   goBack() {
+    this.store.setSelectedStoreDetails(null);
     this.store.setView('view-all');
   }
 }

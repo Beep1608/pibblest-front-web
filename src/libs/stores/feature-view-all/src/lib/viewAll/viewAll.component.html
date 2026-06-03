@@ -1,15 +1,67 @@
-<div class="grid grid-cols-[max-content_max-content_max-content] gap-4">
-	<div
-		class="card card-lg card-dash flex items-center justify-center w-96 bg-transparent h-64 hover:bg-gray-300"
-		(click)="store.setView('create-store')"
-	>
-		<i class="fa-solid fa-plus text-4xl"></i>
-		<label class="label" for="">Crea una nueva tienda!</label>
-	</div>
+<!-- src/libs/stores/feature-view-all/src/lib/viewAll/viewAll.component.html -->
+<div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
+    
+    <label class="input w-full md:w-1/2 outline-0 flex items-center gap-2 border-base-300">
+      <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+      <input class="grow" #searchInput (keyup.enter)="onSearch(searchInput.value)" type="search" [placeholder]="'stores.search.placeholder' | translate" [value]="store.currentKeyword()" />
+      <kbd class="kbd kbd-sm">Enter</kbd>
+    </label>
 
-	@if (store.storesPage(); as page) {
-		@for (item of page.stores; track item.id) {
-			<app-store-preview-component [storePreview]="item"></app-store-preview-component>
-		}
-	}
+    <div class="flex w-full md:w-auto gap-2">
+      <button class="btn btn-neutral w-full md:w-auto" (click)="onSearch(searchInput.value)">
+        <i class="fa-solid fa-search"></i> {{ 'admin.inventory.search.button' | translate }}
+      </button>
+
+      <div class="join hidden md:flex">
+        <button class="btn join-item border-base-300" [class.btn-active]="store.displayMode() === 'grid'" (click)="store.setDisplayMode('grid')">
+          <i class="fa-solid fa-grip"></i>
+        </button>
+        <button class="btn join-item border-base-300" [class.btn-active]="store.displayMode() === 'table'" (click)="store.setDisplayMode('table')">
+          <i class="fa-solid fa-table"></i>
+        </button>
+      </div>
+
+      <button class="btn btn-primary" (click)="store.setView('create-store')">
+        <i class="fa-solid fa-plus"></i> {{ 'stores.actions.new' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (store.displayMode() === 'grid') {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @if (store.storesPage(); as page) {
+        @for (item of page.stores; track item.id) {
+          <app-store-preview-component [storePreview]="item"></app-store-preview-component>
+        } @empty {
+          <div class="col-span-full text-center py-12 text-base-content/50">
+            <i class="fa-solid fa-store-slash text-5xl mb-3"></i>
+            <p>{{ 'stores.table.empty' | translate }}</p>
+          </div>
+        }
+      }
+    </div>
+  } @else {
+    @if (store.storesPage(); as page) {
+      <app-store-table-component [stores]="page.stores"></app-store-table-component>
+    }
+  }
+
+  @if (store.storesPage(); as page) {
+    <div class="flex justify-center mt-8">
+      <div class="join">
+        <button class="join-item btn" (click)="changePage(-1)" [disabled]="page.pageNo === 0 || store.isLoading()">
+          <i class="fa-solid fa-chevron-left mr-1"></i>
+          {{ 'stores.pagination.prev' | translate }}
+        </button>
+        <button class="join-item btn pointer-events-none">
+          {{ 'stores.pagination.page' | translate }} {{ page.pageNo + 1 }} {{ 'stores.pagination.of' | translate }} {{ page.totalPages || 1 }}
+        </button>
+        <button class="join-item btn" (click)="changePage(1)" [disabled]="page.last || store.isLoading()">
+          {{ 'stores.pagination.next' | translate }}
+          <i class="fa-solid fa-chevron-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+  }
 </div>

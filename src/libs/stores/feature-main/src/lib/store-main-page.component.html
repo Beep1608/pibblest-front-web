@@ -1,8 +1,20 @@
-
-@switch (store.selectedView()) {
-    @case ('view-all') {<app-store-view-all-page></app-store-view-all-page>}
-    @case ('store-page') {<app-store-page></app-store-page>}
-    @case ('product-info') {}
-    @case ('sale-info') {}
-
-}
+<!-- src/libs/stores/feature-main/src/lib/store-main-page.component.html -->
+<div class="stores-module-shell w-full h-full">
+  @switch (store.selectedView()) {
+    @case ('view-all') {
+      <app-store-view-all-page></app-store-view-all-page>
+    }
+    @case ('store-page') {
+      <app-store-page></app-store-page>
+    }
+    @case ('create-store') {
+      <app-store-create-page></app-store-create-page>
+    }
+    @case ('edit-store') {
+      <app-store-edit-page></app-store-edit-page>
+    }
+    @default {
+      <app-store-view-all-page></app-store-view-all-page>
+    }
+  }
+</div>

@@ -1,6 +1,5 @@
 // src/libs/stores/data-access/lib/models/store.model.ts
-import { Product } from "../../../../products/data-access/lib/models/product.model";
-import { PageRequest } from "../../../../shared/data-access/models/sort.model";
+import { Tag } from "../../../../tags/data-access/models/tag.model";
 
 export enum StoreStatus {
   ACTIVE = 'active',
@@ -20,6 +19,14 @@ export interface CreateStoreDto {
   name: string;
   address: string;
   status: StoreStatus;
+  tagsId: number[];
+}
+
+export interface UpdateStoreRequest {
+  name: string;
+  address: string;
+  status: StoreStatus;
+  tagsId: number[];
 }
 
 export interface StorePreview {
@@ -34,14 +41,14 @@ export interface StorePreview {
   operatinTime: string;
   growthFromStart: number;
   employees: number;
+  tags?: Tag[];
 }
 
-export interface StorePaginationResponse{
-    last: boolean,
-    pageNo: number,
-    pageSize: number,
-    totalElements: number,
-    totalPages: number,
-    stores: StorePreview[]
+export interface StorePaginationResponse {
+    last: boolean;
+    pageNo: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    stores: StorePreview[];
 }
-

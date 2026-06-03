@@ -1,0 +1,106 @@
+<!-- src/libs/stores/ui/src/lib/store-table/store-table.component.html -->
+<div class="overflow-x-auto bg-base-100 rounded-box shadow-sm border border-base-200/50">
+  <table class="table table-zebra w-full">
+    <thead>
+      <tr>
+        <th>{{ 'stores.table.name' | translate }}</th>
+        <th>{{ 'stores.table.address' | translate }}</th>
+        <th>{{ 'stores.table.kpi' | translate }}</th>
+        <th>{{ 'stores.table.inventory' | translate }}</th>
+        <th>{{ 'stores.table.tags' | translate }}</th>
+        <th class="text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of stores(); track item.id) {
+        <tr>
+          <td>
+            <div class="font-bold cursor-pointer hover:text-primary transition-colors" (click)="selectStore(item.id)">{{ item.name }}</div>
+            <div class="text-xs opacity-70"><i class="fa-solid fa-clock mr-1"></i>{{ item.operatinTime }}</div>
+          </td>
+          <td>
+            <span class="text-sm font-medium">{{ item.address }}</span><br>
+            <span class="badge badge-sm uppercase font-bold"
+              [class.badge-success]="item.status.toLowerCase() === 'active'"
+              [class.badge-ghost]="item.status.toLowerCase() !== 'active'">
+              {{ item.status }}
+            </span>
+          </td>
+          <td>
+            <div class="flex flex-col gap-1 text-xs font-medium">
+              <span class="text-success"><i class="fa-solid fa-dollar-sign mr-1"></i>{{ item.salesOfToday }}</span>
+              <span><i class="fa-solid fa-arrow-up mr-1 text-success"></i>{{ item.growthFromStart }}</span>
+              <span><i class="fa-solid fa-user-tie mr-1 opacity-70"></i>{{ item.employees }}</span>
+            </div>
+          </td>
+          <td>
+             <div class="flex flex-col gap-1">
+                <progress class="progress progress-primary w-24" value="{{ item.currentQuantityOfProducts }}" max="{{ item.totalProducts }}"></progress>
+                <span class="text-[10px]">{{ item.currentQuantityOfProducts }}/{{ item.totalProducts }}</span>
+             </div>
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1 max-w-[150px]">
+              @if (item.tags) {
+                @for (tag of item.tags; track tag.id) {
+                  @if ($index < 3) {
+                    <div class="badge badge-outline badge-secondary text-[10px]">{{ tag.name }}</div>
+                  }
+                }
+                @if (item.tags.length > 3) {
+                  <div class="badge badge-outline text-[10px]">...</div>
+                }
+              }
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="flex justify-end gap-2">
+              <button class="btn btn-sm btn-primary" (click)="goToEdit(item)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-error" (click)="openDeleteModal(item)">
+                <i class="fa-solid fa-trash text-error-content"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="text-center py-8 text-base-content/50">
+            <i class="fa-solid fa-store-slash text-4xl mb-2"></i>
+            <p>{{ 'stores.table.empty' | translate }}</p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<dialog #deleteModalTable class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ 'stores.delete.title' | translate }}
+    </h3>
+    <p class="py-4 text-base">
+      {{ 'stores.delete.message' | translate }} 
+      <span class="font-bold text-base-content">"{{ selectedStoreForDelete?.name }}"</span>?
+    </p>
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="storeStore.isSubmitting()">
+        {{ 'stores.delete.cancel' | translate }}
+      </button>
+      <button class="btn btn-error" (click)="confirmDelete()" [disabled]="storeStore.isSubmitting()">
+        @if (storeStore.isSubmitting()) {
+          <span class="loading loading-spinner"></span>
+        } @else {
+          <i class="fa-solid fa-trash mr-1"></i>
+          {{ 'stores.delete.confirm' | translate }}
+        }
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeDeleteModal()" [disabled]="storeStore.isSubmitting()">close</button>
+  </form>
+</dialog>

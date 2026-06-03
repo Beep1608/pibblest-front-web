@@ -1,78 +1,100 @@
-<div
-  class="flex border-2 border-gray-100 bg-transparent w-80 rounded-md hover:shadow-md hover:cursor-pointer"
-  (click)="selectStore(storePreview().id)"
->
-  <div class="grow">
-    <div class="my-2">
-      <span
-        class="text-xs text-amber-400 font-bold bg-amber-100 mx-2 px-3 py-1 rounded-md border box-border border-amber-400"
-        >{{ storePreview().operatinTime }}</span
-      >
-    </div>
-    <div
-      class="flex flex-col gap-3 items-center justify-center col-start-1 row-start-2 row-end-3"
-    >
-      <i class="fa-solid fa-shop text-5xl"></i>
-      <span>{{ storePreview().name }}</span>
-    </div>
-
-    <div class="col-start-1 flex flex-col gap-2 py-2">
-      <div class="flex items-center justify-center gap-4 mx-2">
-        <div
-          class="flex items-center gap-3 px-2 py-1 border border-green-600 rounded-md bg-green-100"
-        >
-          <i
-            class="fa-solid fa-arrow-up text-sm self-baseline text-green-600"
-          ></i>
-          <span class="text-xs text-green-600 font-bold box-border">{{
-            storePreview().growthFromStart
-          }}</span>
-        </div>
-
-        <div
-          class="flex items-center gap-3 px-2 py-1 border border-slate-600 rounded-md bg-slate-100"
-        >
-          <i
-            class="fa-solid fa-user-tie text-sm self-baseline text-slate-600"
-          ></i>
-          <span class="text-xs text-slate-600 font-bold box-border">{{
-            storePreview().employees
-          }}</span>
-        </div>
-
-        <div
-          class="flex items-center gap-2 px-2 py-1 border border-green-600 rounded-md bg-green-100"
-        >
-          <i
-            class="fa-solid fa-dollar-sign text-sm self-baseline text-green-600"
-          ></i>
-          <span
-            #salesSpan
-            class="text-xs text-green-600 font-bold box-border inline-block"
-          >
-            {{ storePreview().salesOfToday }}
+<!-- src/libs/stores/ui/src/store-component/store-preview.component.html -->
+<div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+  <div class="card-body p-5">
+    
+    <div class="flex justify-between items-start mb-2">
+      <div class="flex flex-col cursor-pointer" (click)="selectStore(storePreview().id)">
+        <h2 class="card-title text-xl mb-0">{{ storePreview().name }}</h2>
+        <div class="flex items-center gap-2 mt-1">
+          <span class="text-xs font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-md">
+            <i class="fa-solid fa-clock mr-1"></i>{{ storePreview().operatinTime }}
+          </span>
+          <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border"
+            [class.bg-success/10]="storePreview().status.toLowerCase() === 'active'"
+            [class.border-success/30]="storePreview().status.toLowerCase() === 'active'"
+            [class.text-success]="storePreview().status.toLowerCase() === 'active'"
+            [class.bg-base-200]="storePreview().status.toLowerCase() !== 'active'"
+            [class.text-base-content]="storePreview().status.toLowerCase() !== 'active'">
+            {{ storePreview().status }}
           </span>
         </div>
       </div>
-
-      <div class="mx-2 flex flex-col">
-        <div class="flex justify-end">
-          <span class="label">{{ percentageOfProducts() }} %</span>
-        </div>
-        <div class="w-full bg-blue-100 h-4 rounded-md overflow-hidden">
-          <div
-            class="bg-blue-600 h-full transition-all duration-500 ease-in-out rounded-md"
-            [style.width.%]="percentageOfProducts()"
-          ></div>
-        </div>
-        <div>
-          <span class="label"
-            >{{ storePreview().currentQuantityOfProducts }}/</span
-          >
-
-          <span class="label">{{ storePreview().totalProducts }}</span>
-        </div>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 border border-base-200">
+          <li><a (click)="goToEdit()"><i class="fa-solid fa-pen text-primary"></i> {{ 'stores.actions.edit' | translate }}</a></li>
+          <li><a (click)="openDeleteModal()" class="text-error"><i class="fa-solid fa-trash"></i> {{ 'stores.actions.delete' | translate }}</a></li>
+        </ul>
       </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 my-4 cursor-pointer" (click)="selectStore(storePreview().id)">
+      <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10">
+        <i class="fa-solid fa-arrow-up text-success"></i>
+        <span class="text-sm font-bold text-success">{{ storePreview().growthFromStart }}</span>
+      </div>
+      <div class="flex items-center gap-2 px-3 py-2 border border-base-300 rounded-lg bg-base-200/50">
+        <i class="fa-solid fa-user-tie text-base-content/70"></i>
+        <span class="text-sm font-bold">{{ storePreview().employees }}</span>
+      </div>
+      <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10 col-span-2">
+        <i class="fa-solid fa-dollar-sign text-success"></i>
+        <span #salesSpan class="text-base font-bold text-success inline-block">{{ storePreview().salesOfToday }}</span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1 mb-4">
+      <div class="flex justify-between text-xs font-medium">
+        <span>{{ 'stores.inventory.capacity' | translate }}</span>
+        <span>{{ percentageOfProducts() }}%</span>
+      </div>
+      <progress class="progress progress-primary w-full" value="{{ storePreview().currentQuantityOfProducts }}" max="{{ storePreview().totalProducts }}"></progress>
+      <div class="flex justify-between text-[10px] text-base-content/60">
+        <span>{{ storePreview().currentQuantityOfProducts }} items</span>
+        <span>{{ storePreview().totalProducts }} limit</span>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-1 mt-auto">
+      @if (storePreview().tags) {
+        @for (tag of storePreview().tags; track tag.id) {
+          @if ($index < 5) {
+            <div class="badge badge-outline badge-secondary text-xs">{{ tag.name }}</div>
+          }
+        }
+        @if (storePreview().tags!.length > 5) {
+          <div class="badge badge-outline text-xs">...</div>
+        }
+      }
     </div>
   </div>
 </div>
+
+<dialog #deleteModal class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ 'stores.delete.title' | translate }}
+    </h3>
+    <p class="py-4 text-base">
+      {{ 'stores.delete.message' | translate }} 
+      <span class="font-bold text-base-content">"{{ storePreview().name }}"</span>?
+    </p>
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">
+        {{ 'stores.delete.cancel' | translate }}
+      </button>
+      <button class="btn btn-error" (click)="confirmDelete()" [disabled]="store.isSubmitting()">
+        @if (store.isSubmitting()) {
+          <span class="loading loading-spinner"></span>
+        } @else {
+          <i class="fa-solid fa-trash mr-1"></i>
+          {{ 'stores.delete.confirm' | translate }}
+        }
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">close</button>
+  </form>
+</dialog>
