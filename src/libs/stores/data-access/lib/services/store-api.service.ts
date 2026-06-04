@@ -9,19 +9,10 @@ import { CreateStoreDto, Store, StorePaginationResponse, StorePreview, UpdateSto
 })
 export class StoreApiService {
   private http = inject(HttpClient);
-
   private readonly base_url = 'http://localhost:8081/api/stores';
 
-  getAllStores(page = 0, size = 10, sort = 'id,asc'): Observable<StorePaginationResponse> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('sort', sort);
-
-    return this.http.get<StorePaginationResponse>(`${this.base_url}/all`, { params });
-  }
-
-  searchStores(keyword: string, page = 0, size = 10, sort = 'id,asc'): Observable<StorePaginationResponse> {
+  // ✨ Único endpoint para listar y buscar. Garantiza que NO vengan las eliminadas.
+  getStores(keyword: string = '', page = 0, size = 10, sort = 'id,desc'): Observable<StorePaginationResponse> {
     let params = new HttpParams()
       .set('keyword', keyword)
       .set('page', page.toString())

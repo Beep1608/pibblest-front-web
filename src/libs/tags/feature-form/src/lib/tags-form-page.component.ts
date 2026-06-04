@@ -1,9 +1,10 @@
 // src/libs/tags/feature-form/src/lib/tags-form-page.component.ts
 import { Component, effect, inject, OnInit } from '@angular/core';
-import { TagStore } from '../../../../data-access/store/tag.store';
-import { CreateTagRequest } from '../../../../data-access/models/tag.model';
-import { TagFormComponent } from '../../../../ui/src/lib/tag-form/tag-form.component';
+
 import { TranslatePipe } from '@ngx-translate/core';
+import { TagFormComponent } from '../../../ui/src/lib/tag-form/tag-form.component';
+import { CreateTagRequest } from '../../../data-access/models/tag.model';
+import { TagStore } from '../../../data-access/store/tag.store';
 
 @Component({
   selector: 'app-tags-form-page',

@@ -21,8 +21,8 @@
           <td>
             <span class="text-sm font-medium">{{ item.address }}</span><br>
             <span class="badge badge-sm uppercase font-bold"
-              [class.badge-success]="item.status.toLowerCase() === 'active'"
-              [class.badge-ghost]="item.status.toLowerCase() !== 'active'">
+              [class.badge-success]="item.status === 'ACTIVE'"
+              [class.badge-ghost]="item.status !== 'ACTIVE'">
               {{ item.status }}
             </span>
           </td>
@@ -40,16 +40,20 @@
              </div>
           </td>
           <td>
-            <div class="flex flex-wrap gap-1 max-w-[150px]">
-              @if (item.tags) {
+            <div class="flex flex-wrap items-center gap-1 w-48">
+              @if (item.tags && item.tags.length > 0) {
                 @for (tag of item.tags; track tag.id) {
-                  @if ($index < 3) {
-                    <div class="badge badge-outline badge-secondary text-[10px]">{{ tag.name }}</div>
+                  @if ($index < 5) {
+                    <div class="badge badge-outline badge-secondary text-[10px] truncate max-w-[80px]" [title]="tag.name">{{ tag.name }}</div>
                   }
                 }
-                @if (item.tags.length > 3) {
-                  <div class="badge badge-outline text-[10px]">...</div>
+                @if (item.tags.length > 5) {
+                  <div class="badge badge-outline text-[10px] tooltip tooltip-left" [attr.data-tip]="'stores.tags.more' | translate">
+                    +{{ item.tags.length - 5 }}
+                  </div>
                 }
+              } @else {
+                <span class="text-[10px] text-base-content/40 italic">{{ 'stores.preview.noTags' | translate }}</span>
               }
             </div>
           </td>

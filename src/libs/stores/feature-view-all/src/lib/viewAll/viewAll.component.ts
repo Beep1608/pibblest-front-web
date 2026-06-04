@@ -17,28 +17,17 @@ export class StoreViewAllPage implements OnInit {
 
   ngOnInit() {
     this.store.resetAlerts();
-    this.store.setPage(0);
-    this.fetchData();
+    // 1. Forzamos la carga inicial (Internamente enviará keyword="")
+    this.store.loadStores();
     this.store.listenToStoreUpdates();
   }
 
   onSearch(keyword: string) {
-    const cleanKeyword = keyword.trim();
-    this.store.setSearchKeyword(cleanKeyword);
-    this.fetchData();
+    // 2. Delegamos la lógica directamente al Store
+    this.store.searchStores(keyword);
   }
 
   changePage(delta: number) {
-    const currentPage = this.store.currentPage();
-    this.store.setPage(currentPage + delta);
-    this.fetchData();
-  }
-
-  private fetchData() {
-    if (this.store.currentKeyword()) {
-      this.store.searchStores();
-    } else {
-      this.store.getAllStores();
-    }
+    this.store.changePage(delta);
   }
 }

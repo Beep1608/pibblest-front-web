@@ -1,35 +1,48 @@
-<div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-6" id="adminMenuList">
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 w-full">
-        <div class="flex w-full lg:w-auto grow gap-2">
-            <label class="input w-full outline-0 flex items-center gap-2">
-                <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
-                <input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
-                <kbd class="kbd kbd-sm">Enter</kbd>
-            </label>
-            <button class="btn btn-neutral" (click)="searchAsAdmin(searchInput.value)">
-                <i class="fa-solid fa-search"></i>
-                {{ 'admin.inventory.search.button' | translate }}
-            </button>
-            
-            <div class="join hidden md:flex">
-                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'grid'" (click)="product.setDisplayMode('grid')">
-                    <i class="fa-solid fa-grip"></i>
-                </button>
-                <button class="btn join-item border-base-300" [class.btn-active]="product.displayMode() === 'table'" (click)="product.setDisplayMode('table')">
-                    <i class="fa-solid fa-table"></i>
-                </button>
-            </div>
-        </div>
-        
-        <button class="btn btn-primary w-full lg:w-auto" (click)="navigateToCreate()">
-            <i class="fa-solid fa-plus"></i>
-            {{ 'admin.inventory.actions.new' | translate }}
-        </button>
-    </div>
+<div class="bg-base-100 rounded-2xl shadow-sm border border-base-200/50 p-4 md:p-6 mb-6">
+  
+  <!-- Header Responsivo -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
+    
+    <!-- Buscador Ocupa todo el ancho en mobile -->
+    <label class="input w-full lg:w-1/2 outline-0 flex items-center gap-2 border-base-300">
+      <i class="fa-solid fa-magnifying-glass text-base-content/50"></i>
+      <input class="grow" #searchInput (keyup.enter)="searchAsAdmin(searchInput.value)" type="search" [placeholder]="'admin.inventory.search.placeholder' | translate" />
+      <kbd class="kbd kbd-sm hidden sm:inline-flex">Enter</kbd>
+    </label>
 
-    <div class="p-1.5 rounded-full flex overflow-x-auto gap-1 mb-8 hide-scrollbar">
-        <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+    <!-- Controles de Acciones y Vistas (Siempre visibles) -->
+    <div class="flex w-full lg:w-auto justify-between lg:justify-end items-center gap-2">
+      
+      <!-- Controles de Vista (Cards/Tabla) -->
+      <div class="join bg-base-200 p-1 rounded-lg">
+        <button class="join-item btn btn-sm border-none shadow-none" 
+                [class.btn-active]="product.displayMode() === 'grid'" 
+                (click)="product.setDisplayMode('grid')">
+          <i class="fa-solid fa-border-all"></i>
+        </button>
+        <button class="join-item btn btn-sm border-none shadow-none" 
+                [class.btn-active]="product.displayMode() === 'table'" 
+                (click)="product.setDisplayMode('table')">
+          <i class="fa-solid fa-table-list"></i>
+        </button>
+      </div>
+      
+      <!-- Botones de Acción -->
+      <div class="flex gap-2">
+        <button class="btn btn-neutral lg:hidden" (click)="searchAsAdmin(searchInput.value)">
+          <i class="fa-solid fa-search"></i>
+        </button>
+        <button class="btn btn-primary" (click)="navigateToCreate()">
+          <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline-block ml-1">{{ 'admin.inventory.actions.new' | translate }}</span>
+        </button>
+      </div>
     </div>
+  </div>
+
+  <!-- Botones de Tags (Debajo del Header) -->
+  <div class="mt-4 pt-4 border-t border-base-200 w-full overflow-x-auto pb-2 scrollbar-hide">
+    <app-tags-buttons-component (selectionChange)="product.setActiveTags($event)"></app-tags-buttons-component>
+  </div>
 
     @if (product.displayMode() === 'grid') {
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -63,4 +76,5 @@
             </div>
         </div>
     }
+
 </div>

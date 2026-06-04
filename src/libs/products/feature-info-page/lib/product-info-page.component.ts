@@ -55,7 +55,8 @@ export class ProductInfoPage implements OnInit {
 	}
 
 	ngOnInit() {
-		this.tagStore.loadProductTags();
+		// Cargamos la lista completa de tags de productos (sin paginar) para el select
+		this.tagStore.loadAllProductTagsList();
 		
 		const id = this.productStore.selectedProductId();
 		if (id) {
@@ -73,15 +74,16 @@ export class ProductInfoPage implements OnInit {
 	}
 
 	onSubmit() {
-		if (this.productForm.valid) {
-			const id = this.productStore.selectedProductId();
-			if (id) {
-				this.productStore.updateProduct({ id, request: this.productForm.getRawValue() });
-			}
-		} else {
-			this.productForm.markAllAsTouched();
-		}
-	}
+        // ✨ FIX: Bloqueamos peticiones repetidas generadas por la tecla Enter
+        if (this.productForm.valid && !this.productStore.isSubmitting()) {
+            const id = this.productStore.selectedProductId();
+            if (id) {
+                this.productStore.updateProduct({ id, request: this.productForm.getRawValue() });
+            }
+        } else if (this.productForm.invalid) {
+            this.productForm.markAllAsTouched();
+        }
+    }
 
 	goBack() {
 		this.productStore.setSelectedProductId(null);

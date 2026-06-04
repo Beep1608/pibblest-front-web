@@ -9,6 +9,7 @@ import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
     selector: 'app-product-admin-inventory-page',
+    standalone: true,
     imports: [ProductPreviewComponent, ProductTableComponent, TagButtonsComponent, TranslatePipe],
     templateUrl: './product-admin-inventory-page.component.html'
 })
@@ -20,12 +21,14 @@ export class ProductAdminInventoryPage implements OnInit {
 
     ngOnInit() {
         this.product.getGlobalProducts(null);
+        // Garantizamos que los botones de filtro siempre tengan la lista global de productos
+        this.tag.loadAllProductTagsList();
     }
 
     searchAsAdmin(keyword: string) {
         const cleanKeyword = keyword.trim();
         this.lastKeyword = cleanKeyword;
-        this.product.setPage(0); // Reseteo paginación antes de llamar
+        this.product.setPage(0);
         this.product.getGlobalProducts(cleanKeyword);
     }
 

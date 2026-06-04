@@ -12,11 +12,19 @@ export class TagApiService {
     private readonly baseUrl = 'http://localhost:8081/api/tags';
 
     // STORES TAGS
-    getAllStoreTags(page = 0, size = 10): Observable<TagPageResponse> {
+    getAllStoreTags(keyword: string | null, page = 0, size = 10): Observable<TagPageResponse> {
         let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString());
+            
+        if (keyword && keyword.trim() !== '') {
+            params = params.set('keyword', keyword.trim());
+        }
         return this.http.get<TagPageResponse>(`${this.baseUrl}/all`, { params });
+    }
+
+    getAllStoreTagsList(): Observable<{ tags: Tag[] }> {
+        return this.http.get<{ tags: Tag[] }>(`${this.baseUrl}/stores/list`);
     }
 
     createStoreTag(request: CreateTagRequest): Observable<{ tag: Tag }> {
@@ -37,10 +45,14 @@ export class TagApiService {
             .set('page', page.toString())
             .set('size', size.toString());
         
-        if (keyword) {
-            params = params.set('keyword', keyword);
+        if (keyword && keyword.trim() !== '') {
+            params = params.set('keyword', keyword.trim());
         }
         return this.http.get<TagPageResponse>(`${this.baseUrl}/get-all-products`, { params });
+    }
+
+    getAllProductTagsList(): Observable<{ tags: Tag[] }> {
+        return this.http.get<{ tags: Tag[] }>(`${this.baseUrl}/products/list`);
     }
 
     createProductTag(request: CreateTagRequest): Observable<{ message: string }> {

@@ -1,6 +1,6 @@
 // src/app/feature-dashboard/src/lib/dashboard-page.component.ts
 import { CommonModule } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { OwnerStore } from "../../../../libs/owners/data-access/src";
 import { Router } from "@angular/router";
 import { DashboardStore } from "./data-access/store/dashboard.store";
@@ -26,6 +26,17 @@ export class DashboardPageComponent {
   dashboardStore = inject(DashboardStore);
   readonly store = inject(OwnerStore);
   private router = inject(Router);
+
+  // ✨ Signal para controlar el estado colapsado/expandido en Desktop
+  isSidebarExpanded = signal(true); 
+
+  toggleSidebar() {
+    this.isSidebarExpanded.update(v => !v);
+  }
+
+  expandSidebar() {
+    this.isSidebarExpanded.set(true);
+  }
 
   onLogout() {
     this.store.logout();

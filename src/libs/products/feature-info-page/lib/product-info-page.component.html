@@ -1,3 +1,4 @@
+<!-- src/libs/products/feature-info-page/lib/product-info-page.component.html -->
 <div class="card bg-base-100 shadow-sm border border-base-200/50 max-w-4xl mx-auto mt-6">
 	<div class="card-body">
 		<h2 class="card-title text-2xl font-bold mb-6">
@@ -86,7 +87,7 @@
 						</div>
 					} @else {
 						<select multiple class="select select-bordered w-full h-32 p-2" (change)="onTagsChange($event)">
-							@for (tag of tagStore.productTags(); track tag.id) {
+							@for (tag of tagStore.allProductTagsList(); track tag.id) {
 								<option class="p-2 mb-1 rounded-md hover:bg-base-200" 
 										[value]="tag.id" 
 										[selected]="productForm.controls.tagsId.value.includes(tag.id)">
@@ -103,7 +104,7 @@
 						<i class="fa-solid fa-arrow-left mr-1"></i>
 						{{ 'admin.product.create.cancel' | translate }}
 					</button>
-					<button type="submit" class="btn btn-primary" [disabled]="productStore.isSubmitting()">
+					<button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || productStore.isSubmitting()">
 						@if (productStore.isSubmitting()) {
 							<span class="loading loading-spinner"></span>
 						} @else {

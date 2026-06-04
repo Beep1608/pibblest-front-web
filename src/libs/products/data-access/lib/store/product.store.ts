@@ -65,6 +65,10 @@ export const ProductStore = signalStore(
 			patchState(product, { currentView: view, isSuccess: false, error: null, message: null });
 		},
 
+		resetProductState: () => {
+			patchState(product, { isSuccess: false, error: null, message: null, isSubmitting: false });
+		},
+
 		setDisplayMode: (mode: DisplayMode) => {
 			patchState(product, { displayMode: mode });
 		},

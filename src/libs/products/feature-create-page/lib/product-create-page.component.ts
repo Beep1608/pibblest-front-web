@@ -1,5 +1,5 @@
 // src/libs/products/feature-create-page/lib/product-create-page.component.ts
-import { Component, effect, inject, OnInit } from "@angular/core";
+import { Component, effect, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ProductStore } from "../../data-access/lib/store/product.store";
@@ -14,6 +14,8 @@ export class ProductCreatePageComponent implements OnInit {
 	private fb = inject(FormBuilder);
 	product = inject(ProductStore);
 	tagStore = inject(TagStore);
+
+	isProcessing = signal(false); // Bandera local para bloqueo inmediato
 
 	productForm = this.fb.nonNullable.group({
 		name: ['', [Validators.required]],
@@ -30,15 +32,15 @@ export class ProductCreatePageComponent implements OnInit {
 	constructor() {
 		effect(() => {
 			if (this.product.isSuccess()) {
-				setTimeout(() => {
-					this.goBack();
-				}, 1500); 
+				// Ya no necesitamos setTimeout aquí si el bloqueo es inmediato
+				this.goBack();
 			}
 		});
 	}
 
 	ngOnInit() {
-		this.tagStore.loadProductTags();
+		// Cargamos la lista completa de tags de productos (sin paginar) para el select
+		this.tagStore.loadAllProductTagsList();
 	}
 
 	onTagsChange(event: Event) {
@@ -49,14 +51,18 @@ export class ProductCreatePageComponent implements OnInit {
 	}
 
 	onSubmit() {
-		if (this.productForm.valid) {
+		// Bloqueo inmediato al entrar a la función
+		if (this.productForm.valid && !this.isProcessing()) {
+			this.isProcessing.set(true); // Bloqueo UI instantáneo
 			this.product.addProduct(this.productForm.getRawValue());
-		} else {
+		} else if (this.productForm.invalid) {
 			this.productForm.markAllAsTouched();
 		}
 	}
 
 	goBack() {
-		this.product.setProductView('admin-inventory');
-	}
+        // Asegúrate de resetear el estado del store al salir
+        this.product.resetProductState(); 
+        this.product.setProductView('admin-inventory');
+    }
 }

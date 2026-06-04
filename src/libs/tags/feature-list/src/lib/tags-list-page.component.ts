@@ -1,7 +1,7 @@
 // src/libs/tags/feature-list/src/lib/tags-list-page.component.ts
 import { Component, inject, OnInit } from '@angular/core';
-import { TagStore } from '../../../../data-access/store/tag.store';
-import { TagTableComponent } from '../../../../ui/src/lib/tag-table/tag-table.component';
+import { TagStore } from '../../../data-access/store/tag.store';
+import { TagTableComponent } from '../../../ui/src/lib/tag-table/tag-table.component';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -18,15 +18,12 @@ export class TagsListPageComponent implements OnInit {
   }
 
   onSearch(keyword: string) {
-    if (this.tagStore.currentContext() === 'stores') return; // API does not support store tag search
-    this.tagStore.setKeyword(keyword.trim());
-    this.tagStore.loadTags();
+    // ✨ ÚNICA LÍNEA: El store se encarga del debounce, de filtrar duplicados y de la petición HTTP.
+    this.tagStore.searchTags(keyword);
   }
 
   changePage(delta: number) {
-    const currentPage = this.tagStore.currentPage();
-    this.tagStore.setPage(currentPage + delta);
-    this.tagStore.loadTags();
+    this.tagStore.changePage(delta);
   }
 
   navigateToCreate() {

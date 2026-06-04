@@ -1,22 +1,21 @@
-@if (tagStore.tagsPage(); as page) {
-	<input
-		class="btn"
-		[checked]="activeCategories().length === 0"
-		(change)="selectAll()"
-		type="checkbox"
-		name="frameworks"
-		aria-label="{{ 'categoryList.All' | translate }}"
-	/>
+<!-- src/libs/tags/ui/src/lib/tags-buttons.component/tags-buttons.component.html -->
+<div class="flex items-center gap-2">
+  <input
+    class="btn btn-sm rounded-full"
+    [checked]="activeCategories().length === 0"
+    (change)="selectAll()"
+    type="checkbox"
+    aria-label="{{ 'categoryList.All' | translate }}"
+  />
 
-	@for (tag of page.tags; track tag.id) {
-		<input
-			class="btn"
-			#checkbox
-			[attr.aria-label]="tag.name"
-			[checked]="activeCategories().includes(tag.id)"
-			(change)="onTagToggle(tag.id, checkbox.checked)"
-			type="checkbox"
-			name="frameworks"
-		/>
-	}
-}
+  @for (tag of tagStore.allProductTagsList(); track tag.id) {
+    <input
+      class="btn btn-sm rounded-full"
+      #checkbox
+      [attr.aria-label]="tag.name"
+      [checked]="activeCategories().includes(tag.id)"
+      (change)="onTagToggle(tag.id, checkbox.checked)"
+      type="checkbox"
+    />
+  }
+</div>

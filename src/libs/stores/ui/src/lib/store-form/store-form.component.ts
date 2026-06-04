@@ -37,7 +37,6 @@ export class StoreFormComponent implements OnInit {
         this.form.patchValue({
           name: data.name,
           address: data.address,
-          // Normalizamos a minúsculas para que coincida con el enum del frontend
           status: (data.status as string).toLowerCase() as StoreStatus,
           tagsId: data.tags ? data.tags.map(t => t.id) : []
         });
@@ -46,7 +45,7 @@ export class StoreFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.tagStore.loadProductTags();
+    this.tagStore.loadAllStoreTagsList();
   }
 
   onTagsChange(event: Event) {

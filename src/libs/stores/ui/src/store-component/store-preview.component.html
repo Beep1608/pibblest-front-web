@@ -1,6 +1,6 @@
 <!-- src/libs/stores/ui/src/store-component/store-preview.component.html -->
-<div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
-  <div class="card-body p-5">
+<div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow h-full flex flex-col">
+  <div class="card-body p-5 grow flex flex-col">
     
     <div class="flex justify-between items-start mb-2">
       <div class="flex flex-col cursor-pointer" (click)="selectStore(storePreview().id)">
@@ -10,11 +10,11 @@
             <i class="fa-solid fa-clock mr-1"></i>{{ storePreview().operatinTime }}
           </span>
           <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border"
-            [class.bg-success/10]="storePreview().status.toLowerCase() === 'active'"
-            [class.border-success/30]="storePreview().status.toLowerCase() === 'active'"
-            [class.text-success]="storePreview().status.toLowerCase() === 'active'"
-            [class.bg-base-200]="storePreview().status.toLowerCase() !== 'active'"
-            [class.text-base-content]="storePreview().status.toLowerCase() !== 'active'">
+            [class.bg-success/10]="storePreview().status === 'ACTIVE'"
+            [class.border-success/30]="storePreview().status === 'ACTIVE'"
+            [class.text-success]="storePreview().status === 'ACTIVE'"
+            [class.bg-base-200]="storePreview().status !== 'ACTIVE'"
+            [class.text-base-content]="storePreview().status !== 'ACTIVE'">
             {{ storePreview().status }}
           </span>
         </div>
@@ -55,16 +55,20 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-1 mt-auto">
-      @if (storePreview().tags) {
+    <div class="flex flex-wrap items-center gap-1 mt-auto pt-4 border-t border-base-200/50 min-h-[46px]">
+      @if (storePreview().tags && storePreview().tags!.length > 0) {
         @for (tag of storePreview().tags; track tag.id) {
           @if ($index < 5) {
-            <div class="badge badge-outline badge-secondary text-xs">{{ tag.name }}</div>
+            <div class="badge badge-outline badge-secondary text-[10px] truncate max-w-[90px]" [title]="tag.name">{{ tag.name }}</div>
           }
         }
         @if (storePreview().tags!.length > 5) {
-          <div class="badge badge-outline text-xs">...</div>
+          <div class="badge badge-outline text-[10px] tooltip tooltip-top" [attr.data-tip]="'stores.tags.more' | translate">
+            +{{ storePreview().tags!.length - 5 }}
+          </div>
         }
+      } @else {
+        <span class="text-xs text-base-content/40 italic">{{ 'stores.preview.noTags' | translate }}</span>
       }
     </div>
   </div>

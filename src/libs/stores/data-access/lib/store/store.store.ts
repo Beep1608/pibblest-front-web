@@ -5,10 +5,9 @@ import { Router } from '@angular/router';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { EMPTY, pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, pipe, switchMap, tap, distinctUntilChanged } from 'rxjs';
 import { DashboardStore } from '../../../../../app/feature-dashboard/src/lib/data-access/store/dashboard.store';
 import { UIStore } from '../../../../shared/data-access/store/ui.store';
-import { PageRequest } from '../../../../shared/data-access/models/sort.model';
 import { CreateStoreDto, StorePaginationResponse, StorePreview, UpdateStoreRequest } from '../models/store.model';
 import { StoreApiService } from '../services/store-api.service';
 
@@ -55,14 +54,31 @@ const initialState: StoreState = {
 export const StoreStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
-    withMethods(
-        (
-            store,
-            api = inject(StoreApiService),
-            router = inject(Router),
-            dashboardStore = inject(DashboardStore),
-            ui = inject(UIStore),
-        ) => ({
+    withMethods((
+        store,
+        api = inject(StoreApiService),
+        router = inject(Router),
+        dashboardStore = inject(DashboardStore),
+        ui = inject(UIStore),
+    ) => {
+
+        // ✨ EL EMBUDO PARA TIENDAS: Filtra peticiones repetidas
+        const performFetch = rxMethod<{ kw: string, p: number }>(
+            pipe(
+                distinctUntilChanged((prev, curr) => prev.kw === curr.kw && prev.p === curr.p),
+                tap(() => patchState(store, { isLoading: true, error: null, isSuccess: false })),
+                switchMap(({ kw, p }) => {
+                    return api.getStores(kw, p, store.pageSize(), 'id,desc').pipe(
+                        tapResponse({
+                            next: response => patchState(store, { isLoading: false, isSuccess: true, storesPage: response }),
+                            error: (error: HttpErrorResponse) => patchState(store, { isLoading: false, isSuccess: false, error: error.message || 'Error al cargar tiendas' }),
+                        })
+                    );
+                })
+            )
+        );
+
+        return {
             resetAlerts() {
                 patchState(store, { isSuccess: false, error: null, message: null, isSubmitting: false });
             },
@@ -90,6 +106,32 @@ export const StoreStore = signalStore(
             setSearchKeyword(keyword: string) {
                 patchState(store, { currentKeyword: keyword, currentPage: 0 });
             },
+
+            // ✨ Lógica centralizada para listar/buscar
+            loadStores() {
+                performFetch({ kw: store.currentKeyword(), p: store.currentPage() });
+            },
+
+            searchStores: rxMethod<string>(
+                pipe(
+                    tap((keyword) => {
+                        const kw = keyword.trim();
+                        patchState(store, { currentKeyword: kw, currentPage: 0 });
+                        performFetch({ kw, p: 0 });
+                    })
+                )
+            ),
+
+            changePage: rxMethod<number>(
+                pipe(
+                    tap((delta) => {
+                        const nextPage = store.currentPage() + delta;
+                        patchState(store, { currentPage: nextPage });
+                        performFetch({ kw: store.currentKeyword(), p: nextPage });
+                    })
+                )
+            ),
+
             createStore: rxMethod<CreateStoreDto>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -109,6 +151,7 @@ export const StoreStore = signalStore(
                     ),
                 ),
             ),
+
             updateStore: rxMethod<{ id: number, request: UpdateStoreRequest }>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -128,6 +171,7 @@ export const StoreStore = signalStore(
                     ),
                 ),
             ),
+
             deleteStore: rxMethod<number>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -145,38 +189,13 @@ export const StoreStore = signalStore(
                                         storesPage: { ...state.storesPage, stores: updatedStores }
                                     };
                                 }),
-                                error: (err: HttpErrorResponse) => patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar' })
+                                    error: (err: HttpErrorResponse) => patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar' })
                             })
                         )
                     )
                 )
             ),
-            getAllStores: rxMethod<void>(
-                pipe(
-                    tap(() => patchState(store, { isLoading: true, error: null, isSuccess: false })),
-                    switchMap(() => {
-                        return api.getAllStores(store.currentPage(), store.pageSize(), 'id,desc').pipe(
-                            tapResponse({
-                                next: response => patchState(store, { isLoading: false, isSuccess: true, storesPage: response }),
-                                error: (error: any) => patchState(store, { isLoading: false, isSuccess: false, error: error.message || 'Error al cargar tiendas' }),
-                            }),
-                        );
-                    }),
-                ),
-            ),
-            searchStores: rxMethod<void>(
-                pipe(
-                    tap(() => patchState(store, { isLoading: true, error: null, isSuccess: false })),
-                    switchMap(() => {
-                        return api.searchStores(store.currentKeyword(), store.currentPage(), store.pageSize(), 'id,desc').pipe(
-                            tapResponse({
-                                next: response => patchState(store, { isLoading: false, isSuccess: true, storesPage: response }),
-                                error: (error: any) => patchState(store, { isLoading: false, isSuccess: false, error: error.message || 'Error al buscar' }),
-                            }),
-                        );
-                    }),
-                ),
-            ),
+
             listenToStoreUpdates: rxMethod<void>(
                 pipe(
                     switchMap(() => {
@@ -197,6 +216,6 @@ export const StoreStore = signalStore(
                     }),
                 ),
             ),
-        }),
-    ),
+        };
+    })
 );

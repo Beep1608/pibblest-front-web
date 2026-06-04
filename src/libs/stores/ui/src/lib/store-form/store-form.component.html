@@ -39,14 +39,10 @@
       </label>
       <div class="relative flex items-center">
         <i class="fa-solid fa-circle-half-stroke absolute left-4 text-base-content/40 text-sm z-10"></i>
-        <select 
-          formControlName="status" 
-          class="select select-bordered pl-10 w-full appearance-none transition-all duration-200 focus:select-primary focus:outline-none"
-        >
+        <select formControlName="status" class="select select-bordered pl-10 w-full appearance-none transition-all duration-200 focus:select-primary focus:outline-none">
+          <option value="" disabled selected>{{ 'stores.form.statusPlaceholder' | translate }}</option>
           @for (status of storeStatuses; track status) {
-            <option [value]="status">
-              {{ 'stores.status.' + status | translate | titlecase }}
-            </option>
+            <option [value]="status">{{ 'stores.status.' + status | translate | titlecase }}</option>
           }
         </select>
       </div>
@@ -62,7 +58,7 @@
         </div>
       } @else {
         <select multiple class="select select-bordered w-full h-32 p-2" (change)="onTagsChange($event)">
-          @for (tag of tagStore.productTags(); track tag.id) {
+          @for (tag of tagStore.allStoreTagsList(); track tag.id) {
             <option class="p-2 mb-1 rounded-md hover:bg-base-200" [value]="tag.id" [selected]="form.controls.tagsId.value.includes(tag.id)">
               {{ tag.name }}
             </option>

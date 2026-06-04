@@ -1,107 +1,133 @@
-<div class="card bg-base-100 w-96 shadow-sm h-full flex flex-col">
-	<figure>
-		<img
-			class="object-cover w-full h-48"
-			[src]="`https://placehold.co/400x300/e2e8f0/64748b?text=${product().name}`"
-			[alt]="product().name"
-		/>
-	</figure>
-	<div class="card-body flex-grow flex flex-col">
-		<h2 class="card-title">{{ product().name }}</h2>
-		<span class="text-xl font-bold text-primary">$ {{ product().basePrice }}</span>
-		
-		<div class="flex flex-col space-y-1 mb-2">
-			<div class="flex gap-1.5 text-sm">
-				<span class="font-semibold text-base-content/70">{{ 'inventory.product.brand' | translate }}:</span>
-				<span>{{ product().brand }}</span>
-			</div>
-			<div class="flex gap-1.5 text-sm">
-				<span class="font-semibold text-base-content/70">{{ 'inventory.product.barcode' | translate }}:</span>
-				<span>{{ product().barcode }}</span>
-			</div>
-		</div>
-		
-		<div class="mb-4">
-			<span class="line-clamp-3 text-sm text-base-content/80 mb-3">{{ product().description }}</span>
-			
-			@if (product().currentQuantity !== undefined && product().desiredQuantity !== undefined) {
-				<div class="flex items-center gap-3">
-					<progress class="progress progress-secondary w-full" value="{{product().currentQuantity}}" max="{{product().desiredQuantity}}"></progress>
-					<span class="text-xs font-medium whitespace-nowrap">{{product().currentQuantity}}/{{product().desiredQuantity}}</span>	
-				</div>
-			} @else {
-				<div class="mt-2 flex items-center justify-between">
-					<span class="text-sm font-medium">{{ product().quantity }} {{ 'inventory.product.available' | translate }}</span>
-					<div class="badge badge-neutral badge-sm">
-						<i class="fa-solid fa-globe mr-1.5"></i>
-						{{ 'inventory.product.global' | translate }}
-					</div>
-				</div>
-			}
-		</div>
+<!-- src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html -->
+<div class="card bg-base-100 w-full h-full shadow-sm border border-base-200 hover:shadow-lg transition-shadow flex flex-col overflow-hidden group">
+    
+    <!-- Header visual (Imagen y Precio Flotante) -->
+    <figure class="relative h-48 overflow-hidden bg-base-200 w-full">
+        <img class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+             [src]="'https://placehold.co/400x300/e2e8f0/64748b?text=' + product().name"
+             [alt]="product().name" />
+        <div class="absolute top-3 right-3">
+            <span class="badge badge-primary font-black shadow-sm text-sm py-3 px-3">
+                $ {{ product().basePrice }}
+            </span>
+        </div>
+    </figure>
 
-		<div class="flex flex-wrap gap-1 mb-4 mt-auto">
-			@if (product().tags) {
-				@for (tag of product().tags; track $index) {
-					@if ($index < 4) {
-						<div class="badge badge-outline badge-primary text-xs">{{ tag.name }}</div>
-					}
-				}
-				@if (product().tags.length > 4) {
-					<div class="badge badge-outline text-xs">...</div>
-				}
-			}
-		</div>
+    <!-- Cuerpo de la tarjeta responsivo -->
+    <div class="card-body p-5 flex-grow flex flex-col w-full">
+        <h2 class="card-title text-lg leading-tight mb-0 line-clamp-1" [title]="product().name">
+            {{ product().name }}
+        </h2>
+        
+        <!-- Meta Data (Brand & Barcode) -->
+        <div class="text-xs text-base-content/60 flex items-center gap-2 mb-2 font-medium">
+            <span class="flex items-center"><i class="fa-solid fa-tag mr-1"></i>{{ product().brand }}</span>
+            <span>&bull;</span>
+            <span class="flex items-center truncate" [title]="product().barcode"><i class="fa-solid fa-barcode mr-1"></i>{{ product().barcode }}</span>
+        </div>
+        
+        <p class="text-sm text-base-content/70 line-clamp-2 mb-4 h-10">{{ product().description }}</p>
+        
+        <!-- Contenedor inferior empujado al final (mt-auto) -->
+        <div class="mt-auto flex flex-col w-full">
+            
+            <!-- Estado de Inventario / Stock -->
+            @if (product().currentQuantity !== undefined && product().desiredQuantity !== undefined) {
+                <div class="flex flex-col gap-1.5 mb-4">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span>{{ 'inventory.product.stock' | translate }}</span>
+                        <span [class.text-error]="product().currentQuantity! <= 0">
+                            {{ product().currentQuantity }}/{{ product().desiredQuantity }}
+                        </span>
+                    </div>
+                    <!-- Barra de progreso inteligente con colores semánticos -->
+                    <progress class="progress w-full" 
+                              [class.progress-success]="product().currentQuantity! > (product().desiredQuantity! * 0.3)"
+                              [class.progress-warning]="product().currentQuantity! <= (product().desiredQuantity! * 0.3) && product().currentQuantity! > 0"
+                              [class.progress-error]="product().currentQuantity! <= 0"
+                              [value]="product().currentQuantity" 
+                              [max]="product().desiredQuantity">
+                    </progress>
+                </div>
+            } @else {
+                <div class="flex items-center justify-between bg-base-200/50 p-2 rounded-lg mb-4">
+                    <span class="text-sm font-semibold flex items-center gap-2" [class.text-error]="product().quantity <= 0">
+                        <i class="fa-solid fa-boxes-stacked text-primary"></i> 
+                        {{ product().quantity }} {{ 'inventory.product.available' | translate }}
+                    </span>
+                    <div class="badge badge-neutral badge-sm"><i class="fa-solid fa-globe mr-1"></i> {{ 'inventory.product.global' | translate }}</div>
+                </div>
+            }
 
-		<div class="card-actions justify-end border-t border-base-200 pt-4">
-			@switch (viewMode()) {
-				@case ('admin') {
-					<div class="flex gap-2 w-full">
-						<button class="btn btn-primary flex-1" (click)="goToEdit()">
-							<i class="fa-solid fa-pen mr-1"></i>
-							{{ 'inventory.product.edit' | translate }}
-						</button>
-						<button class="btn btn-error btn-square" (click)="openDeleteModal()" [title]="'inventory.product.delete.title' | translate">
-							<i class="fa-solid fa-trash text-error-content"></i>
-						</button>
-					</div>
-				}
-				@case ('employee') {
-					<button class="btn btn-secondary w-full" (click)="cart.addToCart(product())">
-						<i class="fa-solid fa-cart-plus mr-1"></i>
-						{{ 'inventory.sale.add.cart' | translate }}
-					</button>
-				}
-			}
-		</div>
-	</div>
+            <!-- Sección de Etiquetas (Tags) limitada a 3 -->
+            <div class="flex flex-wrap items-center gap-1 mb-4 min-h-[24px]">
+                @if (product().tags && product().tags.length > 0) {
+                    @for (tag of product().tags; track tag.id) {
+                        @if ($index < 3) {
+                            <div class="badge badge-outline badge-secondary text-[10px] truncate max-w-[80px]" [title]="tag.name">{{ tag.name }}</div>
+                        }
+                    }
+                    @if (product().tags.length > 3) {
+                        <div class="badge badge-outline text-[10px] tooltip tooltip-top" [attr.data-tip]="'stores.tags.more' | translate">
+                            +{{ product().tags.length - 3 }}
+                        </div>
+                    }
+                } @else {
+                    <span class="text-[10px] text-base-content/40 italic">{{ 'stores.preview.noTags' | translate }}</span>
+                }
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="card-actions justify-end border-t border-base-200/60 pt-4 w-full">
+                @switch (viewMode()) {
+                    @case ('admin') {
+                        <div class="flex gap-2 w-full">
+                            <button class="btn btn-primary btn-sm flex-1" (click)="goToEdit()">
+                                <i class="fa-solid fa-pen mr-1"></i> {{ 'inventory.product.edit' | translate }}
+                            </button>
+                            <button class="btn btn-error btn-sm btn-square" (click)="openDeleteModal()" [title]="'inventory.product.delete.title' | translate">
+                                <i class="fa-solid fa-trash text-error-content"></i>
+                            </button>
+                        </div>
+                    }
+                    @case ('employee') {
+                        <button class="btn btn-secondary btn-sm w-full" (click)="cart.addToCart(product())" 
+                                [disabled]="product().currentQuantity === 0 || product().quantity === 0">
+                            <i class="fa-solid fa-cart-plus mr-1"></i> {{ 'inventory.sale.add.cart' | translate }}
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- (Mismo Dialog de Eliminación previo sin alterar) -->
 <dialog #deleteModal class="modal">
-	<div class="modal-box">
-		<h3 class="font-bold text-lg text-error flex items-center gap-2">
-			<i class="fa-solid fa-triangle-exclamation"></i>
-			{{ 'inventory.product.delete.title' | translate }}
-		</h3>
-		<p class="py-4 text-base">
-			{{ 'inventory.product.delete.message' | translate }} 
-			<span class="font-bold text-base-content">"{{ product().name }}"</span>?
-		</p>
-		<div class="modal-action">
-			<button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">
-				{{ 'inventory.product.delete.cancel' | translate }}
-			</button>
-			<button class="btn btn-error" (click)="confirmDelete()" [disabled]="productStore.isSubmitting()">
-				@if (productStore.isSubmitting()) {
-					<span class="loading loading-spinner"></span>
-				} @else {
-					<i class="fa-solid fa-trash mr-1"></i>
-					{{ 'inventory.product.delete.confirm' | translate }}
-				}
-			</button>
-		</div>
-	</div>
-	<form method="dialog" class="modal-backdrop">
-		<button (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">close</button>
-	</form>
+    <div class="modal-box">
+        <h3 class="font-bold text-lg text-error flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            {{ 'inventory.product.delete.title' | translate }}
+        </h3>
+        <p class="py-4 text-base">
+            {{ 'inventory.product.delete.message' | translate }} 
+            <span class="font-bold text-base-content">"{{ product().name }}"</span>?
+        </p>
+        <div class="modal-action">
+            <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">
+                {{ 'inventory.product.delete.cancel' | translate }}
+            </button>
+            <button class="btn btn-error" (click)="confirmDelete()" [disabled]="productStore.isSubmitting()">
+                @if (productStore.isSubmitting()) {
+                    <span class="loading loading-spinner"></span>
+                } @else {
+                    <i class="fa-solid fa-trash mr-1"></i>
+                    {{ 'inventory.product.delete.confirm' | translate }}
+                }
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button (click)="closeDeleteModal()" [disabled]="productStore.isSubmitting()">close</button>
+    </form>
 </dialog>
