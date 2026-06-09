@@ -2,10 +2,10 @@
 import { Tag } from "../../../../tags/data-access/models/tag.model";
 
 export enum StoreStatus {
-  ACTIVE = 'active',
-  CLOSED = 'closed',
-  MAINTENANCE = 'maintenance',
-  PRE_ACTIVE = 'pre-active',
+  ACTIVE = 'ACTIVE',
+  CLOSED = 'CLOSED',
+  MAINTENANCE = 'MAINTENANCE',
+  PRE_OPENING = 'PRE_OPENING',
 }
 
 export interface Store {

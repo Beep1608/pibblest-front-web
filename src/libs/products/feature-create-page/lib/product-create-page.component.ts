@@ -7,6 +7,7 @@ import { TagStore } from "../../../tags/data-access/store/tag.store";
 
 @Component({
 	selector: 'app-product-create-page',
+	standalone: true,
 	imports: [ReactiveFormsModule, TranslatePipe],
 	templateUrl: './product-create-page.component.html'
 })
@@ -15,7 +16,8 @@ export class ProductCreatePageComponent implements OnInit {
 	product = inject(ProductStore);
 	tagStore = inject(TagStore);
 
-	isProcessing = signal(false); // Bandera local para bloqueo inmediato
+	// Bandera reactiva local para bloqueo total e instantáneo en la interfaz
+	isProcessing = signal(false);
 
 	productForm = this.fb.nonNullable.group({
 		name: ['', [Validators.required]],
@@ -30,16 +32,22 @@ export class ProductCreatePageComponent implements OnInit {
 	});
 
 	constructor() {
+		// Redirección instantánea al confirmar el éxito en el Store
 		effect(() => {
 			if (this.product.isSuccess()) {
-				// Ya no necesitamos setTimeout aquí si el bloqueo es inmediato
 				this.goBack();
 			}
 		});
+
+		// Desbloqueo seguro de la interfaz si ocurre un error en el servidor
+		effect(() => {
+			if (!this.product.isSubmitting()) {
+				this.isProcessing.set(false);
+			}
+		}, { allowSignalWrites: true });
 	}
 
 	ngOnInit() {
-		// Cargamos la lista completa de tags de productos (sin paginar) para el select
 		this.tagStore.loadAllProductTagsList();
 	}
 
@@ -51,9 +59,8 @@ export class ProductCreatePageComponent implements OnInit {
 	}
 
 	onSubmit() {
-		// Bloqueo inmediato al entrar a la función
 		if (this.productForm.valid && !this.isProcessing()) {
-			this.isProcessing.set(true); // Bloqueo UI instantáneo
+			this.isProcessing.set(true); // Bloqueo en el mismo milisegundo del submit
 			this.product.addProduct(this.productForm.getRawValue());
 		} else if (this.productForm.invalid) {
 			this.productForm.markAllAsTouched();
@@ -61,8 +68,7 @@ export class ProductCreatePageComponent implements OnInit {
 	}
 
 	goBack() {
-        // Asegúrate de resetear el estado del store al salir
-        this.product.resetProductState(); 
-        this.product.setProductView('admin-inventory');
-    }
+		this.product.resetProductState(); 
+		this.product.setProductView('admin-inventory');
+	}
 }

@@ -1,0 +1,59 @@
+<!-- src/libs/employees/ui/src/lib/employee-table/employee-table.component.html -->
+<div class="overflow-x-auto bg-base-100 rounded-box shadow-sm border border-base-200/50">
+  <table class="table table-zebra w-full">
+    <thead>
+      <tr>
+        <th class="w-[10%]">ID</th>
+        <th class="w-[30%]">{{ 'employees.table.name' | translate }}</th>
+        <th class="w-[20%]">{{ 'employees.table.username' | translate }}</th>
+        <th class="w-[15%]">{{ 'employees.table.role' | translate }}</th>
+        <th class="w-[15%]">{{ 'employees.table.stores' | translate }}</th>
+        <th class="w-[10%] text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of employees(); track item.id) {
+        <tr>
+          <td class="font-mono text-xs opacity-50">#{{ item.id }}</td>
+          <td>
+            <div class="font-bold text-base-content">{{ item.name }} {{ item.lastName }}</div>
+          </td>
+          <td>
+            <span class="text-sm font-medium">{{ item.username }}</span>
+          </td>
+          <td>
+            <span class="badge badge-sm font-bold bg-primary/10 text-primary border-primary/20">
+              {{ item.role }}
+            </span>
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              @for (assign of item.storeAssignments; track assign.storeId) {
+                <span class="badge badge-xs badge-outline badge-secondary">{{ assign.storeName }}</span>
+              } @empty {
+                <span class="text-xs text-base-content/40 italic">{{ 'employees.table.noStores' | translate }}</span>
+              }
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="flex justify-end gap-1.5">
+              <button class="btn btn-sm btn-ghost btn-circle text-primary" (click)="onEdit(item.id)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-ghost btn-circle text-error" (click)="onDelete(item.id)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="text-center py-8 text-base-content/50">
+            <i class="fa-solid fa-users-slash text-4xl mb-2"></i>
+            <p>{{ 'employees.table.empty' | translate }}</p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

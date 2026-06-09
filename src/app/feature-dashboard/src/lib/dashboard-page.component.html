@@ -3,7 +3,6 @@
   <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
   
   <div class="drawer-content flex flex-col h-screen overflow-hidden bg-base-100">
-
     <nav class="navbar w-full border-b border-base-200 bg-base-100 shadow-sm z-40">
       <div class="flex-none">
         <label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost lg:hidden">
@@ -42,6 +41,9 @@
           @case ('tags-products') {
             <app-tags-shell [context]="'products'"></app-tags-shell>
           }
+          @case ('employees') {
+            <app-employees-shell></app-employees-shell>
+          }
         }
       </div>
     </div>
@@ -59,9 +61,14 @@
       </div>
       
       <ul class="menu w-full px-3 gap-2">
+        
         <li>
-          <button [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.overview' | translate"
-                  class="flex items-center py-3">
+          <button (click)="dashboardStore.setView('overview')"
+                  [class.bg-base-300]="dashboardStore.currentView() === 'overview'" 
+                  [class.text-primary]="dashboardStore.currentView() === 'overview'" 
+                  [class.font-bold]="dashboardStore.currentView() === 'overview'"
+                  [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.overview' | translate"
+                  class="flex items-center py-3 transition-colors">
             <i class="fa-solid fa-house text-lg w-6 text-center"></i>
             <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
               {{ 'dashboard.sidebar.overview' | translate }}
@@ -70,9 +77,12 @@
         </li>
         
         <li>
-          <button [class.active]="dashboardStore.currentView() === 'stores'" (click)="dashboardStore.setView('stores')"
+          <button (click)="dashboardStore.setView('stores')"
+                  [class.bg-base-300]="dashboardStore.currentView() === 'stores'" 
+                  [class.text-primary]="dashboardStore.currentView() === 'stores'" 
+                  [class.font-bold]="dashboardStore.currentView() === 'stores'"
                   [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.stores' | translate"
-                  class="flex items-center py-3">
+                  class="flex items-center py-3 transition-colors">
             <i class="fa-solid fa-store text-lg w-6 text-center"></i>
             <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
               {{ 'dashboard.sidebar.stores' | translate }}
@@ -81,9 +91,12 @@
         </li>
         
         <li>
-          <button [class.active]="dashboardStore.currentView() === 'products'" (click)="dashboardStore.setView('products')"
+          <button (click)="dashboardStore.setView('products')"
+                  [class.bg-base-300]="dashboardStore.currentView() === 'products'" 
+                  [class.text-primary]="dashboardStore.currentView() === 'products'" 
+                  [class.font-bold]="dashboardStore.currentView() === 'products'"
                   [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.products' | translate"
-                  class="flex items-center py-3">
+                  class="flex items-center py-3 transition-colors">
             <i class="fa-solid fa-warehouse text-lg w-6 text-center"></i>
             <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
               {{ 'dashboard.sidebar.products' | translate }}
@@ -94,22 +107,32 @@
         <li>
           <details [open]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'">
             <summary (click)="expandSidebar()" 
+                     [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
+                     [class.text-primary]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
+                     [class.font-bold]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
                      [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.tags' | translate"
-                     class="flex items-center relative py-3">
+                     class="flex items-center relative py-3 transition-colors">
               <i class="fa-solid fa-tags text-lg w-6 text-center"></i>
               <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
                 {{ 'dashboard.sidebar.tags' | translate }}
               </span>
             </summary>
+            
             <ul class="ml-9 mt-2 overflow-hidden border-l border-base-300 pl-2" [class.hidden]="!isSidebarExpanded()">
               <li>
-                <a [class.active]="dashboardStore.currentView() === 'tags-stores'" (click)="dashboardStore.setView('tags-stores')" class="py-2.5">
+                <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores'" 
+                   [class.text-primary]="dashboardStore.currentView() === 'tags-stores'" 
+                   [class.font-bold]="dashboardStore.currentView() === 'tags-stores'"
+                   (click)="dashboardStore.setView('tags-stores')" class="py-2.5 transition-colors">
                   <i class="fa-solid fa-shop w-4 opacity-70"></i>
                   <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.stores' | translate }}</span>
                 </a>
               </li>
               <li>
-                <a [class.active]="dashboardStore.currentView() === 'tags-products'" (click)="dashboardStore.setView('tags-products')" class="py-2.5">
+                <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-products'" 
+                   [class.text-primary]="dashboardStore.currentView() === 'tags-products'" 
+                   [class.font-bold]="dashboardStore.currentView() === 'tags-products'"
+                   (click)="dashboardStore.setView('tags-products')" class="py-2.5 transition-colors">
                   <i class="fa-solid fa-box w-4 opacity-70"></i>
                   <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.products' | translate }}</span>
                 </a>
@@ -117,6 +140,22 @@
             </ul>
           </details>
         </li>
+
+        @if (isOwnerUser()) {
+          <li>
+            <button [class.bg-base-300]="dashboardStore.currentView() === 'employees'" 
+                    [class.text-primary]="dashboardStore.currentView() === 'employees'" 
+                    [class.font-bold]="dashboardStore.currentView() === 'employees'"
+                    (click)="dashboardStore.setView('employees')"
+                    [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.employees' | translate"
+                    class="flex items-center py-3 transition-colors">
+              <i class="fa-solid fa-users-gear text-lg w-6 text-center"></i>
+              <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+                {{ 'dashboard.sidebar.employees' | translate }}
+              </span>
+            </button>
+          </li>
+        }
       </ul>
 
     </div>

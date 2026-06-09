@@ -1,5 +1,5 @@
 // src/libs/stores/ui/src/lib/store-form/store-form.component.ts
-import { Component, output, inject, input, effect, OnInit } from '@angular/core';
+import { Component, output, inject, input, effect, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
@@ -21,6 +21,9 @@ export class StoreFormComponent implements OnInit {
   submitForm = output<any>();
   cancel = output<void>();
 
+  // ✨ Bandera reactiva local para bloqueo total e instantáneo en la interfaz
+  isProcessing = signal(false);
+
   storeStatuses = Object.values(StoreStatus);
 
   form = this.fb.nonNullable.group({
@@ -37,11 +40,19 @@ export class StoreFormComponent implements OnInit {
         this.form.patchValue({
           name: data.name,
           address: data.address,
-          status: (data.status as string).toLowerCase() as StoreStatus,
+          // ✨ FIX: Forzamos la transformación a mayúscula
+          status: (data.status as string).toUpperCase() as StoreStatus,
           tagsId: data.tags ? data.tags.map(t => t.id) : []
         });
       }
     });
+
+    // ✨ Desbloqueo seguro de la interfaz si el estado de carga (Store) termina sin éxito o con error
+    effect(() => {
+      if (!this.isSubmitting()) {
+        this.isProcessing.set(false);
+      }
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit() {
@@ -56,9 +67,11 @@ export class StoreFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.valid) {
+    // ✨ FIX: Bloqueo anti-spam instantáneo al evaluar la validez del formulario
+    if (this.form.valid && !this.isProcessing()) {
+      this.isProcessing.set(true);
       this.submitForm.emit(this.form.getRawValue());
-    } else {
+    } else if (this.form.invalid) {
       this.form.markAllAsTouched();
     }
   }

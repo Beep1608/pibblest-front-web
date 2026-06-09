@@ -17,8 +17,9 @@ export class TagsFormPageComponent implements OnInit {
 
   constructor() {
     effect(() => {
+      // ✨ FIX: Sin setTimeouts. Redirección absolutamente instantánea.
       if (this.tagStore.isSuccess()) {
-        setTimeout(() => this.goBack(), 1500);
+        this.goBack();
       }
     });
   }

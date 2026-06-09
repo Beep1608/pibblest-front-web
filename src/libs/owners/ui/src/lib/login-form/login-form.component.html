@@ -1,73 +1,110 @@
+<!-- src/libs/owners/ui/src/lib/login-form/login-form.component.html -->
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
-  class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white  rounded-lg"
+  class="flex flex-col gap-4 w-full max-w-md mx-auto p-6 bg-white rounded-xl shadow-sm border border-base-200"
 >
-  <h2 class="text-4xl font-bold mb-4">{{ 'login.form.title' | translate }}</h2>
+  <h2 class="text-3xl font-bold mb-2 text-center text-base-content">{{ 'login.form.title' | translate }}</h2>
 
-  <!--<div>
-    <div class="text-sm font-medium">
-      <span>{{ 'login.form.open.account' | translate }}</span>
-    </div>
+  <div class="relative flex w-full p-1 bg-base-200/50 rounded-lg mb-4 border border-base-300">
+    
+    <button 
+      type="button"
+      class="flex-1 py-2 text-sm font-semibold rounded-md transition-all duration-300 z-10 flex items-center justify-center gap-2"
+      [class.bg-base-100]="loginType() === 'owner'"
+      [class.shadow-sm]="loginType() === 'owner'"
+      [class.text-primary]="loginType() === 'owner'"
+      [class.text-base-content/50]="loginType() !== 'owner'"
+      [class.hover:text-base-content]="loginType() !== 'owner'"
+      (click)="toggleLoginType('owner')">
+      <i class="fa-solid fa-user-tie"></i> {{ 'login.role.owner' | translate }}
+    </button>
+
+    <button 
+      type="button"
+      class="flex-1 py-2 text-sm font-semibold rounded-md transition-all duration-300 z-10 flex items-center justify-center gap-2"
+      [class.bg-base-100]="loginType() === 'employee'"
+      [class.shadow-sm]="loginType() === 'employee'"
+      [class.text-primary]="loginType() === 'employee'"
+      [class.text-base-content/50]="loginType() !== 'employee'"
+      [class.hover:text-base-content]="loginType() !== 'employee'"
+      (click)="toggleLoginType('employee')">
+      <i class="fa-solid fa-user-tag"></i> {{ 'login.role.employee' | translate }}
+    </button>
+
   </div>
-  <hr class="border-t-4 border-gray-100" />-->
 
-  <div class="flex flex-col">
-    <!--<div class="text-sm font-medium">
-      <span>{{ 'login.form.normal.account' | translate }}</span>
-    </div>-->
-    <div class=" bg-gray-100  flex items-center rounded-lg">
-       <i class="fa-regular fa-envelope p-2 text-gray-600  "></i>
-
-      <input
-        type="email"
-        formControlName="email"
-        class=" py-2 outline-none bg-transparent w-full "
-        placeholder="hola@example.com"
-      />
-
-     
-    </div>
-     @if (
-        form.controls.email.hasError('email') && form.controls.email.touched
-      ) {
-        <span class="text-red-500 text-xs mt-1"> Ingresa un correo válido</span>
+  @if (loginType() === 'employee') {
+    <div class="flex flex-col animate-slide-down">
+      <div class="bg-base-200/50 flex items-center rounded-lg border border-base-300 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all duration-300">
+        <i class="fa-solid fa-building p-3 text-base-content/50 w-10 text-center"></i>
+        <input
+          type="text"
+          formControlName="organizationCode"
+          class="py-2.5 outline-none bg-transparent w-full text-base-content font-medium placeholder:font-normal"
+          [placeholder]="'login.form.organizationCode' | translate"
+        />
+      </div>
+      @if (form.controls.organizationCode.hasError('required') && form.controls.organizationCode.touched) {
+        <span class="text-error text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i> El código de organización es requerido</span>
       }
+    </div>
+  }
+
+  <!-- Campo Dinámico: Email (Dueño) / Username (Empleado) -->
+  <div class="flex flex-col">
+    <div class="bg-base-200/50 flex items-center rounded-lg border border-base-300 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all duration-300">
+      <i class="p-3 text-base-content/50 w-10 text-center transition-all duration-200"
+         [class.fa-regular]="loginType() === 'owner'"
+         [class.fa-solid]="loginType() !== 'owner'"
+         [class.fa-envelope]="loginType() === 'owner'"
+         [class.fa-user]="loginType() === 'employee'"></i>
+      <input
+        [type]="loginType() === 'owner' ? 'email' : 'text'"
+        formControlName="email"
+        class="py-2.5 outline-none bg-transparent w-full text-base-content font-medium placeholder:font-normal"
+        [placeholder]="loginType() === 'owner' ? 'hola@example.com' : ('login.form.username' | translate)"
+      />
+    </div>
+    
+    <!-- Errores Dinámicos -->
+    @if (form.controls.email.hasError('email') && form.controls.email.touched && loginType() === 'owner') {
+      <span class="text-error text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i> Ingresa un correo válido</span>
+    }
+    @if (form.controls.email.hasError('required') && form.controls.email.touched && loginType() === 'employee') {
+      <span class="text-error text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i> El usuario es requerido</span>
+    }
   </div>
 
-
   <div class="flex flex-col">
-
-    <div class=" bg-gray-100  flex items-center rounded-lg">
-       <i class="fa-solid fa-lock   p-2 text-gray-600"></i>
-
+    <div class="bg-base-200/50 flex items-center rounded-lg border border-base-300 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all duration-300">
+      <i class="fa-solid fa-lock p-3 text-base-content/50 w-10 text-center"></i>
       <input
         type="password"
         formControlName="password"
-        class=" py-2 outline-none bg-transparent w-full "
-        placeholder="*********"
+        class="py-2.5 outline-none bg-transparent w-full text-base-content font-medium placeholder:font-normal"
+        placeholder="••••••••"
       />
-
-     
     </div>
   </div>
 
-
   <button
     type="submit"
-    [disabled]="form.invalid || isLoading"
-    class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-400 disabled:bg-gray-400 transition-colors"
+    [disabled]="form.invalid || isLoading()"
+    class="mt-4 btn btn-primary w-full rounded-full shadow-sm"
   >
-    @if (isLoading) {
+    @if (isLoading()) {
+      <span class="loading loading-spinner loading-sm"></span>
       {{'login.button.login.message' | translate}}
     } @else {
-     {{'login.button.message' | translate}}
+      <i class="fa-solid fa-right-to-bracket mr-1"></i> {{'login.button.message' | translate}}
     }
   </button>
 
-  <div class="text-center mt-2 text-sm text-gray-600">
-    {{"login.doesnt.have.account" | translate}}
-    <a href="/register-owner" class="text-blue-600 hover:underline">{{"login.register.link" | translate}}</a
-    >
-  </div>
+  @if (loginType() === 'owner') {
+    <div class="text-center mt-4 text-sm text-base-content/70">
+      {{"login.doesnt.have.account" | translate}}
+      <a href="/register-owner" class="text-primary font-semibold hover:underline ml-1 transition-colors">{{"login.register.link" | translate}}</a>
+    </div>
+  }
 </form>

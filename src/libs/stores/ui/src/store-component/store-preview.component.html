@@ -9,13 +9,13 @@
           <span class="text-xs font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-md">
             <i class="fa-solid fa-clock mr-1"></i>{{ storePreview().operatinTime }}
           </span>
-          <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md border"
-            [class.bg-success/10]="storePreview().status === 'ACTIVE'"
-            [class.border-success/30]="storePreview().status === 'ACTIVE'"
-            [class.text-success]="storePreview().status === 'ACTIVE'"
-            [class.bg-base-200]="storePreview().status !== 'ACTIVE'"
-            [class.text-base-content]="storePreview().status !== 'ACTIVE'">
-            {{ storePreview().status }}
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border"
+            [class.bg-success/10]="storePreview().status === 'ACTIVE' || storePreview().status === 'active'"
+            [class.border-success/30]="storePreview().status === 'ACTIVE' || storePreview().status === 'active'"
+            [class.text-success]="storePreview().status === 'ACTIVE' || storePreview().status === 'active'"
+            [class.bg-base-200]="storePreview().status !== 'ACTIVE' && storePreview().status !== 'active'"
+            [class.text-base-content]="storePreview().status !== 'ACTIVE' && storePreview().status !== 'active'">
+            {{ storePreview().status.replace('_', ' ') | titlecase }}
           </span>
         </div>
       </div>

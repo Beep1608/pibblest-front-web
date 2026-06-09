@@ -5,25 +5,30 @@ import { TranslatePipe } from "@ngx-translate/core";
 import { StoreStore } from "../../../../data-access/lib/store/store.store";
 import { StorePreviewComponent } from "../../../../ui/src/store-component/store-preview.component";
 import { StoreTableComponent } from "../../../../ui/src/lib/store-table/store-table.component";
+import { TagStore } from "../../../../../tags/data-access/store/tag.store";
+import { TagButtonsComponent } from "../../../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component";
 
 @Component({
   selector: 'app-store-view-all-page',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, StorePreviewComponent, StoreTableComponent],
+  imports: [CommonModule, TranslatePipe, StorePreviewComponent, StoreTableComponent, TagButtonsComponent],
   templateUrl: './viewAll.component.html',
 })
 export class StoreViewAllPage implements OnInit {
   store = inject(StoreStore);
+  tagStore = inject(TagStore);
 
   ngOnInit() {
     this.store.resetAlerts();
-    // 1. Forzamos la carga inicial (Internamente enviará keyword="")
     this.store.loadStores();
     this.store.listenToStoreUpdates();
+
+    // ✨ Configuración inicial de los tags para las tiendas
+    this.tagStore.setContext('stores');
+    this.tagStore.loadAllStoreTagsList();
   }
 
   onSearch(keyword: string) {
-    // 2. Delegamos la lógica directamente al Store
     this.store.searchStores(keyword);
   }
 

@@ -5,11 +5,12 @@ import { StoreStore } from "../../../data-access";
 import { CartStore } from "../../../../cart/data-access/lib/store/cart.store";
 import { SaleStore } from "../../../../sales/data-access";
 import { TranslatePipe } from "@ngx-translate/core";
+import { TitleCasePipe } from "@angular/common";
 
 @Component({
   selector: 'app-store-preview-component',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, TitleCasePipe],
   templateUrl: './store-preview.component.html'
 })
 export class StorePreviewComponent {

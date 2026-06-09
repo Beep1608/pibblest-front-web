@@ -3,10 +3,10 @@
   <table class="table table-zebra w-full">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>{{ 'tags.table.name' | translate }}</th>
-        <th>{{ 'tags.table.usage' | translate }}</th>
-        <th class="text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+        <th class="w-[10%]">ID</th>
+        <th class="w-[50%]">{{ 'tags.table.name' | translate }}</th>
+        <th class="w-[20%]">{{ 'tags.table.usage' | translate }}</th>
+        <th class="w-[20%] text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -56,14 +56,15 @@
     </p>
     <div class="modal-action">
       <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="tagStore.isSubmitting()">
-        {{ 'stores.delete.cancel' | translate }}
+        {{ 'tags.delete.cancel' | translate }}
       </button>
+      
       <button class="btn btn-error" (click)="confirmDelete()" [disabled]="tagStore.isSubmitting()">
         @if (tagStore.isSubmitting()) {
           <span class="loading loading-spinner"></span>
         } @else {
           <i class="fa-solid fa-trash mr-1"></i>
-          {{ 'stores.delete.confirm' | translate }}
+          {{ 'tags.delete.confirm' | translate }}
         }
       </button>
     </div>

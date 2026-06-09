@@ -1,0 +1,149 @@
+<!-- src/libs/employees/ui/src/lib/employee-form/employee-form.component.html -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+  
+  <!-- General Information Section -->
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-5 space-y-4">
+      <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+        <i class="fa-solid fa-address-card mr-2 text-primary"></i>
+        {{ 'employees.form.generalInfo' | translate }}
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text font-medium">{{ 'employees.form.name' | translate }}</span>
+          </label>
+          <input formControlName="name" [placeholder]="'employees.form.namePlaceholder' | translate" 
+                 class="input input-bordered w-full transition-all duration-200 focus:input-primary focus:outline-none"
+                 [class.input-error]="form.controls.name.invalid && form.controls.name.touched" />
+        </div>
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text font-medium">{{ 'employees.form.lastName' | translate }}</span>
+          </label>
+          <input formControlName="lastName" [placeholder]="'employees.form.lastNamePlaceholder' | translate" 
+                 class="input input-bordered w-full transition-all duration-200 focus:input-primary focus:outline-none"
+                 [class.input-error]="form.controls.lastName.invalid && form.controls.lastName.touched" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store Assignments & Permissions Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Stores Selection List (Left Column) -->
+    <div class="card bg-base-100 border border-base-200 shadow-sm lg:col-span-1">
+      <div class="card-body p-5 space-y-4">
+        <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+          <i class="fa-solid fa-store mr-2 text-secondary"></i>
+          {{ 'employees.form.storesTitle' | translate }}
+        </h3>
+        
+        <div class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+          @for (store of storeStore.storesPage()?.stores; track store.id) {
+            <div class="p-3 border rounded-xl flex items-center justify-between transition-colors duration-200"
+                 [class.border-primary/30]="isStoreAssigned(store.id)"
+                 [class.bg-primary/5]="isStoreAssigned(store.id)"
+                 [class.border-base-200]="!isStoreAssigned(store.id)">
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-base-content">{{ store.name }}</span>
+                <span class="text-xs text-base-content/50 truncate max-w-[150px]">{{ store.address }}</span>
+              </div>
+              <button type="button" class="btn btn-xs rounded-full transition-all"
+                      [class.btn-primary]="isStoreAssigned(store.id)"
+                      [class.btn-outline]="!isStoreAssigned(store.id)"
+                      (click)="toggleStoreAssignment(store.id)">
+                @if (isStoreAssigned(store.id)) {
+                  <i class="fa-solid fa-circle-check"></i>
+                  {{ 'employees.form.assigned' | translate }}
+                } @else {
+                  <i class="fa-solid fa-plus"></i>
+                  {{ 'employees.form.assign' | translate }}
+                }
+              </button>
+            </div>
+          } @empty {
+            <p class="text-xs text-base-content/50 italic text-center py-4">{{ 'employees.form.noStoresAvailable' | translate }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions Configurator (Right Column) -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="card bg-base-100 border border-base-200 shadow-sm">
+        <div class="card-body p-5 space-y-4">
+          <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+            <i class="fa-solid fa-shield-halved mr-2 text-warning"></i>
+            {{ 'employees.form.permissionsTitle' | translate }}
+          </h3>
+          
+          <div formArrayName="storeAssignments" class="space-y-4">
+            @for (assignment of storeAssignments.controls; let i = $index; track i) {
+              <div [formGroupName]="i" 
+                   class="border border-base-300 rounded-xl p-4 bg-base-200/20 transition-colors"
+                   [class.border-error]="assignment.invalid && assignment.touched">
+                <div class="flex justify-between items-center border-b border-base-300 pb-2 mb-3">
+                  <h4 class="font-bold text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-shop"></i>
+                    {{ getStoreName(assignment.value.storeId) }}
+                  </h4>
+                  <button type="button" class="btn btn-circle btn-ghost btn-xs text-error" (click)="storeAssignments.removeAt(i)">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+                @if (assignment.invalid && assignment.touched) {
+                  <span class="text-error text-xs font-bold block mb-2">Revisa los permisos de esta tienda</span>
+                }
+                
+                <div formArrayName="permissions" class="space-y-3">
+                  @for (mod of modules; let j = $index; track mod.id) {
+                    <div [formGroupName]="j" class="grid grid-cols-1 md:grid-cols-5 items-start md:items-center py-2 border-b border-base-200/50 last:border-b-0">
+                      <span class="text-xs font-semibold uppercase text-base-content/70 md:col-span-1">{{ mod.name }}</span>
+                      
+                      <div class="flex flex-wrap gap-x-4 gap-y-2 md:col-span-4 mt-1 md:mt-0">
+                        @for (action of actions; track action) {
+                          <label class="label cursor-pointer justify-start gap-1.5 p-0">
+                            <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" 
+                                   [checked]="isActionSelected(i, j, action)"
+                                   (change)="toggleAction(i, j, action)" />
+                            <span class="label-text text-xs">{{ action | titlecase }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-12 text-base-content/50 border border-dashed border-base-300 rounded-xl">
+                <i class="fa-solid fa-user-lock text-4xl mb-3 opacity-40"></i>
+                <p class="text-sm font-medium">{{ 'employees.form.noStoresAssigned' | translate }}</p>
+                <p class="text-xs text-base-content/40 mt-1">{{ 'employees.form.noStoresAssignedHint' | translate }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Actions Panel -->
+  <div class="flex justify-end gap-3 pt-4 border-t border-base-200">
+    <button type="button" class="btn btn-ghost hover:bg-base-200/50" (click)="cancel.emit()">
+      {{ 'employees.form.cancel' | translate }}
+    </button>
+    <button type="submit" class="btn btn-primary px-8 shadow-sm" [disabled]="form.invalid || isSubmitting()">
+      @if (isSubmitting()) {
+        <span class="loading loading-spinner loading-sm"></span>
+        {{ 'employees.form.processing' | translate }}
+      } @else {
+        <i class="fa-solid fa-save mr-1.5"></i>
+        {{ 'employees.form.save' | translate }}
+      }
+    </button>
+  </div>
+
+</form>

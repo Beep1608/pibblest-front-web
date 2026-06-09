@@ -1,7 +1,7 @@
 // src/app/feature-dashboard/src/lib/data-access/store/dashboard.store.ts
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
 
-export type DashboardPage = 'overview' | 'stores' | 'products' | 'tags-stores' | 'tags-products';
+export type DashboardPage = 'overview' | 'stores' | 'products' | 'tags-stores' | 'tags-products' | 'employees';
 
 type UiState = {
     currentView: DashboardPage;

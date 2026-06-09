@@ -19,9 +19,6 @@ import { TranslateModule } from '@ngx-translate/core';
         <h1 class="text-2xl font-bold">{{ 'stores.create.title' | translate }}</h1>
       </div>
 
-      @if (store.isSuccess() && store.message()) {
-        <div class="alert alert-success mb-4"><i class="fa-solid fa-circle-check"></i><span>{{ store.message() }}</span></div>
-      }
       @if (store.error()) {
         <div class="alert alert-error mb-4"><i class="fa-solid fa-circle-exclamation"></i><span>{{ store.error() }}</span></div>
       }
@@ -39,8 +36,9 @@ export class StoreCreateComponent implements OnInit {
 
   constructor() {
     effect(() => {
+      // ✨ FIX: Sin retardos
       if (this.store.isSuccess()) {
-        setTimeout(() => this.goBack(), 1500);
+        this.goBack();
       }
     });
   }

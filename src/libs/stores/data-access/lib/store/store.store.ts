@@ -1,9 +1,9 @@
 // src/libs/stores/data-access/lib/store/store.store.ts
 import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { EMPTY, pipe, switchMap, tap, distinctUntilChanged } from 'rxjs';
 import { DashboardStore } from '../../../../../app/feature-dashboard/src/lib/data-access/store/dashboard.store';
@@ -31,6 +31,7 @@ interface StoreState {
     currentPage: number;
     pageSize: number;
     currentKeyword: string;
+    activeTagIds: number[];
 }
 
 const initialState: StoreState = {
@@ -48,12 +49,27 @@ const initialState: StoreState = {
     displayMode: 'grid',
     currentPage: 0,
     pageSize: 10,
-    currentKeyword: ''
+    currentKeyword: '',
+    activeTagIds: []
 };
 
 export const StoreStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
+    withComputed(({ storesPage, activeTagIds }) => ({
+        filteredStores: computed(() => {
+            const allStores = storesPage()?.stores || [];
+            const selectedTags = activeTagIds();
+
+            if (selectedTags.length === 0) {
+                return allStores;
+            }
+
+            return allStores.filter(store => {
+                return store.tags?.some(tag => selectedTags.includes(tag.id));
+            });
+        }),
+    })),
     withMethods((
         store,
         api = inject(StoreApiService),
@@ -62,10 +78,12 @@ export const StoreStore = signalStore(
         ui = inject(UIStore),
     ) => {
 
-        // ✨ EL EMBUDO PARA TIENDAS: Filtra peticiones repetidas
-        const performFetch = rxMethod<{ kw: string, p: number }>(
+        const performFetch = rxMethod<{ kw: string, p: number, force?: boolean }>(
             pipe(
-                distinctUntilChanged((prev, curr) => prev.kw === curr.kw && prev.p === curr.p),
+                distinctUntilChanged((prev, curr) => {
+                    if (curr.force) return false;
+                    return prev.kw === curr.kw && prev.p === curr.p;
+                }),
                 tap(() => patchState(store, { isLoading: true, error: null, isSuccess: false })),
                 switchMap(({ kw, p }) => {
                     return api.getStores(kw, p, store.pageSize(), 'id,desc').pipe(
@@ -106,12 +124,12 @@ export const StoreStore = signalStore(
             setSearchKeyword(keyword: string) {
                 patchState(store, { currentKeyword: keyword, currentPage: 0 });
             },
-
-            // ✨ Lógica centralizada para listar/buscar
+            setActiveTags(tagIds: number[]) {
+                patchState(store, { activeTagIds: tagIds });
+            },
             loadStores() {
                 performFetch({ kw: store.currentKeyword(), p: store.currentPage() });
             },
-
             searchStores: rxMethod<string>(
                 pipe(
                     tap((keyword) => {
@@ -121,7 +139,6 @@ export const StoreStore = signalStore(
                     })
                 )
             ),
-
             changePage: rxMethod<number>(
                 pipe(
                     tap((delta) => {
@@ -131,7 +148,6 @@ export const StoreStore = signalStore(
                     })
                 )
             ),
-
             createStore: rxMethod<CreateStoreDto>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -141,6 +157,7 @@ export const StoreStore = signalStore(
                                 next: () => {
                                     patchState(store, { isSubmitting: false, isSuccess: true, message: 'Tienda creada con éxito' });
                                     ui.showToast('Tienda creada con éxito');
+                                    performFetch({ kw: store.currentKeyword(), p: store.currentPage(), force: true });
                                 },
                                 error: (error: HttpErrorResponse) => {
                                     patchState(store, { isSubmitting: false, isSuccess: false, error: error.error?.message || 'Error al crear la tienda' });
@@ -151,7 +168,6 @@ export const StoreStore = signalStore(
                     ),
                 ),
             ),
-
             updateStore: rxMethod<{ id: number, request: UpdateStoreRequest }>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -161,6 +177,7 @@ export const StoreStore = signalStore(
                                 next: () => {
                                     patchState(store, { isSubmitting: false, isSuccess: true, message: 'Tienda actualizada correctamente' });
                                     ui.showToast('Tienda actualizada con éxito');
+                                    performFetch({ kw: store.currentKeyword(), p: store.currentPage(), force: true });
                                 },
                                 error: (error: HttpErrorResponse) => {
                                     patchState(store, { isSubmitting: false, isSuccess: false, error: error.error?.message || 'Error al actualizar' });
@@ -171,7 +188,6 @@ export const StoreStore = signalStore(
                     ),
                 ),
             ),
-
             deleteStore: rxMethod<number>(
                 pipe(
                     tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
@@ -189,13 +205,12 @@ export const StoreStore = signalStore(
                                         storesPage: { ...state.storesPage, stores: updatedStores }
                                     };
                                 }),
-                                    error: (err: HttpErrorResponse) => patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar' })
+                                error: (err: HttpErrorResponse) => patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar' })
                             })
                         )
                     )
                 )
             ),
-
             listenToStoreUpdates: rxMethod<void>(
                 pipe(
                     switchMap(() => {

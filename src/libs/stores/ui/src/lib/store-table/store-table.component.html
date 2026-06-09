@@ -20,10 +20,10 @@
           </td>
           <td>
             <span class="text-sm font-medium">{{ item.address }}</span><br>
-            <span class="badge badge-sm uppercase font-bold"
-              [class.badge-success]="item.status === 'ACTIVE'"
-              [class.badge-ghost]="item.status !== 'ACTIVE'">
-              {{ item.status }}
+            <span class="badge badge-sm font-bold"
+              [class.badge-success]="item.status === 'ACTIVE' || item.status === 'active'"
+              [class.badge-ghost]="item.status !== 'ACTIVE' && item.status !== 'active'">
+              {{ item.status.replace('_', ' ') | titlecase }}
             </span>
           </td>
           <td>

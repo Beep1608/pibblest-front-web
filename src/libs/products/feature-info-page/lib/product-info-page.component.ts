@@ -1,5 +1,5 @@
 // src/libs/products/feature-info-page/lib/product-info-page.component.ts
-import { Component, effect, inject, OnInit } from "@angular/core";
+import { Component, effect, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ProductStore } from "../../data-access/lib/store/product.store";
@@ -7,6 +7,7 @@ import { TagStore } from "../../../tags/data-access/store/tag.store";
 
 @Component({
 	selector: 'app-product-info-page',
+	standalone: true,
 	imports: [ReactiveFormsModule, TranslatePipe],
 	templateUrl: './product-info-page.component.html'
 })
@@ -14,6 +15,9 @@ export class ProductInfoPage implements OnInit {
 	private fb = inject(FormBuilder);
 	productStore = inject(ProductStore);
 	tagStore = inject(TagStore);
+
+	// Bandera reactiva local para bloqueo total e instantáneo en la interfaz
+	isProcessing = signal(false);
 
 	productForm = this.fb.nonNullable.group({
 		name: ['', [Validators.required]],
@@ -45,17 +49,22 @@ export class ProductInfoPage implements OnInit {
 			}
 		});
 
+		// ✨ FIX: Sin retardos artificiales. Redirección absolutamente instantánea.
 		effect(() => {
 			if (this.productStore.isSuccess()) {
-				setTimeout(() => {
-					this.goBack();
-				}, 1500);
+				this.goBack();
 			}
 		});
+
+		// Desbloqueo seguro de la interfaz si ocurre un error en el servidor
+		effect(() => {
+			if (!this.productStore.isSubmitting()) {
+				this.isProcessing.set(false);
+			}
+		}, { allowSignalWrites: true });
 	}
 
 	ngOnInit() {
-		// Cargamos la lista completa de tags de productos (sin paginar) para el select
 		this.tagStore.loadAllProductTagsList();
 		
 		const id = this.productStore.selectedProductId();
@@ -74,19 +83,20 @@ export class ProductInfoPage implements OnInit {
 	}
 
 	onSubmit() {
-        // ✨ FIX: Bloqueamos peticiones repetidas generadas por la tecla Enter
-        if (this.productForm.valid && !this.productStore.isSubmitting()) {
-            const id = this.productStore.selectedProductId();
-            if (id) {
-                this.productStore.updateProduct({ id, request: this.productForm.getRawValue() });
-            }
-        } else if (this.productForm.invalid) {
-            this.productForm.markAllAsTouched();
-        }
-    }
+		if (this.productForm.valid && !this.isProcessing()) {
+			this.isProcessing.set(true); // Bloqueo instantáneo anti-spam
+			const id = this.productStore.selectedProductId();
+			if (id) {
+				this.productStore.updateProduct({ id, request: this.productForm.getRawValue() });
+			}
+		} else if (this.productForm.invalid) {
+			this.productForm.markAllAsTouched();
+		}
+	}
 
 	goBack() {
 		this.productStore.setSelectedProductId(null);
+		this.productStore.resetProductState();
 		this.productStore.setProductView('admin-inventory');
 	}
 }

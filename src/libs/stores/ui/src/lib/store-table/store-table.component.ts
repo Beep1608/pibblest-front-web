@@ -5,11 +5,12 @@ import { TranslatePipe } from "@ngx-translate/core";
 import { StoreStore } from "../../../../data-access/lib/store/store.store";
 import { CartStore } from "../../../../../cart/data-access/lib/store/cart.store";
 import { SaleStore } from "../../../../../sales/data-access";
+import { TitleCasePipe } from "@angular/common";
 
 @Component({
   selector: 'app-store-table-component',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, TitleCasePipe],
   templateUrl: './store-table.component.html'
 })
 export class StoreTableComponent {

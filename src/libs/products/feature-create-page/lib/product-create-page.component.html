@@ -5,13 +5,6 @@
 			<i class="fa-solid fa-box-open mr-2"></i>
 			{{ 'admin.product.create.title' | translate }}
 		</h2>
-		
-		@if (product.isSuccess() && product.message()) {
-			<div class="alert alert-success mb-6">
-				<i class="fa-solid fa-circle-check"></i>
-				<span>{{ product.message() }}</span>
-			</div>
-		}
 
 		@if (product.error()) {
 			<div class="alert alert-error mb-6">
@@ -25,25 +18,25 @@
 			<label class="form-control w-full">
 				<div class="label"><span class="label-text">{{ 'admin.product.fields.name' | translate }}</span></div>
 				<input type="text" formControlName="name" class="input input-bordered w-full" 
-					   [class.input-error]="productForm.controls.name.invalid && productForm.controls.name.touched" />
+				       [class.input-error]="productForm.controls.name.invalid && productForm.controls.name.touched" />
 			</label>
 
 			<label class="form-control w-full">
 				<div class="label"><span class="label-text">{{ 'admin.product.fields.brand' | translate }}</span></div>
 				<input type="text" formControlName="brand" class="input input-bordered w-full" 
-					   [class.input-error]="productForm.controls.brand.invalid && productForm.controls.brand.touched" />
+				       [class.input-error]="productForm.controls.brand.invalid && productForm.controls.brand.touched" />
 			</label>
 
 			<label class="form-control w-full">
 				<div class="label"><span class="label-text">{{ 'admin.product.fields.sku' | translate }}</span></div>
 				<input type="text" formControlName="sku" class="input input-bordered w-full" 
-					   [class.input-error]="productForm.controls.sku.invalid && productForm.controls.sku.touched" />
+				       [class.input-error]="productForm.controls.sku.invalid && productForm.controls.sku.touched" />
 			</label>
 
 			<label class="form-control w-full">
 				<div class="label"><span class="label-text">{{ 'admin.product.fields.barcode' | translate }}</span></div>
 				<input type="text" formControlName="barcode" class="input input-bordered w-full" 
-					   [class.input-error]="productForm.controls.barcode.invalid && productForm.controls.barcode.touched" />
+				       [class.input-error]="productForm.controls.barcode.invalid && productForm.controls.barcode.touched" />
 			</label>
 
 			<label class="form-control w-full">
@@ -65,7 +58,7 @@
 			<label class="form-control w-full md:col-span-2">
 				<div class="label"><span class="label-text">{{ 'admin.product.fields.quantity' | translate }}</span></div>
 				<input type="number" formControlName="quantity" class="input input-bordered w-full" 
-					   [class.input-error]="productForm.controls.quantity.invalid && productForm.controls.quantity.touched" />
+				       [class.input-error]="productForm.controls.quantity.invalid && productForm.controls.quantity.touched" />
 			</label>
 
 			<label class="form-control w-full md:col-span-2">
@@ -93,21 +86,22 @@
 			</label>
 
 			<div class="md:col-span-2 flex justify-end gap-3 mt-4">
-				<button type="button" class="btn btn-ghost" (click)="goBack()">
+				<button type="button" class="btn btn-ghost" (click)="goBack()" [disabled]="isProcessing() || product.isSubmitting()">
 					<i class="fa-solid fa-arrow-left mr-1"></i>
 					{{ 'admin.product.create.cancel' | translate }}
 				</button>
+				
 				<button 
 					type="submit" 
-					class="btn btn-primary" 
+					class="btn btn-primary min-w-[160px] flex flex-nowrap justify-center items-center gap-2" 
 					[disabled]="productForm.invalid || isProcessing() || product.isSubmitting()">
 					
 					@if (isProcessing() || product.isSubmitting()) {
-						<span class="loading loading-spinner"></span>
+						<span class="loading loading-spinner loading-sm"></span>
 						<span>{{ 'admin.product.create.processing' | translate }}</span>
 					} @else {
-						<i class="fa-solid fa-save mr-1"></i>
-						{{ 'admin.product.create.submit' | translate }}
+						<i class="fa-solid fa-save"></i>
+						<span>{{ 'admin.product.create.submit' | translate }}</span>
 					}
 				</button>
 			</div>

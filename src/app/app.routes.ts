@@ -1,6 +1,7 @@
 import { authGuard } from '../libs/auth/data-access/auth.guard';
 import { loginRoutes } from './../libs/owners/feature-login/src/lib.routes';
 import { Route } from '@angular/router';
+import { ownerOnlyGuard } from './core/guards/owner-only.guard';
 
 export const appRoutes: Route[] = [
 
@@ -20,6 +21,15 @@ export const appRoutes: Route[] = [
     {
         path:'verify',
         loadChildren: () => import('@pibblest-front-web/owners/feature-verify').then(m => m.verifyRoutes),
+    },
+    {
+        path: 'auth/activate-account',
+        loadComponent: () => import('./auth/feature-activate/activate-account.component').then(m => m.ActivateAccountComponent)
+    },
+    {
+        path: 'employees',
+        loadComponent: () => import('../libs/employees/feature-shell/src/lib/employee-shell.component').then(m => m.EmployeeShellComponent),
+        canActivate: [ownerOnlyGuard]
     },
     {
         path:'dashboard',

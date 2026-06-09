@@ -5,13 +5,6 @@
 			<i class="fa-solid fa-pen-to-square mr-2"></i>
 			{{ 'admin.product.edit.title' | translate }}
 		</h2>
-		
-		@if (productStore.isSuccess() && productStore.message()) {
-			<div class="alert alert-success mb-6">
-				<i class="fa-solid fa-circle-check"></i>
-				<span>{{ productStore.message() }}</span>
-			</div>
-		}
 
 		@if (productStore.error()) {
 			<div class="alert alert-error mb-6">
@@ -100,16 +93,22 @@
 				</label>
 
 				<div class="md:col-span-2 flex justify-end gap-3 mt-4">
-					<button type="button" class="btn btn-ghost" (click)="goBack()">
+					<button type="button" class="btn btn-ghost" (click)="goBack()" [disabled]="isProcessing() || productStore.isSubmitting()">
 						<i class="fa-solid fa-arrow-left mr-1"></i>
 						{{ 'admin.product.create.cancel' | translate }}
 					</button>
-					<button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || productStore.isSubmitting()">
-						@if (productStore.isSubmitting()) {
-							<span class="loading loading-spinner"></span>
+					
+					<button 
+						type="submit" 
+						class="btn btn-primary min-w-[160px] flex flex-nowrap justify-center items-center gap-2" 
+						[disabled]="productForm.invalid || isProcessing() || productStore.isSubmitting()">
+						
+						@if (isProcessing() || productStore.isSubmitting()) {
+							<span class="loading loading-spinner loading-sm"></span>
+							<span>{{ 'admin.product.edit.processing' | translate }}</span>
 						} @else {
-							<i class="fa-solid fa-save mr-1"></i>
-							{{ 'admin.product.edit.submit' | translate }}
+							<i class="fa-solid fa-save"></i>
+							<span>{{ 'admin.product.edit.submit' | translate }}</span>
 						}
 					</button>
 				</div>
