@@ -11,8 +11,11 @@ export class EmployeeApiService {
     private http = inject(HttpClient);
     private readonly baseUrl = 'http://localhost:8081/api/employees';
 
-    getAllEmployees(page = 0, size = 10): Observable<EmployeePageResponse> {
-        const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    getAllEmployees(page = 0, size = 10, search = ''): Observable<EmployeePageResponse> {
+        let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+        if (search) {
+            params = params.set('search', search);
+        }
         return this.http.get<EmployeePageResponse>(this.baseUrl, { params });
     }
 

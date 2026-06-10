@@ -1,0 +1,911 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: src/libs/employees/**/*.{ts,html}
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/libs/employees/data-access/src/index.ts
+src/libs/employees/data-access/src/lib/models/employee-config.ts
+src/libs/employees/data-access/src/lib/models/employee.model.ts
+src/libs/employees/data-access/src/lib/services/employee-api.service.ts
+src/libs/employees/data-access/src/lib/store/employee.store.ts
+src/libs/employees/feature-form/src/index.ts
+src/libs/employees/feature-form/src/lib/employee-form-page.component.ts
+src/libs/employees/feature-shell/src/index.ts
+src/libs/employees/feature-shell/src/lib/employee-shell.component.ts
+src/libs/employees/ui/src/index.ts
+src/libs/employees/ui/src/lib/employee-form/employee-form.component.html
+src/libs/employees/ui/src/lib/employee-form/employee-form.component.ts
+src/libs/employees/ui/src/lib/employee-table/employee-table.component.html
+src/libs/employees/ui/src/lib/employee-table/employee-table.component.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/libs/employees/data-access/src/index.ts">
+export * from './lib/models/employee.model';
+export * from './lib/models/employee-config';
+export * from './lib/services/employee-api.service';
+export * from './lib/store/employee.store';
+</file>
+
+<file path="src/libs/employees/data-access/src/lib/models/employee-config.ts">
+// src/libs/employees/data-access/src/lib/models/employee-config.ts
+export const MODULE_CONFIG = [
+  { id: 1, name: 'Productos', code: 'MODULE_PRODUCTS' },
+  { id: 2, name: 'Tiendas', code: 'MODULE_STORES' },
+  { id: 3, name: 'Ventas', code: 'MODULE_SALES' },
+  { id: 4, name: 'Empleados', code: 'MODULE_EMPLOYEES' }
+];
+
+export const ACTIONS = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
+</file>
+
+<file path="src/libs/employees/data-access/src/lib/models/employee.model.ts">
+// src/libs/employees/data-access/src/lib/models/employee.model.ts
+export interface ModulePermissionDto {
+    moduleId: number;
+    moduleCode: string;
+    actions: string[];
+}
+
+export interface StoreAssignmentDto {
+    storeId: number;
+    storeName: string;
+    modules: ModulePermissionDto[];
+}
+
+export interface EmployeeDto {
+    id: string;
+    name: string;
+    lastName: string;
+    username: string;
+    role: string;
+    storeAssignments: StoreAssignmentDto[];
+}
+
+export interface EmployeePageResponse {
+    employees: EmployeeDto[];
+    pageNo: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+}
+
+export interface ModulePermissionRequest {
+    moduleId: number;
+    actions: string[];
+}
+
+export interface StoreAssignmentRequest {
+    storeId: number;
+    permissions: ModulePermissionRequest[];
+}
+
+export interface CreateEmployeeRequest {
+    name: string;
+    lastName: string;
+    storeAssignments: StoreAssignmentRequest[];
+}
+
+export interface UpdateEmployeeRequest {
+    name: string;
+    lastName: string;
+    storeAssignments: StoreAssignmentRequest[];
+}
+</file>
+
+<file path="src/libs/employees/data-access/src/lib/services/employee-api.service.ts">
+// src/libs/employees/data-access/src/lib/services/employee-api.service.ts
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CreateEmployeeRequest, EmployeeDto, EmployeePageResponse, UpdateEmployeeRequest } from '../models/employee.model';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class EmployeeApiService {
+    private http = inject(HttpClient);
+    private readonly baseUrl = 'http://localhost:8081/api/employees';
+
+    getAllEmployees(page = 0, size = 10): Observable<EmployeePageResponse> {
+        const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+        return this.http.get<EmployeePageResponse>(this.baseUrl, { params });
+    }
+
+    getEmployeeById(id: string): Observable<EmployeeDto> {
+        return this.http.get<EmployeeDto>(`${this.baseUrl}/${id}`);
+    }
+
+    createEmployee(request: CreateEmployeeRequest): Observable<{ message: string, activationLink: string }> {
+        console.log("ApiService: Intentando POST a", this.baseUrl, request);
+        return this.http.post<{ message: string, activationLink: string }>(this.baseUrl, request);
+    }
+
+    editEmployee(id: string, request: UpdateEmployeeRequest): Observable<{ message: string }> {
+        console.log("ApiService: Intentando PUT a", `${this.baseUrl}/${id}`, request);
+        return this.http.put<{ message: string }>(`${this.baseUrl}/${id}`, request);
+    }
+
+    deleteEmployee(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    }
+
+    resendActivation(id: string): Observable<{ message: string, activationLink: string }> {
+        return this.http.post<{ message: string, activationLink: string }>(`${this.baseUrl}/${id}/resend-activation`, {});
+    }
+
+    activateAccount(token: string, password: string): Observable<{ message: string }> {
+        return this.http.post<{ message: string }>(`${this.baseUrl}/activate`, { token, password });
+    }
+}
+</file>
+
+<file path="src/libs/employees/data-access/src/lib/store/employee.store.ts">
+// src/libs/employees/data-access/src/lib/store/employee.store.ts
+import { HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { tapResponse } from '@ngrx/operators';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { pipe, switchMap, tap, EMPTY } from 'rxjs';
+import { EmployeeApiService } from '../services/employee-api.service';
+import { EmployeePageResponse, EmployeeDto, CreateEmployeeRequest, UpdateEmployeeRequest } from '../models/employee.model';
+import { UIStore } from '../../../../../shared/data-access/store/ui.store';
+
+export type EmployeeView = 'list' | 'create' | 'edit';
+
+interface EmployeeState {
+    isLoading: boolean;
+    isSubmitting: boolean;
+    error: string | null;
+    isSuccess: boolean;
+    message: string | null;
+    activationLink: string | null;
+    employeesPage: EmployeePageResponse | null;
+    currentView: EmployeeView;
+    selectedEmployeeId: string | null;
+    selectedEmployee: EmployeeDto | null;
+    currentPage: number;
+    pageSize: number;
+}
+
+const initialState: EmployeeState = {
+    isLoading: false,
+    isSubmitting: false,
+    error: null,
+    isSuccess: false,
+    message: null,
+    activationLink: null,
+    employeesPage: null,
+    currentView: 'list',
+    selectedEmployeeId: null,
+    selectedEmployee: null,
+    currentPage: 0,
+    pageSize: 10
+};
+
+export const EmployeeStore = signalStore(
+    { providedIn: 'root' },
+    withState(initialState),
+    withMethods((store, api = inject(EmployeeApiService), ui = inject(UIStore)) => {
+        
+        const setView = (view: EmployeeView) => {
+            patchState(store, { currentView: view, isSuccess: false, error: null, message: null, activationLink: null });
+        };
+
+        const setPage = (page: number) => {
+            patchState(store, { currentPage: page });
+        };
+
+        const setSelectedEmployeeId = (id: string | null) => {
+            patchState(store, { selectedEmployeeId: id });
+        };
+
+        const resetAlerts = () => {
+            patchState(store, { isSuccess: false, error: null, message: null, activationLink: null, isSubmitting: false });
+        };
+
+        const resetStore = () => {
+            patchState(store, { 
+                selectedEmployee: null, 
+                selectedEmployeeId: null,
+                currentView: 'list',
+                isSuccess: false,
+                error: null
+            });
+        };
+
+        const loadEmployees = rxMethod<void>(
+            pipe(
+                tap(() => patchState(store, { isLoading: true, error: null })),
+                switchMap(() => api.getAllEmployees(store.currentPage(), store.pageSize()).pipe(
+                    tapResponse({
+                        next: (response) => patchState(store, { isLoading: false, employeesPage: response }),
+                        error: (err: HttpErrorResponse) => patchState(store, { isLoading: false, error: err.error?.message || 'Error al cargar empleados' })
+                    })
+                ))
+            )
+        );
+
+        const loadEmployeeDetails = rxMethod<string>(
+            pipe(
+                // ✨ SOLUCIÓN: Recibimos el 'id' en el tap y lo guardamos inmediatamente en el estado
+                tap((id) => patchState(store, { 
+                    isLoading: true, 
+                    error: null, 
+                    selectedEmployeeId: id 
+                })),
+                switchMap((id) => api.getEmployeeById(id).pipe(
+                    tapResponse({
+                        next: (employee) => {
+                            console.log("DATA RECIBIDA DEL BACKEND:", employee);
+                            patchState(store, { 
+                                isLoading: false, 
+                                selectedEmployee: employee,
+                                currentView: 'edit' 
+                            });
+                        },
+                        error: (err: HttpErrorResponse) => {
+                            console.error("ERROR DE API:", err);
+                            patchState(store, { 
+                                isLoading: false, 
+                                error: err.error?.message || 'Error al cargar detalles del empleado' 
+                            });
+                        }
+                    })
+                ))
+            )
+        );
+
+        const createEmployee = rxMethod<CreateEmployeeRequest>(
+            pipe(
+                tap(() => {
+                    console.log("Iniciando petición HTTP (Creación)...");
+                    patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null });
+                }),
+                switchMap(req => api.createEmployee(req).pipe(
+                    tapResponse({
+                        next: (res) => {
+                            patchState(store, { isSubmitting: false, isSuccess: true, message: res.message, activationLink: res.activationLink });
+                            ui.showToast(res.message);
+                            setView('list');
+                            loadEmployees();
+                        },
+                        error: (err: HttpErrorResponse) => {
+                            patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al crear empleado' });
+                            ui.showToast(err.message, 'error');
+                        }
+                    })
+                ))
+            )
+        );
+
+        const updateEmployee = rxMethod<{ id: string, request: UpdateEmployeeRequest }>(
+            pipe(
+                tap(() => {
+                    console.log("Iniciando petición HTTP (Edición)...");
+                    patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null });
+                }),
+                switchMap(({ id, request }) => {
+                    return api.editEmployee(id, request).pipe(
+                        tapResponse({
+                            next: (res) => {
+                                patchState(store, { isSubmitting: false, isSuccess: true, message: res.message });
+                                ui.showToast(res.message);
+                                setView('list');
+                                loadEmployees();
+                            },
+                            error: (err: HttpErrorResponse) => {
+                                patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al editar empleado' });
+                                ui.showToast(err.message, 'error');
+                            }
+                        })
+                    );
+                })
+            )
+        );
+
+        const deleteEmployee = rxMethod<string>(
+            pipe(
+                tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
+                switchMap((id) => api.deleteEmployee(id).pipe(
+                    tapResponse({
+                        next: () => {
+                            patchState(store, (state) => {
+                                ui.showToast('Empleado eliminado con éxito');
+                                if (!state.employeesPage) return { isSubmitting: false, isSuccess: true };
+                                const updatedList = state.employeesPage.employees.filter(e => e.id !== id);
+                                return {
+                                    isSubmitting: false,
+                                    isSuccess: true,
+                                    employeesPage: { ...state.employeesPage, employees: updatedList }
+                                };
+                            });
+                        },
+                        error: (err: HttpErrorResponse) => {
+                            patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar empleado' });
+                            ui.showToast(err.message, 'error');
+                        }
+                    })
+                ))
+            )
+        );
+
+        return {
+            setView,
+            setPage,
+            setSelectedEmployeeId,
+            resetAlerts,
+            resetStore,
+            loadEmployees,
+            loadEmployeeDetails,
+            createEmployee,
+            updateEmployee,
+            deleteEmployee
+        };
+    })
+);
+</file>
+
+<file path="src/libs/employees/feature-form/src/index.ts">
+export * from './lib/employee-form-page.component';
+</file>
+
+<file path="src/libs/employees/feature-form/src/lib/employee-form-page.component.ts">
+// src/libs/employees/feature-form/src/lib/employee-form-page.component.ts
+import { Component, inject } from '@angular/core';
+import { EmployeeStore } from '../../../data-access/src';
+import { EmployeeFormComponent } from '../../../ui/src/lib/employee-form/employee-form.component';
+
+@Component({
+  selector: 'app-employee-form-page',
+  standalone: true,
+  imports: [EmployeeFormComponent],
+  template: `
+    <app-employee-form 
+        [isSubmitting]="store.isSubmitting()"
+        [initialData]="store.selectedEmployee()"
+        (submitForm)="onSave($event)"
+        (cancel)="store.setView('list')">
+    </app-employee-form>
+  `
+})
+export class EmployeeFormPageComponent {
+  store = inject(EmployeeStore);
+
+  onSave(payload: any) {
+    console.log("onSave ejecutado en el PageComponent:", payload); 
+    if (this.store.currentView() === 'create') {
+      this.store.createEmployee(payload);
+    } else {
+      // Verifica que el ID esté presente antes de enviar
+      const id = this.store.selectedEmployeeId();
+      console.log ("Editando ");
+      console.log(id);
+      if (id) {
+            console.log('Editando');
+         this.store.updateEmployee({ id, request: payload });
+      }
+    }
+  }
+}
+</file>
+
+<file path="src/libs/employees/feature-shell/src/index.ts">
+export * from './lib/employee-shell.component';
+</file>
+
+<file path="src/libs/employees/feature-shell/src/lib/employee-shell.component.ts">
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { EmployeeStore } from '../../../data-access/src/lib/store/employee.store';
+import { EmployeeTableComponent } from '../../../ui/src/lib/employee-table/employee-table.component';
+import { EmployeeFormPageComponent } from '../../../feature-form/src/lib/employee-form-page.component';
+
+@Component({
+	selector: 'app-employees-shell',
+	standalone: true,
+	imports: [TranslateModule, EmployeeTableComponent, EmployeeFormPageComponent],
+	template: `
+		<div class="employees-module-shell w-full h-full">
+			@switch (employeeStore.currentView()) {
+				@case ('list') {
+					<div class="p-6 bg-base-100 rounded-2xl shadow-sm border border-base-200/50">
+						<h2 class="text-2xl font-bold mb-4 text-base-content">
+							<i class="fa-solid fa-users-gear mr-2 text-primary"></i>
+							{{ 'employees.title' | translate }}
+						</h2>
+
+						<app-employee-table
+							[employees]="employeeStore.employeesPage()?.employees || []"
+							(delete)="employeeStore.deleteEmployee($event)"
+							(edit)="employeeStore.loadEmployeeDetails($event)"
+						></app-employee-table>
+					</div>
+				}
+				@case ('create') {
+					<app-employee-form-page></app-employee-form-page>
+				}
+				@case ('edit') {
+					<app-employee-form-page></app-employee-form-page>
+				}
+				@default {
+                    <div class="p-6 text-center text-primary font-bold">
+                        Cargando...
+                    </div>
+                }
+			}
+		</div>
+	`,
+})
+export class EmployeeShellComponent implements OnInit, OnDestroy {
+	employeeStore = inject(EmployeeStore);
+	
+	ngOnInit() {
+		this.employeeStore.loadEmployees();
+	}
+
+	ngOnDestroy() {
+		this.employeeStore.resetStore();
+	}
+}
+</file>
+
+<file path="src/libs/employees/ui/src/index.ts">
+export * from './lib/employee-form/employee-form.component';
+export * from './lib/employee-table/employee-table.component';
+</file>
+
+<file path="src/libs/employees/ui/src/lib/employee-form/employee-form.component.html">
+<!-- src/libs/employees/ui/src/lib/employee-form/employee-form.component.html -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+  
+  <!-- General Information Section -->
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-5 space-y-4">
+      <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+        <i class="fa-solid fa-address-card mr-2 text-primary"></i>
+        {{ 'employees.form.generalInfo' | translate }}
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text font-medium">{{ 'employees.form.name' | translate }}</span>
+          </label>
+          <input formControlName="name" [placeholder]="'employees.form.namePlaceholder' | translate" 
+                 class="input input-bordered w-full transition-all duration-200 focus:input-primary focus:outline-none"
+                 [class.input-error]="form.controls.name.invalid && form.controls.name.touched" />
+        </div>
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text font-medium">{{ 'employees.form.lastName' | translate }}</span>
+          </label>
+          <input formControlName="lastName" [placeholder]="'employees.form.lastNamePlaceholder' | translate" 
+                 class="input input-bordered w-full transition-all duration-200 focus:input-primary focus:outline-none"
+                 [class.input-error]="form.controls.lastName.invalid && form.controls.lastName.touched" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store Assignments & Permissions Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Stores Selection List (Left Column) -->
+    <div class="card bg-base-100 border border-base-200 shadow-sm lg:col-span-1">
+      <div class="card-body p-5 space-y-4">
+        <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+          <i class="fa-solid fa-store mr-2 text-secondary"></i>
+          {{ 'employees.form.storesTitle' | translate }}
+        </h3>
+        
+        <div class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+          @for (store of storeStore.storesPage()?.stores; track store.id) {
+            <div class="p-3 border rounded-xl flex items-center justify-between transition-colors duration-200"
+                 [class.border-primary/30]="isStoreAssigned(store.id)"
+                 [class.bg-primary/5]="isStoreAssigned(store.id)"
+                 [class.border-base-200]="!isStoreAssigned(store.id)">
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-base-content">{{ store.name }}</span>
+                <span class="text-xs text-base-content/50 truncate max-w-[150px]">{{ store.address }}</span>
+              </div>
+              <button type="button" class="btn btn-xs rounded-full transition-all"
+                      [class.btn-primary]="isStoreAssigned(store.id)"
+                      [class.btn-outline]="!isStoreAssigned(store.id)"
+                      (click)="toggleStoreAssignment(store.id)">
+                @if (isStoreAssigned(store.id)) {
+                  <i class="fa-solid fa-circle-check"></i>
+                  {{ 'employees.form.assigned' | translate }}
+                } @else {
+                  <i class="fa-solid fa-plus"></i>
+                  {{ 'employees.form.assign' | translate }}
+                }
+              </button>
+            </div>
+          } @empty {
+            <p class="text-xs text-base-content/50 italic text-center py-4">{{ 'employees.form.noStoresAvailable' | translate }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions Configurator (Right Column) -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="card bg-base-100 border border-base-200 shadow-sm">
+        <div class="card-body p-5 space-y-4">
+          <h3 class="font-bold text-lg text-base-content border-b border-base-200 pb-2">
+            <i class="fa-solid fa-shield-halved mr-2 text-warning"></i>
+            {{ 'employees.form.permissionsTitle' | translate }}
+          </h3>
+          
+          <div formArrayName="storeAssignments" class="space-y-4">
+            @for (assignment of storeAssignments.controls; let i = $index; track i) {
+              <div [formGroupName]="i" 
+                   class="border border-base-300 rounded-xl p-4 bg-base-200/20 transition-colors"
+                   [class.border-error]="assignment.invalid && assignment.touched">
+                <div class="flex justify-between items-center border-b border-base-300 pb-2 mb-3">
+                  <h4 class="font-bold text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-shop"></i>
+                    {{ getStoreName(assignment.value.storeId) }}
+                  </h4>
+                  <button type="button" class="btn btn-circle btn-ghost btn-xs text-error" (click)="storeAssignments.removeAt(i)">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+                @if (assignment.invalid && assignment.touched) {
+                  <span class="text-error text-xs font-bold block mb-2">Revisa los permisos de esta tienda</span>
+                }
+                
+                <div formArrayName="permissions" class="space-y-3">
+                  @for (mod of modules; let j = $index; track mod.id) {
+                    <div [formGroupName]="j" class="grid grid-cols-1 md:grid-cols-5 items-start md:items-center py-2 border-b border-base-200/50 last:border-b-0">
+                      <span class="text-xs font-semibold uppercase text-base-content/70 md:col-span-1">{{ mod.name }}</span>
+                      
+                      <div class="flex flex-wrap gap-x-4 gap-y-2 md:col-span-4 mt-1 md:mt-0">
+                        @for (action of actions; track action) {
+                          <label class="label cursor-pointer justify-start gap-1.5 p-0">
+                            <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" 
+                                   [checked]="isActionSelected(i, j, action)"
+                                   (change)="toggleAction(i, j, action)" />
+                            <span class="label-text text-xs">{{ action | titlecase }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-12 text-base-content/50 border border-dashed border-base-300 rounded-xl">
+                <i class="fa-solid fa-user-lock text-4xl mb-3 opacity-40"></i>
+                <p class="text-sm font-medium">{{ 'employees.form.noStoresAssigned' | translate }}</p>
+                <p class="text-xs text-base-content/40 mt-1">{{ 'employees.form.noStoresAssignedHint' | translate }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Actions Panel -->
+  <div class="flex justify-end gap-3 pt-4 border-t border-base-200">
+    <button type="button" class="btn btn-ghost hover:bg-base-200/50" (click)="cancel.emit()">
+      {{ 'employees.form.cancel' | translate }}
+    </button>
+    <button type="submit" class="btn btn-primary px-8 shadow-sm" [disabled]="form.invalid || isSubmitting()">
+      @if (isSubmitting()) {
+        <span class="loading loading-spinner loading-sm"></span>
+        {{ 'employees.form.processing' | translate }}
+      } @else {
+        <i class="fa-solid fa-save mr-1.5"></i>
+        {{ 'employees.form.save' | translate }}
+      }
+    </button>
+  </div>
+
+</form>
+</file>
+
+<file path="src/libs/employees/ui/src/lib/employee-form/employee-form.component.ts">
+// src/libs/employees/ui/src/lib/employee-form/employee-form.component.ts
+import { Component, inject, input, output, OnInit, OnDestroy, effect } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { StoreStore } from '../../../../../stores/data-access/lib/store/store.store';
+import { MODULE_CONFIG, ACTIONS } from '../../../../data-access/src';
+
+@Component({
+  selector: 'app-employee-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule, TitleCasePipe],
+  templateUrl: './employee-form.component.html'
+})
+export class EmployeeFormComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  storeStore = inject(StoreStore);
+
+  readonly modules = MODULE_CONFIG;
+  readonly actions = ACTIONS;
+
+  isSubmitting = input<boolean>(false);
+  initialData = input<any | null>(null);
+  submitForm = output<any>();
+  cancel = output<void>();
+
+  form = this.fb.nonNullable.group({
+    name: ['', Validators.required],
+    lastName: ['', Validators.required],
+    storeAssignments: this.fb.array([])
+  });
+
+  constructor() {
+    effect(() => {
+      const data = this.initialData();
+      if (data) {
+        // Clear existing assignments
+        while (this.storeAssignments.length !== 0) {
+          this.storeAssignments.removeAt(0);
+        }
+        
+        this.form.patchValue({
+          name: data.name,
+          lastName: data.lastName
+        });
+
+        if (data.storeAssignments) {
+          data.storeAssignments.forEach((assignment: any) => {
+            const modules = assignment.modules || assignment.permissions || [];
+            this.addStoreAssignment(assignment.storeId, modules);
+          });
+        }
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.storeStore.loadStores(); // Cargamos tiendas para el selector
+  }
+
+  ngOnDestroy() {
+    this.form.reset();
+    while (this.storeAssignments.length !== 0) {
+      this.storeAssignments.removeAt(0);
+    }
+  }
+
+  get storeAssignments() {
+    return this.form.get('storeAssignments') as FormArray;
+  }
+
+  getPermissions(assignmentIndex: number): FormArray {
+    const assignment = this.storeAssignments.at(assignmentIndex) as FormGroup;
+    return assignment.get('permissions') as FormArray;
+  }
+
+  getActions(assignmentIndex: number, modIndex: number): FormArray {
+    const permissions = this.getPermissions(assignmentIndex);
+    const modGroup = permissions.at(modIndex) as FormGroup;
+    return modGroup.get('actions') as FormArray;
+  }
+
+  isStoreAssigned(storeId: number): boolean {
+    return this.storeAssignments.value.some((s: any) => s.storeId === storeId);
+  }
+
+  toggleStoreAssignment(storeId: number) {
+    const idx = this.storeAssignments.value.findIndex((s: any) => s.storeId === storeId);
+    if (idx > -1) {
+      this.storeAssignments.removeAt(idx);
+    } else {
+      this.addStoreAssignment(storeId);
+    }
+  }
+
+  addStoreAssignment(storeId: number, modules: any[] = []) {
+    if (this.isStoreAssigned(storeId) && modules.length === 0) return;
+
+    const existingIdx = this.storeAssignments.value.findIndex((s: any) => s.storeId === storeId);
+    if (existingIdx > -1 && modules.length > 0) {
+      this.storeAssignments.removeAt(existingIdx);
+    }
+
+    const permissionsArray = this.fb.array(
+      this.modules.map(mod => {
+        const existing = modules.find(m => m.moduleId === mod.id || m.moduleCode === mod.code);
+        const actions = existing ? existing.actions || [] : [];
+        return this.fb.group({
+          moduleId: [mod.id],
+          actions: this.fb.array(actions.map((act: string) => this.fb.control(act)))
+        });
+      })
+    );
+
+    const assignment = this.fb.group({
+      storeId: [storeId],
+      permissions: permissionsArray
+    });
+
+    this.storeAssignments.push(assignment);
+  }
+
+  toggleAction(assignmentIndex: number, modIndex: number, action: string) {
+    const actionsArr = this.getActions(assignmentIndex, modIndex);
+    const index = actionsArr.value.indexOf(action);
+    if (index > -1) {
+      actionsArr.removeAt(index);
+    } else {
+      actionsArr.push(this.fb.control(action));
+    }
+  }
+
+  isActionSelected(assignmentIndex: number, modIndex: number, action: string): boolean {
+    const actionsArr = this.getActions(assignmentIndex, modIndex);
+    return actionsArr.value.includes(action);
+  }
+
+  getStoreName(storeId: number): string {
+    const stores = this.storeStore.storesPage()?.stores || [];
+    const found = stores.find(s => s.id === storeId);
+    return found ? found.name : `Tienda #${storeId}`;
+  }
+
+  onSubmit() {
+    console.log("Submit iniciado, formulario válido:", this.form.valid);
+    if (this.form.valid) {
+      // Estructura anidada para el backend:
+      // { name, lastName, storeAssignments: [{ storeId, permissions: [{ moduleId, actions }] }] }
+      const payload = {
+        name: this.form.value.name,
+        lastName: this.form.value.lastName,
+        storeAssignments: this.storeAssignments.value 
+      };
+      console.log("Enviando datos:", payload);
+      this.submitForm.emit(payload);
+    } else {
+      console.log("Formulario inválido, errores:", this.form.errors);
+      this.form.markAllAsTouched();
+    }
+  }
+}
+</file>
+
+<file path="src/libs/employees/ui/src/lib/employee-table/employee-table.component.html">
+<!-- src/libs/employees/ui/src/lib/employee-table/employee-table.component.html -->
+<div class="overflow-x-auto bg-base-100 rounded-box shadow-sm border border-base-200/50">
+  <table class="table table-zebra w-full">
+    <thead>
+      <tr>
+        <th class="w-[10%]">ID</th>
+        <th class="w-[30%]">{{ 'employees.table.name' | translate }}</th>
+        <th class="w-[20%]">{{ 'employees.table.username' | translate }}</th>
+        <th class="w-[15%]">{{ 'employees.table.role' | translate }}</th>
+        <th class="w-[15%]">{{ 'employees.table.stores' | translate }}</th>
+        <th class="w-[10%] text-right">{{ 'admin.inventory.actions.title' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of employees(); track item.id) {
+        <tr>
+          <td class="font-mono text-xs opacity-50">#{{ item.id }}</td>
+          <td>
+            <div class="font-bold text-base-content">{{ item.name }} {{ item.lastName }}</div>
+          </td>
+          <td>
+            <span class="text-sm font-medium">{{ item.username }}</span>
+          </td>
+          <td>
+            <span class="badge badge-sm font-bold bg-primary/10 text-primary border-primary/20">
+              {{ item.role }}
+            </span>
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              @for (assign of item.storeAssignments; track assign.storeId) {
+                <span class="badge badge-xs badge-outline badge-secondary">{{ assign.storeName }}</span>
+              } @empty {
+                <span class="text-xs text-base-content/40 italic">{{ 'employees.table.noStores' | translate }}</span>
+              }
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="flex justify-end gap-1.5">
+              <button class="btn btn-sm btn-ghost btn-circle text-primary" (click)="onEdit(item.id)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-ghost btn-circle text-error" (click)="onDelete(item.id)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="text-center py-8 text-base-content/50">
+            <i class="fa-solid fa-users-slash text-4xl mb-2"></i>
+            <p>{{ 'employees.table.empty' | translate }}</p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+</file>
+
+<file path="src/libs/employees/ui/src/lib/employee-table/employee-table.component.ts">
+// src/libs/employees/ui/src/lib/employee-table/employee-table.component.ts
+import { Component, input, output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { EmployeeDto } from '../../../../data-access/src/lib/models/employee.model';
+
+@Component({
+  selector: 'app-employee-table',
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
+  templateUrl: './employee-table.component.html'
+})
+export class EmployeeTableComponent {
+  employees = input.required<EmployeeDto[]>();
+  delete = output<string>();
+  edit = output<string>();
+  resendActivation = output<string>();
+
+  onDelete(id: string) {
+    this.delete.emit(id);
+  }
+
+  onEdit(id: string) {
+    this.edit.emit(id);
+  }
+
+  onResendActivation(id: string) {
+    this.resendActivation.emit(id);
+  }
+}
+</file>
+
+</files>

@@ -4,7 +4,7 @@ import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap, EMPTY } from 'rxjs';
+import { pipe, switchMap, tap } from 'rxjs';
 import { EmployeeApiService } from '../services/employee-api.service';
 import { EmployeePageResponse, EmployeeDto, CreateEmployeeRequest, UpdateEmployeeRequest } from '../models/employee.model';
 import { UIStore } from '../../../../../shared/data-access/store/ui.store';
@@ -24,6 +24,7 @@ interface EmployeeState {
     selectedEmployee: EmployeeDto | null;
     currentPage: number;
     pageSize: number;
+    searchQuery: string; // ✨ NUEVO ESTADO PARA BÚSQUEDA
 }
 
 const initialState: EmployeeState = {
@@ -38,7 +39,8 @@ const initialState: EmployeeState = {
     selectedEmployeeId: null,
     selectedEmployee: null,
     currentPage: 0,
-    pageSize: 10
+    pageSize: 10,
+    searchQuery: ''
 };
 
 export const EmployeeStore = signalStore(
@@ -52,6 +54,10 @@ export const EmployeeStore = signalStore(
 
         const setPage = (page: number) => {
             patchState(store, { currentPage: page });
+        };
+
+        const setSearchQuery = (query: string) => {
+            patchState(store, { searchQuery: query, currentPage: 0 }); // Reinicia la página al buscar
         };
 
         const setSelectedEmployeeId = (id: string | null) => {
@@ -68,14 +74,16 @@ export const EmployeeStore = signalStore(
                 selectedEmployeeId: null,
                 currentView: 'list',
                 isSuccess: false,
-                error: null
+                error: null,
+                searchQuery: '',
+                currentPage: 0
             });
         };
 
         const loadEmployees = rxMethod<void>(
             pipe(
                 tap(() => patchState(store, { isLoading: true, error: null })),
-                switchMap(() => api.getAllEmployees(store.currentPage(), store.pageSize()).pipe(
+                switchMap(() => api.getAllEmployees(store.currentPage(), store.pageSize(), store.searchQuery()).pipe(
                     tapResponse({
                         next: (response) => patchState(store, { isLoading: false, employeesPage: response }),
                         error: (err: HttpErrorResponse) => patchState(store, { isLoading: false, error: err.error?.message || 'Error al cargar empleados' })
@@ -86,28 +94,14 @@ export const EmployeeStore = signalStore(
 
         const loadEmployeeDetails = rxMethod<string>(
             pipe(
-                // ✨ SOLUCIÓN: Recibimos el 'id' en el tap y lo guardamos inmediatamente en el estado
-                tap((id) => patchState(store, { 
-                    isLoading: true, 
-                    error: null, 
-                    selectedEmployeeId: id 
-                })),
+                tap((id) => patchState(store, { isLoading: true, error: null, selectedEmployeeId: id })),
                 switchMap((id) => api.getEmployeeById(id).pipe(
                     tapResponse({
                         next: (employee) => {
-                            console.log("DATA RECIBIDA DEL BACKEND:", employee);
-                            patchState(store, { 
-                                isLoading: false, 
-                                selectedEmployee: employee,
-                                currentView: 'edit' 
-                            });
+                            patchState(store, { isLoading: false, selectedEmployee: employee, currentView: 'edit' });
                         },
                         error: (err: HttpErrorResponse) => {
-                            console.error("ERROR DE API:", err);
-                            patchState(store, { 
-                                isLoading: false, 
-                                error: err.error?.message || 'Error al cargar detalles del empleado' 
-                            });
+                            patchState(store, { isLoading: false, error: err.error?.message || 'Error al cargar detalles del empleado' });
                         }
                     })
                 ))
@@ -116,10 +110,7 @@ export const EmployeeStore = signalStore(
 
         const createEmployee = rxMethod<CreateEmployeeRequest>(
             pipe(
-                tap(() => {
-                    console.log("Iniciando petición HTTP (Creación)...");
-                    patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null });
-                }),
+                tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
                 switchMap(req => api.createEmployee(req).pipe(
                     tapResponse({
                         next: (res) => {
@@ -139,10 +130,7 @@ export const EmployeeStore = signalStore(
 
         const updateEmployee = rxMethod<{ id: string, request: UpdateEmployeeRequest }>(
             pipe(
-                tap(() => {
-                    console.log("Iniciando petición HTTP (Edición)...");
-                    patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null });
-                }),
+                tap(() => patchState(store, { isSubmitting: true, error: null, isSuccess: false, message: null })),
                 switchMap(({ id, request }) => {
                     return api.editEmployee(id, request).pipe(
                         tapResponse({
@@ -168,16 +156,8 @@ export const EmployeeStore = signalStore(
                 switchMap((id) => api.deleteEmployee(id).pipe(
                     tapResponse({
                         next: () => {
-                            patchState(store, (state) => {
-                                ui.showToast('Empleado eliminado con éxito');
-                                if (!state.employeesPage) return { isSubmitting: false, isSuccess: true };
-                                const updatedList = state.employeesPage.employees.filter(e => e.id !== id);
-                                return {
-                                    isSubmitting: false,
-                                    isSuccess: true,
-                                    employeesPage: { ...state.employeesPage, employees: updatedList }
-                                };
-                            });
+                            ui.showToast('Empleado eliminado con éxito');
+                            loadEmployees(); // Recargamos para mantener la paginación correcta
                         },
                         error: (err: HttpErrorResponse) => {
                             patchState(store, { isSubmitting: false, isSuccess: false, error: err.error?.message || 'Error al eliminar empleado' });
@@ -191,6 +171,7 @@ export const EmployeeStore = signalStore(
         return {
             setView,
             setPage,
+            setSearchQuery,
             setSelectedEmployeeId,
             resetAlerts,
             resetStore,

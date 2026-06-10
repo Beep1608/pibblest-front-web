@@ -14,7 +14,7 @@
     <tbody>
       @for (item of employees(); track item.id) {
         <tr>
-          <td class="font-mono text-xs opacity-50">#{{ item.id }}</td>
+          <td class="font-mono text-xs opacity-50">#{{ item.id | slice:0:8 }}</td>
           <td>
             <div class="font-bold text-base-content">{{ item.name }} {{ item.lastName }}</div>
           </td>
@@ -40,7 +40,7 @@
               <button class="btn btn-sm btn-ghost btn-circle text-primary" (click)="onEdit(item.id)">
                 <i class="fa-solid fa-pen"></i>
               </button>
-              <button class="btn btn-sm btn-ghost btn-circle text-error" (click)="onDelete(item.id)">
+              <button class="btn btn-sm btn-ghost btn-circle text-error" (click)="requestDelete(item.id)">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -57,3 +57,21 @@
     </tbody>
   </table>
 </div>
+
+<dialog class="modal" [class.modal-open]="employeeToDelete() !== null">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error flex items-center">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ 'employees.delete.title' | translate }}
+    </h3>
+    <p class="py-4 text-base-content/80">
+      {{ 'employees.delete.message' | translate }}
+    </p>
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="cancelDelete()">{{ 'employees.delete.cancel' | translate }}</button>
+      <button class="btn btn-error text-white" (click)="confirmDelete()">{{ 'employees.delete.confirm' | translate }}</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop" (click)="cancelDelete()">
+    <button>close</button>
+  </form>
+</dialog>
