@@ -1,6 +1,6 @@
 // src/libs/stores/feature-view-all/src/lib/viewAll/viewAll.component.ts
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
 import { StoreStore } from "../../../../data-access/lib/store/store.store";
 import { StorePreviewComponent } from "../../../../ui/src/store-component/store-preview.component";
@@ -18,7 +18,11 @@ export class StoreViewAllPage implements OnInit {
   store = inject(StoreStore);
   tagStore = inject(TagStore);
 
+  // ✨ Nueva señal para restringir acceso
+  isOwner = signal(false);
+
   ngOnInit() {
+    this.checkUserRole();
     this.store.resetAlerts();
     this.store.loadStores();
     this.store.listenToStoreUpdates();
@@ -28,6 +32,18 @@ export class StoreViewAllPage implements OnInit {
     this.tagStore.loadAllStoreTagsList();
   }
 
+  checkUserRole() {
+    const token = localStorage.getItem('pibblest_token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isOwner.set(payload.role === 'OWNER' || payload.isOwner === true);
+      } catch (e) {
+        this.isOwner.set(false);
+      }
+    }
+  }
+
   onSearch(keyword: string) {
     this.store.searchStores(keyword);
   }
@@ -35,4 +51,4 @@ export class StoreViewAllPage implements OnInit {
   changePage(delta: number) {
     this.store.changePage(delta);
   }
-}
+}

@@ -45,11 +45,19 @@
     @if (product.displayMode() === 'grid') {
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             @for (productItem of product.filteredProducts(); track productItem.id) {
-                <app-product-preview-component [product]="productItem" [viewMode]="'employee'"></app-product-preview-component>
+                <app-product-preview-component 
+                    [product]="productItem" 
+                    [viewMode]="'employee'"
+                    (productSelect)="productSelect.emit($event)">
+                </app-product-preview-component>
             }
         </div>
     } @else {
-        <app-product-table-component [products]="product.filteredProducts()" [viewMode]="'employee'"></app-product-table-component>
+        <app-product-table-component 
+            [products]="product.filteredProducts()" 
+            [viewMode]="'employee'"
+            (productSelect)="productSelect.emit($event)">
+        </app-product-table-component>
     }
 
     @if (product.productsPage()) {

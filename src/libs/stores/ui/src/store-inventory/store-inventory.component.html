@@ -1,6 +1,9 @@
 <div class="grid sm:grid-cols-1 md:grid-cols-[3fr_1fr] gap-2">
 
-	<app-product-invetory-page (searchKeyword)="buscarEnTienda($event)"></app-product-invetory-page>
+	<app-product-invetory-page 
+		(searchKeyword)="buscarEnTienda($event)"
+		(productSelect)="onProductSelect($event)">
+	</app-product-invetory-page>
 
 	@if (store.selectedSubMenu() === 'sale') {
 		<app-checkout-component></app-checkout-component>

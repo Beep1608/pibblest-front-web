@@ -9,6 +9,7 @@ import { StoreMainPage } from "../../../../libs/stores/feature-main/src/lib/stor
 import { ProductsShellComponent } from "../../../../libs/products/feature-shell";
 import { TagsShellComponent } from "../../../../libs/tags/feature-shell/src/lib/tags-shell.component";
 import { EmployeeShellComponent } from "../../../../libs/employees/feature-shell/src/lib/employee-shell.component";
+import { StoreStore } from "../../../../libs/stores/data-access/lib/store/store.store";
 
 @Component({
   selector: 'app-dashboard-owner-page',
@@ -27,6 +28,7 @@ import { EmployeeShellComponent } from "../../../../libs/employees/feature-shell
 export class DashboardPageComponent implements OnInit {
   dashboardStore = inject(DashboardStore);
   readonly store = inject(OwnerStore);
+  storeStore = inject(StoreStore); // Inyectamos el Store maestro de tiendas
   private router = inject(Router);
 
   // ✨ Signal para controlar el estado colapsado/expandido en Desktop
@@ -37,6 +39,14 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit() {
     this.checkUserRole();
+    
+    // ✨ DISPARADOR DE FLUSHING: Obliga al Store a leer el token nuevo,
+    // limpiar la caché y redirigir a 'view-all' de manera instantánea.
+    this.storeStore.loadStores(); 
+
+    if (!this.isOwnerUser()) {
+       this.dashboardStore.setView('stores');
+    }
   }
 
   // Decodificación segura y en tiempo de ejecución del JWT

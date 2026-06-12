@@ -17,6 +17,7 @@ export class ProductInventoryPage implements OnInit {
     product = inject(ProductStore);
     tag = inject(TagStore);
     searchKeyword = output<string>();
+    productSelect = output<number>(); // ✨ Exponer evento de selección de producto
 
     lastKeyword = '';
 

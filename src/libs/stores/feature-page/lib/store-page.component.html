@@ -2,20 +2,29 @@
   <div>
    <button class="btn text-center" (click)="store.setView('view-all')"><i class="fa-solid fa-arrow-left"></i></button>
   </div>
+  
   <div role="tablist" class="tabs tabs-border mb-6">
-    <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale'" (click)="store.setSubmenu('sale')">
-      {{ 'stores.sale' | translate }}
-    </a>
-    <a role="tab" class="tab font-medium" [class.tab-active]="store.selectedSubMenu() === 'products'" (click)="store.setSubmenu('products')">
-      {{ 'stores.products' | translate }}
-    </a>
-    <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale-history'" (click)="store.setSubmenu('sale-history')">
-      {{ 'stores.saleHistory' | translate }}
-    </a>
+    @if (hasPermission('MODULE_SALES')) {
+      <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale'" (click)="store.setSubmenu('sale')">
+        {{ 'stores.sale' | translate }}
+      </a>
+    }
+    
+    @if (hasPermission('MODULE_PRODUCTS')) {
+      <a role="tab" class="tab font-medium" [class.tab-active]="store.selectedSubMenu() === 'products'" (click)="store.setSubmenu('products')">
+        {{ 'stores.products' | translate }}
+      </a>
+    }
+    
+    @if (hasPermission('MODULE_SALES')) {
+      <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale-history'" (click)="store.setSubmenu('sale-history')">
+        {{ 'stores.saleHistory' | translate }}
+      </a>
+    }
   </div>
 
   @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'sale') {
-    <app-store-invetory-component ></app-store-invetory-component>
+    <app-store-invetory-component></app-store-invetory-component>
   }
   
 </div>

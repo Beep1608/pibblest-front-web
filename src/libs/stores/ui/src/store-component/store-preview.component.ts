@@ -1,5 +1,5 @@
 // src/libs/stores/ui/src/store-component/store-preview.component.ts
-import { Component, computed, effect, ElementRef, inject, input, viewChild } from "@angular/core";
+import { Component, computed, effect, ElementRef, inject, input, viewChild, signal, OnInit } from "@angular/core";
 import { StorePreview } from "../../../data-access/lib/models/store.model";
 import { StoreStore } from "../../../data-access";
 import { CartStore } from "../../../../cart/data-access/lib/store/cart.store";
@@ -13,7 +13,7 @@ import { TitleCasePipe } from "@angular/common";
   imports: [TranslatePipe, TitleCasePipe],
   templateUrl: './store-preview.component.html'
 })
-export class StorePreviewComponent {
+export class StorePreviewComponent implements OnInit {
   storePreview = input.required<StorePreview>();
 
   store = inject(StoreStore);
@@ -22,6 +22,9 @@ export class StorePreviewComponent {
   
   salesSpan = viewChild<ElementRef<HTMLSpanElement>>('salesSpan');
   deleteModal = viewChild<ElementRef<HTMLDialogElement>>('deleteModal');
+
+  // ✨ Nueva señal para restringir acceso
+  isOwner = signal(false);
 
   constructor() {
     let previousSales = 0;
@@ -35,6 +38,22 @@ export class StorePreviewComponent {
       }
       previousSales = currentSales;
     });
+  }
+
+  ngOnInit() {
+    this.checkUserRole();
+  }
+
+  checkUserRole() {
+    const token = localStorage.getItem('pibblest_token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isOwner.set(payload.role === 'OWNER' || payload.isOwner === true);
+      } catch (e) {
+        this.isOwner.set(false);
+      }
+    }
   }
 
   selectStore(storeId: number) {

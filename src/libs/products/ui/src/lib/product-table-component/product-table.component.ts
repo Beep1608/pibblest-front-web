@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, input, viewChild } from "@angular/core";
+import { Component, ElementRef, inject, input, viewChild, output } from "@angular/core";
 import { Product } from "../../../../data-access/lib/models/product.model";
 import { TranslatePipe } from "@ngx-translate/core";
 import { SaleStore } from "../../../../../sales/data-access";
@@ -13,6 +13,8 @@ import { ProductStore } from "../../../../data-access/lib/store/product.store";
 export class ProductTableComponent {
     products = input.required<Product[]>();
     viewMode = input<'admin' | 'employee'>('employee'); 
+    
+    productSelect = output<number>(); // ✨ Exponer evento de selección de fila/producto
     
     sale = inject(SaleStore);
     cart = inject(CartStore);

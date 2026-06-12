@@ -19,41 +19,46 @@
           </span>
         </div>
       </div>
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle"><i class="fa-solid fa-ellipsis-vertical"></i></div>
-        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 border border-base-200">
-          <li><a (click)="goToEdit()"><i class="fa-solid fa-pen text-primary"></i> {{ 'stores.actions.edit' | translate }}</a></li>
-          <li><a (click)="openDeleteModal()" class="text-error"><i class="fa-solid fa-trash"></i> {{ 'stores.actions.delete' | translate }}</a></li>
-        </ul>
-      </div>
+      
+      @if (isOwner()) {
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 border border-base-200">
+            <li><a (click)="goToEdit()"><i class="fa-solid fa-pen text-primary"></i> {{ 'stores.actions.edit' | translate }}</a></li>
+            <li><a (click)="openDeleteModal()" class="text-error"><i class="fa-solid fa-trash"></i> {{ 'stores.actions.delete' | translate }}</a></li>
+          </ul>
+        </div>
+      }
     </div>
 
-    <div class="grid grid-cols-2 gap-3 my-4 cursor-pointer" (click)="selectStore(storePreview().id)">
-      <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10">
-        <i class="fa-solid fa-arrow-up text-success"></i>
-        <span class="text-sm font-bold text-success">{{ storePreview().growthFromStart }}</span>
+    @if (isOwner()) {
+      <div class="grid grid-cols-2 gap-3 my-4 cursor-pointer" (click)="selectStore(storePreview().id)">
+        <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10">
+          <i class="fa-solid fa-arrow-up text-success"></i>
+          <span class="text-sm font-bold text-success">{{ storePreview().growthFromStart }}</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-2 border border-base-300 rounded-lg bg-base-200/50">
+          <i class="fa-solid fa-user-tie text-base-content/70"></i>
+          <span class="text-sm font-bold">{{ storePreview().employees }}</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10 col-span-2">
+          <i class="fa-solid fa-dollar-sign text-success"></i>
+          <span #salesSpan class="text-base font-bold text-success inline-block">{{ storePreview().salesOfToday }}</span>
+        </div>
       </div>
-      <div class="flex items-center gap-2 px-3 py-2 border border-base-300 rounded-lg bg-base-200/50">
-        <i class="fa-solid fa-user-tie text-base-content/70"></i>
-        <span class="text-sm font-bold">{{ storePreview().employees }}</span>
-      </div>
-      <div class="flex items-center gap-2 px-3 py-2 border border-success/30 rounded-lg bg-success/10 col-span-2">
-        <i class="fa-solid fa-dollar-sign text-success"></i>
-        <span #salesSpan class="text-base font-bold text-success inline-block">{{ storePreview().salesOfToday }}</span>
-      </div>
-    </div>
 
-    <div class="flex flex-col gap-1 mb-4">
-      <div class="flex justify-between text-xs font-medium">
-        <span>{{ 'stores.inventory.capacity' | translate }}</span>
-        <span>{{ percentageOfProducts() }}%</span>
+      <div class="flex flex-col gap-1 mb-4">
+        <div class="flex justify-between text-xs font-medium">
+          <span>{{ 'stores.inventory.capacity' | translate }}</span>
+          <span>{{ percentageOfProducts() }}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" value="{{ storePreview().currentQuantityOfProducts }}" max="{{ storePreview().totalProducts }}"></progress>
+        <div class="flex justify-between text-[10px] text-base-content/60">
+          <span>{{ storePreview().currentQuantityOfProducts }} items</span>
+          <span>{{ storePreview().totalProducts }} limit</span>
+        </div>
       </div>
-      <progress class="progress progress-primary w-full" value="{{ storePreview().currentQuantityOfProducts }}" max="{{ storePreview().totalProducts }}"></progress>
-      <div class="flex justify-between text-[10px] text-base-content/60">
-        <span>{{ storePreview().currentQuantityOfProducts }} items</span>
-        <span>{{ storePreview().totalProducts }} limit</span>
-      </div>
-    </div>
+    }
 
     <div class="flex flex-wrap items-center gap-1 mt-auto pt-4 border-t border-base-200/50 min-h-[46px]">
       @if (storePreview().tags && storePreview().tags!.length > 0) {
@@ -74,31 +79,33 @@
   </div>
 </div>
 
-<dialog #deleteModal class="modal">
-  <div class="modal-box">
-    <h3 class="font-bold text-lg text-error flex items-center gap-2">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-      {{ 'stores.delete.title' | translate }}
-    </h3>
-    <p class="py-4 text-base">
-      {{ 'stores.delete.message' | translate }} 
-      <span class="font-bold text-base-content">"{{ storePreview().name }}"</span>?
-    </p>
-    <div class="modal-action">
-      <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">
-        {{ 'stores.delete.cancel' | translate }}
-      </button>
-      <button class="btn btn-error" (click)="confirmDelete()" [disabled]="store.isSubmitting()">
-        @if (store.isSubmitting()) {
-          <span class="loading loading-spinner"></span>
-        } @else {
-          <i class="fa-solid fa-trash mr-1"></i>
-          {{ 'stores.delete.confirm' | translate }}
-        }
-      </button>
+@if (isOwner()) {
+  <dialog #deleteModal class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg text-error flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        {{ 'stores.delete.title' | translate }}
+      </h3>
+      <p class="py-4 text-base">
+        {{ 'stores.delete.message' | translate }} 
+        <span class="font-bold text-base-content">"{{ storePreview().name }}"</span>?
+      </p>
+      <div class="modal-action">
+        <button class="btn btn-ghost" (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">
+          {{ 'stores.delete.cancel' | translate }}
+        </button>
+        <button class="btn btn-error" (click)="confirmDelete()" [disabled]="store.isSubmitting()">
+          @if (store.isSubmitting()) {
+            <span class="loading loading-spinner"></span>
+          } @else {
+            <i class="fa-solid fa-trash mr-1"></i>
+            {{ 'stores.delete.confirm' | translate }}
+          }
+        </button>
+      </div>
     </div>
-  </div>
-  <form method="dialog" class="modal-backdrop">
-    <button (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">close</button>
-  </form>
-</dialog>
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeDeleteModal()" [disabled]="store.isSubmitting()">close</button>
+    </form>
+  </dialog>
+}

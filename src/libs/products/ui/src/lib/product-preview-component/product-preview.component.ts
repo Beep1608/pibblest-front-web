@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, input, viewChild } from "@angular/core";
+import { Component, ElementRef, inject, input, output, viewChild } from "@angular/core";
 import { Product } from "../../../../data-access/lib/models/product.model";
 import { TranslatePipe } from "@ngx-translate/core";
 import { SaleStore } from "../../../../../sales/data-access";
@@ -14,12 +14,21 @@ export class ProductPreviewComponent {
 	product = input.required<Product>();
 	viewMode = input<'admin' | 'employee'>('employee'); 
 	
+	// ✨ FIX: Oficialmente exponemos el evento para que suba hasta la tienda
+	productSelect = output<number>();
+	
 	sale = inject(SaleStore);
 	cart = inject(CartStore);
 	productStore = inject(ProductStore);
 
-	// Referencia estricta al modal nativo de DaisyUI usando signals
 	deleteModal = viewChild<ElementRef<HTMLDialogElement>>('deleteModal');
+
+	// ✨ FIX: Función que delega el clic internamente
+	onCardClick() {
+		if (this.viewMode() === 'employee') {
+			this.productSelect.emit(this.product().id);
+		}
+	}
 
 	goToEdit() {
 		this.productStore.setSelectedProductId(this.product().id);

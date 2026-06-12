@@ -48,8 +48,10 @@
 	"employees.search.placeholder": "Buscar empleados...",
 	"employees.search.placeholder_enter": "Buscar empleados (Enter)...",
 	"employees.pagination.info": "Mostrando pág. {{ current }} de {{ total }} ({{ elements }} en total)",
-	"employees.pagination.prev": "« Ant",
-	"employees.pagination.next": "Sig »",
+	"employees.pagination.showing": "Mostrando página {{ current }} de {{ total }}",
+	"employees.pagination.records": "({{ elements }} registros)",
+	"employees.pagination.prev": "Anterior",
+	"employees.pagination.next": "Siguiente",
 	"employees.loading": "Cargando...",
 	"employees.delete.title": "Confirmar Eliminación",
 	"employees.delete.message": "¿Estás seguro de que deseas eliminar este empleado? Esta acción revocará inmediatamente todos sus accesos.",
@@ -156,5 +158,11 @@
 	"inventory.product.delete.title": "Confirmar Eliminación",
 	"inventory.product.delete.message": "¿Estás seguro que deseas eliminar permanentemente el producto",
 	"inventory.product.delete.cancel": "Cancelar",
-	"inventory.product.delete.confirm": "Sí, eliminar"
+	"inventory.product.delete.confirm": "Sí, eliminar",
+	"stores.manageProduct.title": "Gestionar Producto en Tienda",
+	"stores.manageProduct.stockLabel": "Stock Físico / Actual",
+	"stores.manageProduct.updateBtn": "Actualizar Inventario",
+	"stores.manageProduct.removeBtn": "Desvincular Producto",
+	"stores.manageProduct.cancelBtn": "Regresar",
+	"stores.manageProduct.removeConfirm": "¿Estás seguro de que deseas quitar este producto de la tienda? Esta acción revocará su disponibilidad para ventas locales en esta sucursal."
 }

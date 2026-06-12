@@ -1,5 +1,7 @@
 <!-- src/libs/products/ui/src/lib/product-preview-component/product-preview.component.html -->
-<div class="card bg-base-100 w-full h-full shadow-sm border border-base-200 hover:shadow-lg transition-shadow flex flex-col overflow-hidden group">
+<div class="card bg-base-100 w-full h-full shadow-sm border border-base-200 hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col overflow-hidden group"
+     [class.cursor-pointer]="viewMode() === 'employee'"
+     (click)="onCardClick()">
     
     <!-- Header visual (Imagen y Precio Flotante) -->
     <figure class="relative h-48 overflow-hidden bg-base-200 w-full">
@@ -82,16 +84,16 @@
                 @switch (viewMode()) {
                     @case ('admin') {
                         <div class="flex gap-2 w-full">
-                            <button class="btn btn-primary btn-sm flex-1" (click)="goToEdit()">
+                            <button class="btn btn-primary btn-sm flex-1" (click)="goToEdit(); $event.stopPropagation()">
                                 <i class="fa-solid fa-pen mr-1"></i> {{ 'inventory.product.edit' | translate }}
                             </button>
-                            <button class="btn btn-error btn-sm btn-square" (click)="openDeleteModal()" [title]="'inventory.product.delete.title' | translate">
+                            <button class="btn btn-error btn-sm btn-square" (click)="openDeleteModal(); $event.stopPropagation()" [title]="'inventory.product.delete.title' | translate">
                                 <i class="fa-solid fa-trash text-error-content"></i>
                             </button>
                         </div>
                     }
                     @case ('employee') {
-                        <button class="btn btn-secondary btn-sm w-full" (click)="cart.addToCart(product())" 
+                        <button class="btn btn-secondary btn-sm w-full" (click)="cart.addToCart(product()); $event.stopPropagation()" 
                                 [disabled]="product().currentQuantity === 0 || product().quantity === 0">
                             <i class="fa-solid fa-cart-plus mr-1"></i> {{ 'inventory.sale.add.cart' | translate }}
                         </button>

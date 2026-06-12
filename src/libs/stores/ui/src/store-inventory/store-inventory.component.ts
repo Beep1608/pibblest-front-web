@@ -21,8 +21,6 @@ export class StoreInventoryComponent implements OnInit {
 		if (currentStoreId) {
 			this.product.getAllProducts({ storeId: currentStoreId, keyword: null });
 		}
-		
-		// Fijamos el contexto a productos y disparamos la carga
 		this.tag.setContext('products');
 		this.tag.loadTags();
 	}
@@ -33,4 +31,15 @@ export class StoreInventoryComponent implements OnInit {
 			this.product.getAllProducts({ storeId: currentStoreId, keyword: keyword || null });
 		}
 	}
+
+    // ✨ FIX: Comprobación fluida y reactiva usando la lógica unificada del Store
+    onProductSelect(productId: number) {
+        const canUpdate = this.store.hasPermission('MODULE_PRODUCTS', 'UPDATE');
+        const canDelete = this.store.hasPermission('MODULE_PRODUCTS', 'DELETE');
+
+        if (canUpdate || canDelete || this.store.isOwnerUser()) {
+            this.store.setSelectedProductId(productId);
+            this.store.setView('manage-store-product'); 
+        }
+    }
 }

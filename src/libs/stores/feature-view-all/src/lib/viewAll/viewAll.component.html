@@ -22,9 +22,11 @@
         </button>
       </div>
 
-      <button class="btn btn-primary" (click)="store.setView('create-store')">
-        <i class="fa-solid fa-plus"></i> {{ 'stores.actions.new' | translate }}
-      </button>
+      @if (isOwner()) {
+        <button class="btn btn-primary" (click)="store.setView('create-store')">
+          <i class="fa-solid fa-plus"></i> {{ 'stores.actions.new' | translate }}
+        </button>
+      }
     </div>
   </div>
 

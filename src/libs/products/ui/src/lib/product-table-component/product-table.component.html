@@ -11,7 +11,8 @@
         </thead>
         <tbody>
             @for (item of products(); track item.id) {
-                <tr>
+                <tr [class.cursor-pointer]="viewMode() === 'employee'" 
+                    (click)="viewMode() === 'employee' ? productSelect.emit(item.id) : null">
                     <td>
                         <div class="font-bold">{{ item.name }}</div>
                         <div class="text-xs opacity-50">{{ item.sku }}</div>
@@ -47,7 +48,7 @@
                                 </div>
                             }
                             @case ('employee') {
-                                <button class="btn btn-sm btn-secondary" (click)="cart.addToCart(item)">
+                                <button class="btn btn-sm btn-secondary" (click)="cart.addToCart(item); $event.stopPropagation()">
                                     <i class="fa-solid fa-cart-plus"></i>
                                 </button>
                             }

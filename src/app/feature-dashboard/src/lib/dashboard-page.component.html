@@ -1,23 +1,25 @@
 <!-- src/app/feature-dashboard/src/lib/dashboard-page.component.html -->
-<div class="drawer lg:drawer-open">
-  <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+<div class="drawer" [class.lg:drawer-open]="isOwnerUser()">
+  <input id="dashboard-drawer" type="checkbox" class="drawer-toggle" />
   
   <div class="drawer-content flex flex-col h-screen overflow-hidden bg-base-100">
     <nav class="navbar w-full border-b border-base-200 bg-base-100 shadow-sm z-40">
       <div class="flex-none">
-        <label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost lg:hidden">
-          <i class="fa-solid fa-bars text-xl"></i>
-        </label>
-        
-        <button class="btn btn-square btn-ghost hidden lg:flex" (click)="toggleSidebar()">
-          <i class="fa-solid text-xl transition-transform duration-200" 
-             [class.fa-bars]="!isSidebarExpanded()" 
-             [class.fa-align-left]="isSidebarExpanded()">
-          </i>
-        </button>
+        @if (isOwnerUser()) {
+          <label for="dashboard-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost lg:hidden">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </label>
+          
+          <button class="btn btn-square btn-ghost hidden lg:flex" (click)="toggleSidebar()">
+            <i class="fa-solid text-xl transition-transform duration-200" 
+               [class.fa-bars]="!isSidebarExpanded()" 
+               [class.fa-align-left]="isSidebarExpanded()">
+            </i>
+          </button>
+        }
       </div>
       <div class="flex-1">
-        <span class="text-xl font-bold ml-4">Pibblest</span>
+        <span class="text-xl font-bold ml-4">Punto de Venta</span>
       </div>
       <div class="flex-none">
         <button class="btn btn-ghost btn-circle" (click)="onLogout()">
@@ -33,131 +35,148 @@
             <app-store-main-page></app-store-main-page>
           }
           @case ('products') {
-            <app-products-shell></app-products-shell>
+            @if (isOwnerUser()) {
+              <app-products-shell></app-products-shell>
+            } @else {
+              <div class="p-10 text-center text-error font-bold">No tienes acceso a esta área.</div>
+            }
           }
           @case ('tags-stores') {
-            <app-tags-shell [context]="'stores'"></app-tags-shell>
+            @if (isOwnerUser()) {
+              <app-tags-shell [context]="'stores'"></app-tags-shell>
+            } @else {
+              <div class="p-10 text-center text-error font-bold">No tienes acceso a esta área.</div>
+            }
           }
           @case ('tags-products') {
-            <app-tags-shell [context]="'products'"></app-tags-shell>
+            @if (isOwnerUser()) {
+              <app-tags-shell [context]="'products'"></app-tags-shell>
+            } @else {
+              <div class="p-10 text-center text-error font-bold">No tienes acceso a esta área.</div>
+            }
           }
           @case ('employees') {
-            <app-employees-shell></app-employees-shell>
+            @if (isOwnerUser()) {
+              <app-employees-shell></app-employees-shell>
+            } @else {
+              <div class="p-10 text-center text-error font-bold">No tienes acceso a esta área.</div>
+            }
           }
         }
       </div>
     </div>
   </div>
 
-  <div class="drawer-side z-50">
-    <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
-    
-    <div class="bg-base-200 min-h-full flex flex-col transition-all duration-300 overflow-x-hidden flex-nowrap border-r border-base-300"
-         [class.w-64]="isSidebarExpanded()" 
-         [class.w-20]="!isSidebarExpanded()">
+  @if (isOwnerUser()) {
+    <div class="drawer-side z-50">
+      <label for="dashboard-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
       
-      <div class="h-16 flex items-center justify-center border-b border-base-300 mb-4">
-        <i class="fa-solid fa-gem text-primary text-2xl"></i>
-      </div>
-      
-      <ul class="menu w-full px-3 gap-2">
+      <div class="bg-base-200 min-h-full flex flex-col transition-all duration-300 overflow-x-hidden flex-nowrap border-r border-base-300"
+           [class.w-64]="isSidebarExpanded()" 
+           [class.w-20]="!isSidebarExpanded()">
         
-        <li>
-          <button (click)="dashboardStore.setView('overview')"
-                  [class.bg-base-300]="dashboardStore.currentView() === 'overview'" 
-                  [class.text-primary]="dashboardStore.currentView() === 'overview'" 
-                  [class.font-bold]="dashboardStore.currentView() === 'overview'"
-                  [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.overview' | translate"
-                  class="flex items-center py-3 transition-colors">
-            <i class="fa-solid fa-house text-lg w-6 text-center"></i>
-            <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
-              {{ 'dashboard.sidebar.overview' | translate }}
-            </span>
-          </button>
-        </li>
+        <div class="h-16 flex items-center justify-center border-b border-base-300 mb-4">
+          <i class="fa-solid fa-gem text-primary text-2xl"></i>
+        </div>
         
-        <li>
-          <button (click)="dashboardStore.setView('stores')"
-                  [class.bg-base-300]="dashboardStore.currentView() === 'stores'" 
-                  [class.text-primary]="dashboardStore.currentView() === 'stores'" 
-                  [class.font-bold]="dashboardStore.currentView() === 'stores'"
-                  [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.stores' | translate"
-                  class="flex items-center py-3 transition-colors">
-            <i class="fa-solid fa-store text-lg w-6 text-center"></i>
-            <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
-              {{ 'dashboard.sidebar.stores' | translate }}
-            </span>
-          </button>
-        </li>
-        
-        <li>
-          <button (click)="dashboardStore.setView('products')"
-                  [class.bg-base-300]="dashboardStore.currentView() === 'products'" 
-                  [class.text-primary]="dashboardStore.currentView() === 'products'" 
-                  [class.font-bold]="dashboardStore.currentView() === 'products'"
-                  [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.products' | translate"
-                  class="flex items-center py-3 transition-colors">
-            <i class="fa-solid fa-warehouse text-lg w-6 text-center"></i>
-            <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
-              {{ 'dashboard.sidebar.products' | translate }}
-            </span>
-          </button>
-        </li>
-
-        <li>
-          <details [open]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'">
-            <summary (click)="expandSidebar()" 
-                     [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
-                     [class.text-primary]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
-                     [class.font-bold]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
-                     [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.tags' | translate"
-                     class="flex items-center relative py-3 transition-colors">
-              <i class="fa-solid fa-tags text-lg w-6 text-center"></i>
-              <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
-                {{ 'dashboard.sidebar.tags' | translate }}
-              </span>
-            </summary>
-            
-            <ul class="ml-9 mt-2 overflow-hidden border-l border-base-300 pl-2" [class.hidden]="!isSidebarExpanded()">
-              <li>
-                <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores'" 
-                   [class.text-primary]="dashboardStore.currentView() === 'tags-stores'" 
-                   [class.font-bold]="dashboardStore.currentView() === 'tags-stores'"
-                   (click)="dashboardStore.setView('tags-stores')" class="py-2.5 transition-colors">
-                  <i class="fa-solid fa-shop w-4 opacity-70"></i>
-                  <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.stores' | translate }}</span>
-                </a>
-              </li>
-              <li>
-                <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-products'" 
-                   [class.text-primary]="dashboardStore.currentView() === 'tags-products'" 
-                   [class.font-bold]="dashboardStore.currentView() === 'tags-products'"
-                   (click)="dashboardStore.setView('tags-products')" class="py-2.5 transition-colors">
-                  <i class="fa-solid fa-box w-4 opacity-70"></i>
-                  <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.products' | translate }}</span>
-                </a>
-              </li>
-            </ul>
-          </details>
-        </li>
-
-        @if (isOwnerUser()) {
+        <ul class="menu w-full px-3 gap-2">
+          
           <li>
-            <button [class.bg-base-300]="dashboardStore.currentView() === 'employees'" 
-                    [class.text-primary]="dashboardStore.currentView() === 'employees'" 
-                    [class.font-bold]="dashboardStore.currentView() === 'employees'"
-                    (click)="dashboardStore.setView('employees')"
-                    [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.employees' | translate"
+            <button (click)="dashboardStore.setView('overview')"
+                    [class.bg-base-300]="dashboardStore.currentView() === 'overview'" 
+                    [class.text-primary]="dashboardStore.currentView() === 'overview'" 
+                    [class.font-bold]="dashboardStore.currentView() === 'overview'"
+                    [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.overview' | translate"
                     class="flex items-center py-3 transition-colors">
-              <i class="fa-solid fa-users-gear text-lg w-6 text-center"></i>
+              <i class="fa-solid fa-house text-lg w-6 text-center"></i>
               <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
-                {{ 'dashboard.sidebar.employees' | translate }}
+                {{ 'dashboard.sidebar.overview' | translate }}
               </span>
             </button>
           </li>
-        }
-      </ul>
+          
+          <li>
+            <button (click)="dashboardStore.setView('stores')"
+                    [class.bg-base-300]="dashboardStore.currentView() === 'stores'" 
+                    [class.text-primary]="dashboardStore.currentView() === 'stores'" 
+                    [class.font-bold]="dashboardStore.currentView() === 'stores'"
+                    [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.stores' | translate"
+                    class="flex items-center py-3 transition-colors">
+              <i class="fa-solid fa-store text-lg w-6 text-center"></i>
+              <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+                {{ 'dashboard.sidebar.stores' | translate }}
+              </span>
+            </button>
+          </li>
+          
+          <li>
+            <button (click)="dashboardStore.setView('products')"
+                    [class.bg-base-300]="dashboardStore.currentView() === 'products'" 
+                    [class.text-primary]="dashboardStore.currentView() === 'products'" 
+                    [class.font-bold]="dashboardStore.currentView() === 'products'"
+                    [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.products' | translate"
+                    class="flex items-center py-3 transition-colors">
+              <i class="fa-solid fa-warehouse text-lg w-6 text-center"></i>
+              <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+                {{ 'dashboard.sidebar.products' | translate }}
+              </span>
+            </button>
+          </li>
 
+          <li>
+            <details [open]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'">
+              <summary (click)="expandSidebar()" 
+                       [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
+                       [class.text-primary]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
+                       [class.font-bold]="dashboardStore.currentView() === 'tags-stores' || dashboardStore.currentView() === 'tags-products'"
+                       [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.tags' | translate"
+                       class="flex items-center relative py-3 transition-colors">
+                <i class="fa-solid fa-tags text-lg w-6 text-center"></i>
+                <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+                  {{ 'dashboard.sidebar.tags' | translate }}
+                </span>
+              </summary>
+              
+              <ul class="ml-9 mt-2 overflow-hidden border-l border-base-300 pl-2" [class.hidden]="!isSidebarExpanded()">
+                <li>
+                  <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-stores'" 
+                     [class.text-primary]="dashboardStore.currentView() === 'tags-stores'" 
+                     [class.font-bold]="dashboardStore.currentView() === 'tags-stores'"
+                     (click)="dashboardStore.setView('tags-stores')" class="py-2.5 transition-colors">
+                    <i class="fa-solid fa-shop w-4 opacity-70"></i>
+                    <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.stores' | translate }}</span>
+                  </a>
+                </li>
+                <li>
+                  <a [class.bg-base-300]="dashboardStore.currentView() === 'tags-products'" 
+                     [class.text-primary]="dashboardStore.currentView() === 'tags-products'" 
+                     [class.font-bold]="dashboardStore.currentView() === 'tags-products'"
+                     (click)="dashboardStore.setView('tags-products')" class="py-2.5 transition-colors">
+                    <i class="fa-solid fa-box w-4 opacity-70"></i>
+                    <span class="whitespace-nowrap">{{ 'dashboard.sidebar.tags.products' | translate }}</span>
+                  </a>
+                </li>
+              </ul>
+            </details>
+          </li>
+
+          @if (isOwnerUser()) {
+            <li>
+              <button [class.bg-base-300]="dashboardStore.currentView() === 'employees'" 
+                      [class.text-primary]="dashboardStore.currentView() === 'employees'" 
+                      [class.font-bold]="dashboardStore.currentView() === 'employees'"
+                      (click)="dashboardStore.setView('employees')"
+                      [class.tooltip]="!isSidebarExpanded()" [class.tooltip-right]="!isSidebarExpanded()" [attr.data-tip]="'dashboard.sidebar.employees' | translate"
+                      class="flex items-center py-3 transition-colors">
+                <i class="fa-solid fa-users-gear text-lg w-6 text-center"></i>
+                <span class="ml-3 whitespace-nowrap transition-opacity duration-200" [class.opacity-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+                  {{ 'dashboard.sidebar.employees' | translate }}
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
     </div>
-  </div>
+  }
 </div>

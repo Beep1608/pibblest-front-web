@@ -1,5 +1,5 @@
 // src/libs/stores/ui/src/lib/store-table/store-table.component.ts
-import { Component, ElementRef, inject, input, viewChild } from "@angular/core";
+import { Component, ElementRef, inject, input, viewChild, signal, OnInit } from "@angular/core";
 import { StorePreview } from "../../../../data-access/lib/models/store.model";
 import { TranslatePipe } from "@ngx-translate/core";
 import { StoreStore } from "../../../../data-access/lib/store/store.store";
@@ -13,7 +13,7 @@ import { TitleCasePipe } from "@angular/common";
   imports: [TranslatePipe, TitleCasePipe],
   templateUrl: './store-table.component.html'
 })
-export class StoreTableComponent {
+export class StoreTableComponent implements OnInit {
   stores = input.required<StorePreview[]>();
 
   storeStore = inject(StoreStore);
@@ -22,6 +22,25 @@ export class StoreTableComponent {
 
   deleteModalTable = viewChild<ElementRef<HTMLDialogElement>>('deleteModalTable');
   selectedStoreForDelete: StorePreview | null = null;
+
+  // ✨ Nueva señal para restringir acceso
+  isOwner = signal(false);
+
+  ngOnInit() {
+    this.checkUserRole();
+  }
+
+  checkUserRole() {
+    const token = localStorage.getItem('pibblest_token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isOwner.set(payload.role === 'OWNER' || payload.isOwner === true);
+      } catch (e) {
+        this.isOwner.set(false);
+      }
+    }
+  }
 
   selectStore(storeId: number) {
     if (this.storeStore.selectedStore() !== undefined && this.storeStore.selectedStore() !== storeId) {
@@ -54,3 +73,4 @@ export class StoreTableComponent {
     this.closeDeleteModal();
   }
 }
+
