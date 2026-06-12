@@ -13,59 +13,78 @@ import {
 } from '../models/product.model';
 
 @Injectable({
-	providedIn: 'root',
+    providedIn: 'root',
 })
 export class ProductApiService {
-	private http = inject(HttpClient);
+    private http = inject(HttpClient);
 
-	private readonly baseUrl = 'http://localhost:8081/api/products';
+    private readonly baseUrl = 'http://localhost:8081/api/products';
 
-	getAllProducts(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
-		let params = new HttpParams();
+    getAllProducts(storeId: number, keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
+        let params = new HttpParams();
 
-		if (keyword?.trim()) {
-			console.log('Llegó la keyword:', keyword);
-			// ¡IMPORTANTE: reasignar la variable!
-			params = params.set('keyword', keyword);
-		}
+        if (keyword?.trim()) {
+            params = params.set('keyword', keyword);
+        }
 
-		// Reasignar también aquí
-		params = params.set('page', page.toString());
-		params = params.set('size', size.toString());
+        params = params.set('page', page.toString());
+        params = params.set('size', size.toString());
 
-		return this.http.get<ProductPageResponse>(`${this.baseUrl}/${storeId.toString()}`, { params });
-	}
+        return this.http.get<ProductPageResponse>(`${this.baseUrl}/${storeId.toString()}`, { params });
+    }
 
-	getUniverseProducts(keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
-		let params = new HttpParams();
+    getUniverseProducts(keyword: string | null, page = 0, size = 10): Observable<ProductPageResponse> {
+        let params = new HttpParams();
 
-		if (keyword?.trim()) {
-			params = params.set('keyword', keyword);
-		}
+        if (keyword?.trim()) {
+            params = params.set('keyword', keyword);
+        }
 
-		params = params.set('page', page.toString());
-		params = params.set('size', size.toString());
+        params = params.set('page', page.toString());
+        params = params.set('size', size.toString());
 
-		// Apuntamos al endpoint global /api/products/all según el controlador backend
-		return this.http.get<ProductPageResponse>(`${this.baseUrl}/all`, { params });
-	}
+        return this.http.get<ProductPageResponse>(`${this.baseUrl}/all`, { params });
+    }
 
-	// NUEVO MÉTODO: POST para crear un producto
-	createProduct(request: CreateProductRequest): Observable<CreateProductResponse> {
-		return this.http.post<CreateProductResponse>(this.baseUrl, request);
-	}
+    createProduct(request: CreateProductRequest): Observable<CreateProductResponse> {
+        return this.http.post<CreateProductResponse>(this.baseUrl, request);
+    }
 
-	// NUEVOS MÉTODOS DE EDICIÓN
-	getProductById(id: number): Observable<Product> {
-		return this.http.get<Product>(`${this.baseUrl}/detail/${id}`);
-	}
+    getProductById(id: number): Observable<Product> {
+        return this.http.get<Product>(`${this.baseUrl}/detail/${id}`);
+    }
 
-	editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
-		return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
-	}
+    editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
+        return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
+    }
 
-	// NUEVO MÉTODO DE BORRADO
-	deleteProduct(id: number): Observable<DeleteProductResponse> {
-		return this.http.delete<DeleteProductResponse>(`${this.baseUrl}/${id}`);
-	}
+    deleteProduct(id: number): Observable<DeleteProductResponse> {
+        return this.http.delete<DeleteProductResponse>(`${this.baseUrl}/${id}`);
+    }
+
+    // ✨ FIX BUG 1 & 2: Nuevas rutas y estructuras de payload exactas para el backend
+
+    assignProductToStore(storeId: number, productId: number, desiredQuantity: number): Observable<{message: string}> {
+        // Payload estructurado según AssignProductsToStoreRequest (Lista de items)
+        const payload = {
+            items: [
+                { productId: productId, quantity: desiredQuantity }
+            ]
+        };
+        return this.http.post<{message: string}>(`${this.baseUrl}/store/${storeId}/associate`, payload);
+    }
+
+    updateStoreProductStock(storeId: number, productId: number, desiredQuantity: number, currentQuantity: number): Observable<{message: string}> {
+        // Payload estructurado según UpdateStoreProductQuantitiesRequest
+        const payload = { desiredQuantity, currentQuantity };
+        return this.http.put<{message: string}>(`${this.baseUrl}/store/${storeId}/quantities/${productId}`, payload);
+    }
+
+    removeProductFromStore(storeId: number, productId: number): Observable<{message: string}> {
+        // Payload estructurado según DissociateProductsRequest (Lista de productIds enviada en el body de un DELETE)
+        const payload = {
+            productIds: [productId]
+        };
+        return this.http.delete<{message: string}>(`${this.baseUrl}/store/${storeId}/associations`, { body: payload });
+    }
 }

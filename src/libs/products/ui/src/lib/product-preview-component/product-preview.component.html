@@ -93,10 +93,16 @@
                         </div>
                     }
                     @case ('employee') {
-                        <button class="btn btn-secondary btn-sm w-full" (click)="cart.addToCart(product()); $event.stopPropagation()" 
-                                [disabled]="product().currentQuantity === 0 || product().quantity === 0">
-                            <i class="fa-solid fa-cart-plus mr-1"></i> {{ 'inventory.sale.add.cart' | translate }}
-                        </button>
+                        @if (!isGlobal()) {
+                            <button class="btn btn-secondary btn-sm w-full" (click)="cart.addToCart(product()); $event.stopPropagation()" 
+                                    [disabled]="!product().currentQuantity || product().currentQuantity! <= 0">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> {{ 'inventory.sale.add.cart' | translate }}
+                            </button>
+                        } @else {
+                            <button class="btn btn-outline btn-primary btn-sm w-full">
+                                <i class="fa-solid fa-link mr-1"></i> {{ 'inventory.product.assign' | translate }}
+                            </button>
+                        }
                     }
                 }
             </div>
@@ -104,7 +110,6 @@
     </div>
 </div>
 
-<!-- (Mismo Dialog de Eliminación previo sin alterar) -->
 <dialog #deleteModal class="modal">
     <div class="modal-box">
         <h3 class="font-bold text-lg text-error flex items-center gap-2">

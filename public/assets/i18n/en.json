@@ -126,6 +126,7 @@
 	"inventory.pagination.next": "Next",
 	"categoryList.All": "All",
 	"inventory.product.edit": " Info",
+	"inventory.product.assign": "Select to assign",
 	"inventory.product.brand": "Brand",
 	"inventory.product.available": "available",
 	"inventory.product.barcode": "Barcode",
@@ -162,8 +163,14 @@
 	"inventory.product.delete.confirm": "Yes, delete",
 	"stores.manageProduct.title": "Manage Product in Store",
 	"stores.manageProduct.stockLabel": "Physical / Current Stock",
+	"stores.manageProduct.desiredQuantityLabel": "Desired Quantity / Target",
 	"stores.manageProduct.updateBtn": "Update Inventory",
 	"stores.manageProduct.removeBtn": "Unlink Product",
 	"stores.manageProduct.cancelBtn": "Back",
-	"stores.manageProduct.removeConfirm": "Are you sure you want to remove this product from the store? This action will revoke its availability for local sales in this branch."
+	"stores.manageProduct.removeConfirm": "Are you sure you want to remove this product from the store? This action will revoke its availability for local sales in this branch.",
+	"stores.globalInventory": "Global Inventory",
+	"stores.assignProduct.title": "Link to Branch",
+	"stores.assignProduct.quantityLabel": "Desired Quantity or Initial Goal",
+	"stores.assignProduct.assignBtn": "Assign Product",
+	"stores.assignProduct.cancelBtn": "Cancel"
 }

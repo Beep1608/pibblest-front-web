@@ -43,11 +43,12 @@
 
 
     @if (product.displayMode() === 'grid') {
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4 md:gap-6 w-full">
             @for (productItem of product.filteredProducts(); track productItem.id) {
                 <app-product-preview-component 
                     [product]="productItem" 
                     [viewMode]="'employee'"
+                    [isGlobal]="isGlobal()"
                     (productSelect)="productSelect.emit($event)">
                 </app-product-preview-component>
             }
@@ -56,6 +57,7 @@
         <app-product-table-component 
             [products]="product.filteredProducts()" 
             [viewMode]="'employee'"
+            [isGlobal]="isGlobal()"
             (productSelect)="productSelect.emit($event)">
         </app-product-table-component>
     }

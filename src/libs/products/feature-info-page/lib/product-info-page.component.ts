@@ -61,7 +61,7 @@ export class ProductInfoPage implements OnInit {
 			if (!this.productStore.isSubmitting()) {
 				this.isProcessing.set(false);
 			}
-		}, { allowSignalWrites: true });
+		});
 	}
 
 	ngOnInit() {

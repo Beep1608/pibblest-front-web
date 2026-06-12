@@ -125,6 +125,7 @@
 	"inventory.pagination.next": "Siguiente",
 	"categoryList.All": "Todos",
 	"inventory.product.edit": "Editar",
+	"inventory.product.assign": "Seleccionar para asignar",
 	"inventory.product.brand": "Marca",
 	"inventory.product.available": "Disponibles",
 	"inventory.product.barcode": "Código de barras",
@@ -161,8 +162,14 @@
 	"inventory.product.delete.confirm": "Sí, eliminar",
 	"stores.manageProduct.title": "Gestionar Producto en Tienda",
 	"stores.manageProduct.stockLabel": "Stock Físico / Actual",
+	"stores.manageProduct.desiredQuantityLabel": "Cantidad Deseada / Meta",
 	"stores.manageProduct.updateBtn": "Actualizar Inventario",
 	"stores.manageProduct.removeBtn": "Desvincular Producto",
 	"stores.manageProduct.cancelBtn": "Regresar",
-	"stores.manageProduct.removeConfirm": "¿Estás seguro de que deseas quitar este producto de la tienda? Esta acción revocará su disponibilidad para ventas locales en esta sucursal."
+	"stores.manageProduct.removeConfirm": "¿Estás seguro de que deseas quitar este producto de la tienda? Esta acción revocará su disponibilidad para ventas locales en esta sucursal.",
+	"stores.globalInventory": "Inventario Global",
+	"stores.assignProduct.title": "Vincular a Sucursal",
+	"stores.assignProduct.quantityLabel": "Cantidad Deseada o Meta Inicial",
+	"stores.assignProduct.assignBtn": "Asignar Producto",
+	"stores.assignProduct.cancelBtn": "Cancelar"
 }

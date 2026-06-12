@@ -13,6 +13,7 @@ import { ProductStore } from "../../../../data-access/lib/store/product.store";
 export class ProductTableComponent {
     products = input.required<Product[]>();
     viewMode = input<'admin' | 'employee'>('employee'); 
+    isGlobal = input<boolean>(false);
     
     productSelect = output<number>(); // ✨ Exponer evento de selección de fila/producto
     

@@ -44,7 +44,7 @@ export class ProductCreatePageComponent implements OnInit {
 			if (!this.product.isSubmitting()) {
 				this.isProcessing.set(false);
 			}
-		}, { allowSignalWrites: true });
+		});
 	}
 
 	ngOnInit() {

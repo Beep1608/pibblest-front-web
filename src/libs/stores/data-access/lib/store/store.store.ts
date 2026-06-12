@@ -11,8 +11,8 @@ import { UIStore } from '../../../../shared/data-access/store/ui.store';
 import { CreateStoreDto, StorePaginationResponse, StorePreview, UpdateStoreRequest } from '../models/store.model';
 import { StoreApiService } from '../services/store-api.service';
 
-export type StoreSubmenu = 'products' | 'sale' | 'sale-history';
-export type StoreView = 'view-all' | 'create-store' | 'store-page' | 'product-info' | 'sale-info' | 'edit-store' | 'manage-store-product' | null;
+export type StoreSubmenu = 'products' | 'sale' | 'sale-history' | 'global-inventory';
+export type StoreView = 'view-all' | 'create-store' | 'store-page' | 'product-info' | 'sale-info' | 'edit-store' | 'manage-store-product' | 'assign-global-product' | null;
 export type DisplayMode = 'grid' | 'table';
 
 interface StoreState {

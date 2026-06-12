@@ -13,6 +13,7 @@ import { ProductStore } from "../../../../data-access/lib/store/product.store";
 export class ProductPreviewComponent {
 	product = input.required<Product>();
 	viewMode = input<'admin' | 'employee'>('employee'); 
+	isGlobal = input<boolean>(false);
 	
 	// ✨ FIX: Oficialmente exponemos el evento para que suba hasta la tienda
 	productSelect = output<number>();

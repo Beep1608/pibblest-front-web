@@ -1,5 +1,5 @@
 // src/libs/products/feature-inventory-page/lib/product-inventory-page.component.ts
-import { Component, inject, OnInit, output } from '@angular/core';
+import { Component, inject, OnInit, output, input } from '@angular/core';
 import { TagButtonsComponent } from '../../../tags/ui/src/lib/tags-buttons.component/tags-buttons.component';
 import { ProductStore } from '../../data-access/lib/store/product.store';
 import { ProductPreviewComponent } from '../../ui/src/lib/product-preview-component/product-preview.component';
@@ -16,6 +16,10 @@ import { TagStore } from '../../../tags/data-access/store/tag.store';
 export class ProductInventoryPage implements OnInit {
     product = inject(ProductStore);
     tag = inject(TagStore);
+    
+    // ✨ FIX BUG 3: Input para identificar el contexto visual
+    isGlobal = input<boolean>(false);
+
     searchKeyword = output<string>();
     productSelect = output<number>(); // ✨ Exponer evento de selección de producto
 

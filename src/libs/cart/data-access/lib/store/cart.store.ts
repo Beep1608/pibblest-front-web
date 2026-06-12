@@ -1,3 +1,4 @@
+// src/libs/cart/data-access/lib/store/cart.store.ts
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { Product } from '../../../../products/data-access/lib/models/product.model';
 import { CartItem } from '../models/cart.model';
@@ -23,7 +24,7 @@ export const CartStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),
     withComputed(cart =>({
-        		totalPrice: computed(() => {
+        totalPrice: computed(() => {
 			return cart.cart().reduce((total, item) => total + item.product.basePrice * item.quantity, 0);
 		}),
 
@@ -33,7 +34,6 @@ export const CartStore = signalStore(
     })),
 	withMethods(cart => ({
 		addToCart(product: Product) {
-			console.log(cart.cart());
 			patchState(cart, state => {
 				if (product.currentQuantity <= 0) {
 					return {
@@ -65,13 +65,18 @@ export const CartStore = signalStore(
 			}));
 		},
 
+        // ✨ NUEVO: Elimina el producto del carrito usando solo el ID
+        removeFromCartById(productId: number) {
+            patchState(cart, state => ({
+                cart: state.cart.filter(item => item.product.id !== productId),
+            }));
+        },
+
 		decreaseQuantity(product: Product) {
 			patchState(cart, state => {
 				return {
 					cart: state.cart
-
 						.map(item => (item.product.id === product.id ? { ...item, quantity: item.quantity - 1 } : item))
-
 						.filter(item => item.quantity > 0),
 				};
 			});

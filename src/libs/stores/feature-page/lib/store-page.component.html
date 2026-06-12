@@ -1,30 +1,36 @@
+<!-- src/libs/stores/feature-page/lib/store-page.component.html -->
 <div class="bg-base-200/30 min-h-screen p-4">
   <div>
    <button class="btn text-center" (click)="store.setView('view-all')"><i class="fa-solid fa-arrow-left"></i></button>
   </div>
   
   <div role="tablist" class="tabs tabs-border mb-6">
-    @if (hasPermission('MODULE_SALES')) {
+    @if (store.hasPermission('MODULE_SALES')) {
       <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale'" (click)="store.setSubmenu('sale')">
         {{ 'stores.sale' | translate }}
       </a>
     }
     
-    @if (hasPermission('MODULE_PRODUCTS')) {
+    @if (store.hasPermission('MODULE_PRODUCTS')) {
       <a role="tab" class="tab font-medium" [class.tab-active]="store.selectedSubMenu() === 'products'" (click)="store.setSubmenu('products')">
         {{ 'stores.products' | translate }}
       </a>
     }
+
+    @if (store.hasPermission('MODULE_PRODUCTS', 'READ')) {
+      <a role="tab" class="tab font-medium" [class.tab-active]="store.selectedSubMenu() === 'global-inventory'" (click)="store.setSubmenu('global-inventory')">
+        {{ 'stores.globalInventory' | translate }}
+      </a>
+    }
     
-    @if (hasPermission('MODULE_SALES')) {
+    @if (store.hasPermission('MODULE_SALES')) {
       <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale-history'" (click)="store.setSubmenu('sale-history')">
         {{ 'stores.saleHistory' | translate }}
       </a>
     }
   </div>
 
-  @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'sale') {
+  @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'sale' || store.selectedSubMenu() === 'global-inventory') {
     <app-store-invetory-component></app-store-invetory-component>
   }
-  
 </div>

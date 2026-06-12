@@ -1,9 +1,10 @@
 // src/libs/stores/feature-manage-product/src/lib/store-product-manage.component.ts
-import { Component, inject, OnInit, computed, ElementRef, viewChild } from '@angular/core';
+import { Component, inject, OnInit, computed, ElementRef, viewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StoreStore } from '../../../data-access/lib/store/store.store';
 import { ProductStore } from '../../../../products/data-access/lib/store/product.store';
+import { CartStore } from '../../../../cart/data-access/lib/store/cart.store'; // ✨ Importación del carrito
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -24,18 +25,34 @@ import { TranslateModule } from '@ngx-translate/core';
             
           @if (canUpdate()) {
               <form [formGroup]="stockForm" (ngSubmit)="onUpdateStock()">
-                <div class="form-control mb-4">
-                  <label class="label">
-                    <span class="label-text font-semibold">{{ 'stores.manageProduct.stockLabel' | translate }}</span>
-                  </label>
-                  <input type="number" formControlName="stock" min="0"
-                         class="input input-bordered w-full focus:input-primary" 
-                         [class.input-error]="stockForm.invalid && stockForm.touched" />
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text font-semibold">{{ 'stores.manageProduct.stockLabel' | translate }}</span>
+                      </label>
+                      <input type="number" formControlName="stock" min="0"
+                             class="input input-bordered w-full focus:input-primary" 
+                             [class.input-error]="stockForm.controls.stock.invalid && stockForm.controls.stock.touched" />
+                    </div>
+
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text font-semibold">{{ 'stores.manageProduct.desiredQuantityLabel' | translate }}</span>
+                      </label>
+                      <input type="number" formControlName="desiredQuantity" min="0"
+                             class="input input-bordered w-full focus:input-primary" 
+                             [class.input-error]="stockForm.controls.desiredQuantity.invalid && stockForm.controls.desiredQuantity.touched" />
+                    </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-full" [disabled]="stockForm.invalid">
-                  <i class="fa-solid fa-boxes-stacked mr-2"></i>
-                  {{ 'stores.manageProduct.updateBtn' | translate }}
+                <button type="submit" class="btn btn-primary w-full" [disabled]="stockForm.invalid || product.isSubmitting()">
+                  @if (product.isSubmitting()) {
+                     <span class="loading loading-spinner"></span>
+                  } @else {
+                     <i class="fa-solid fa-boxes-stacked mr-2"></i>
+                     {{ 'stores.manageProduct.updateBtn' | translate }}
+                  }
                 </button>
               </form>
           }
@@ -64,16 +81,20 @@ import { TranslateModule } from '@ngx-translate/core';
           {{ 'stores.manageProduct.removeConfirm' | translate }}
         </p>
         <div class="modal-action">
-          <button class="btn btn-ghost" (click)="closeRemoveModal()">
+          <button class="btn btn-ghost" (click)="closeRemoveModal()" [disabled]="product.isSubmitting()">
             {{ 'stores.manageProduct.cancelBtn' | translate }}
           </button>
-          <button class="btn btn-error" (click)="confirmRemove()">
-            <i class="fa-solid fa-trash mr-1"></i> Confirmar
+          <button class="btn btn-error" (click)="confirmRemove()" [disabled]="product.isSubmitting()">
+            @if (product.isSubmitting()) {
+                <span class="loading loading-spinner"></span>
+            } @else {
+                <i class="fa-solid fa-trash mr-1"></i> Confirmar
+            }
           </button>
         </div>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button (click)="closeRemoveModal()">close</button>
+        <button (click)="closeRemoveModal()" [disabled]="product.isSubmitting()">close</button>
       </form>
     </dialog>
   `
@@ -82,16 +103,27 @@ export class StoreProductManageComponent implements OnInit {
   private fb = inject(FormBuilder);
   store = inject(StoreStore);
   product = inject(ProductStore);
+  cart = inject(CartStore); // ✨ Inyección del carrito
   
-  // ✨ Mapeo reactivo exacto gracias a tu JSON payload
   canUpdate = computed(() => this.store.hasPermission('MODULE_PRODUCTS', 'UPDATE'));
   canDelete = computed(() => this.store.hasPermission('MODULE_PRODUCTS', 'DELETE'));
 
   removeModal = viewChild<ElementRef<HTMLDialogElement>>('removeModal');
 
+  // ✨ FIX: Agregamos desiredQuantity al formulario para hacerlo editable
   stockForm = this.fb.nonNullable.group({
-    stock: [0, [Validators.required, Validators.min(0)]]
+    stock: [0, [Validators.required, Validators.min(0)]],
+    desiredQuantity: [0, [Validators.required, Validators.min(0)]]
   });
+
+  constructor() {
+      effect(() => {
+          if (this.product.isSuccess()) {
+              this.closeRemoveModal();
+              this.goBack();
+          }
+      });
+  }
 
   ngOnInit() {
     const currentProductId = this.store.selectedProductId();
@@ -100,14 +132,29 @@ export class StoreProductManageComponent implements OnInit {
         const productRef = productStoreState.find((p: any) => p.product?.id === currentProductId || p.id === currentProductId);
         if (productRef) {
             const currentStock = productRef.currentQuantity ?? productRef.stock ?? 0;
-            this.stockForm.patchValue({ stock: currentStock });
+            const desiredQuantity = productRef.desiredQuantity ?? 0;
+            
+            // Llenamos el formulario con ambos valores
+            this.stockForm.patchValue({ 
+                stock: currentStock,
+                desiredQuantity: desiredQuantity
+            });
         }
     }
   }
 
   onUpdateStock() {
-      if (this.stockForm.valid && this.store.selectedProductId()) {
-          this.goBack();
+      if (this.stockForm.valid && this.store.selectedProductId() && this.store.selectedStore()) {
+          // ✨ FIX BUG 1: Purgar el producto del carrito al modificar el inventario
+          this.cart.removeFromCartById(this.store.selectedProductId()!);
+          
+          this.product.updateStoreProductStock({ 
+              storeId: this.store.selectedStore()!, 
+              productId: this.store.selectedProductId()!, 
+              // Tomamos el valor actualizado por el empleado directamente del form
+              desiredQuantity: this.stockForm.getRawValue().desiredQuantity, 
+              stock: this.stockForm.getRawValue().stock 
+          });
       }
   }
 
@@ -120,13 +167,19 @@ export class StoreProductManageComponent implements OnInit {
   }
 
   confirmRemove() {
-      if (this.store.selectedProductId()) {
-           this.closeRemoveModal();
-           this.goBack();
+      if (this.store.selectedProductId() && this.store.selectedStore()) {
+           // ✨ FIX BUG 2: Purgar el producto del carrito al eliminar su relación con la tienda
+           this.cart.removeFromCartById(this.store.selectedProductId()!);
+           
+           this.product.removeProductFromStore({
+               storeId: this.store.selectedStore()!,
+               productId: this.store.selectedProductId()!
+           });
       }
   }
 
   goBack() {
+    this.product.resetProductState();
     this.store.setSelectedProductId(null);
     this.store.setView('store-page');
   }

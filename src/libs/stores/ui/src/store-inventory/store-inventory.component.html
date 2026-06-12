@@ -1,11 +1,15 @@
-<div class="grid sm:grid-cols-1 md:grid-cols-[3fr_1fr] gap-2">
+<!-- src/libs/stores/ui/src/store-inventory/store-inventory.component.html -->
+<div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] xl:grid-cols-[3fr_1fr] gap-4 items-start w-full">
 
-	<app-product-invetory-page 
-		(searchKeyword)="buscarEnTienda($event)"
-		(productSelect)="onProductSelect($event)">
-	</app-product-invetory-page>
+    <app-product-invetory-page class="w-full overflow-hidden"
+        [isGlobal]="store.selectedSubMenu() === 'global-inventory'"
+        (searchKeyword)="buscarEnTienda($event)"
+        (productSelect)="onProductSelect($event)">
+    </app-product-invetory-page>
 
-	@if (store.selectedSubMenu() === 'sale') {
-		<app-checkout-component></app-checkout-component>
-	}
+    @if (store.selectedSubMenu() === 'sale' || store.selectedSubMenu() === 'products') {
+        <div class="sticky top-4 w-full">
+            <app-checkout-component></app-checkout-component>
+        </div>
+    }
 </div>

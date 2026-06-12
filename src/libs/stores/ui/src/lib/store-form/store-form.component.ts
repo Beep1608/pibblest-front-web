@@ -52,7 +52,7 @@ export class StoreFormComponent implements OnInit {
       if (!this.isSubmitting()) {
         this.isProcessing.set(false);
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   ngOnInit() {

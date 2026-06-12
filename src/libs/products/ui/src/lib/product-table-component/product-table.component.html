@@ -48,9 +48,14 @@
                                 </div>
                             }
                             @case ('employee') {
-                                <button class="btn btn-sm btn-secondary" (click)="cart.addToCart(item); $event.stopPropagation()">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
+                                @if (!isGlobal()) {
+                                    <button class="btn btn-sm btn-secondary" (click)="cart.addToCart(item); $event.stopPropagation()"
+                                            [disabled]="!item.currentQuantity || item.currentQuantity <= 0">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                } @else {
+                                    <span class="badge badge-primary badge-outline text-xs"><i class="fa-solid fa-plus"></i></span>
+                                }
                             }
                         }
                     </td>
