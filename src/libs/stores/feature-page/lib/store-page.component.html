@@ -5,7 +5,7 @@
   </div>
   
   <div role="tablist" class="tabs tabs-border mb-6">
-    @if (store.hasPermission('MODULE_SALES')) {
+    @if (store.hasPermission('MODULE_SALES', 'CREATE')) {
       <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale'" (click)="store.setSubmenu('sale')">
         {{ 'stores.sale' | translate }}
       </a>
@@ -23,14 +23,16 @@
       </a>
     }
     
-    @if (store.hasPermission('MODULE_SALES')) {
-      <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale-history'" (click)="store.setSubmenu('sale-history')">
-        {{ 'stores.saleHistory' | translate }}
-      </a>
-    }
+    <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale-history'" (click)="store.setSubmenu('sale-history')">
+      {{ 'stores.saleHistory' | translate }}
+    </a>
   </div>
 
   @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'sale' || store.selectedSubMenu() === 'global-inventory') {
     <app-store-invetory-component></app-store-invetory-component>
+  }
+  
+  @if (store.selectedSubMenu() === 'sale-history') {
+    <app-sale-history></app-sale-history>
   }
 </div>
