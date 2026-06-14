@@ -161,9 +161,38 @@ export class SaleHistoryComponent implements OnInit {
     const storeId = this.store.selectedStore();
     if (storeId) {
       if (this.store.isOwnerUser() || this.store.hasPermission('MODULE_SALES', 'READ')) {
-          this.saleApi.getSimpleEmployeesByStore(storeId).subscribe(res => this.employees.set(res));
+          this.saleApi.getSimpleEmployeesByStore(storeId).subscribe(res => {
+              // El endpoint /simple solo devuelve empleados asignados en employees_stores.
+              // El owner (y vendedores no listados ahí) no aparece, pero sus ventas sí quedan
+              // registradas con su employeeId. Inyectamos al usuario actual desde el JWT para
+              // que pueda filtrar por sus propias ventas.
+              this.employees.set(this.withCurrentUser(res));
+          });
       }
       this.saleStore.loadSales(storeId);
+    }
+  }
+
+  /** Antepone al usuario autenticado (owner/lector) a la lista del filtro, sin duplicarlo. */
+  private withCurrentUser(employees: {id: string, username: string}[]): {id: string, username: string}[] {
+    const current = this.currentUserFromToken();
+    if (!current) return employees;
+    if (employees.some(emp => emp.id === current.id)) return employees;
+    return [current, ...employees];
+  }
+
+  /** Extrae employeeId y username del JWT almacenado. */
+  private currentUserFromToken(): {id: string, username: string} | null {
+    const token = localStorage.getItem('pibblest_token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const id = payload.employeeId;
+      const username = payload.username ?? payload.sub;
+      if (!id || !username) return null;
+      return { id: String(id), username: String(username) };
+    } catch {
+      return null;
     }
   }
 

@@ -75,7 +75,11 @@
 	
 	</div>
 
-	<button class="btn btn-secondary w-full" [disabled]="cart.cart().length === 0" (click)="createSale()">
+	<button
+		class="btn btn-secondary w-full"
+		[disabled]="cart.cart().length === 0 || !store.hasPermission('MODULE_SALES', 'CREATE')"
+		(click)="createSale()"
+	>
 		{{ 'sale.pay.button' | translate }}
 	</button>
 </div>

@@ -18,8 +18,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(authReq).pipe(
 
         catchError((error: HttpErrorResponse) => {
-            if(error.status === 401 || error.status === 403){
-                console.warn('Acceso denegado o sesión expirada. Redirigiendo al login');
+            // 401 = sesión inválida/expirada -> cerrar sesión y redirigir al login.
+            // 403 = autenticado pero sin permisos -> NO redirigir; propagar el error
+            // para que la capa que hizo la petición muestre el mensaje (toast).
+            if(error.status === 401){
+                console.warn('Sesión expirada o inválida. Redirigiendo al login');
                 localStorage.removeItem('pibblest_token');
                 router.navigate(['login']);
             }
