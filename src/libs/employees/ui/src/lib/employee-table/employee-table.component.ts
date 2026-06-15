@@ -12,6 +12,7 @@ import { EmployeeDto } from '../../../../data-access/src/lib/models/employee.mod
 })
 export class EmployeeTableComponent {
   employees = input.required<EmployeeDto[]>();
+  currentUserId = input<string | null>(null);
   delete = output<string>();
   edit = output<string>();
   resendActivation = output<string>();

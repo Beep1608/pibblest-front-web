@@ -1,6 +1,6 @@
 // src/libs/shared/data-access/services/barcode-scanner.service.ts
-import { Injectable, NgZone } from '@angular/core';
-import { Subject, Observable, buffer, debounceTime, filter, map } from 'rxjs';
+import { Injectable, NgZone, signal } from '@angular/core';
+import { Subject, Observable, buffer, debounceTime, filter, map, tap } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +12,14 @@ export class BarcodeScannerService {
      * Observable that emits the full barcode string when a scan is detected.
      */
     public readonly scan$: Observable<string>;
+
+    // Reactive flag: true once the global key listener is attached and capturing scans.
+    private readonly _isListening = signal(false);
+    public readonly isListening = this._isListening.asReadonly();
+
+    // Last barcode captured. Lets views show live "scanning" feedback.
+    private readonly _lastScan = signal<string | null>(null);
+    public readonly lastScan = this._lastScan.asReadonly();
 
     constructor(private ngZone: NgZone) {
         // We buffer keystrokes and emit them when there's a pause of 50ms.
@@ -26,10 +34,12 @@ export class BarcodeScannerService {
             }),
             // Usually, scanners append 'Enter' at the end of the scan.
             map(str => str.replace(/Enter$/, '').trim()),
-            filter(str => str.length >= 4) // Only emit if it looks like a barcode
+            filter(str => str.length >= 4), // Only emit if it looks like a barcode
+            tap(str => this._lastScan.set(str))
         );
 
         this.listenToGlobalKeys();
+        this._isListening.set(true);
     }
 
     private listenToGlobalKeys() {

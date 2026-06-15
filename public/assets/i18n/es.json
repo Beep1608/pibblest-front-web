@@ -190,5 +190,8 @@
 	"sales.history.filters.startDate": "Fecha Inicio",
 	"sales.history.filters.endDate": "Fecha Fin",
 	"sales.history.filters.search": "Buscar",
-	"sales.history.filters.clear": "Limpiar"
+	"sales.history.filters.clear": "Limpiar",
+	"stores.scanner.active": "Escáner activo",
+	"sales.scan.addedToCart": "Producto añadido: {{ name }}",
+	"sales.scan.notFoundInStore": "Producto no encontrado en esta tienda"
 }

@@ -191,5 +191,8 @@
 	"sales.history.filters.startDate": "Start Date",
 	"sales.history.filters.endDate": "End Date",
 	"sales.history.filters.search": "Search",
-	"sales.history.filters.clear": "Clear"
+	"sales.history.filters.clear": "Clear",
+	"stores.scanner.active": "Scanner active",
+	"sales.scan.addedToCart": "Product added: {{ name }}",
+	"sales.scan.notFoundInStore": "Product not found in this store"
 }

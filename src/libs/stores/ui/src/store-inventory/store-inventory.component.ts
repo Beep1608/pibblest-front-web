@@ -1,5 +1,5 @@
 // src/libs/stores/ui/src/store-inventory/store-inventory.component.ts
-import { Component, inject, OnInit, effect, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, effect, OnDestroy, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { StoreStore } from '../../../data-access';
 import { CheckoutComponent } from '../lib/checkout-component/checkout.component';
@@ -26,6 +26,12 @@ export class StoreInventoryComponent implements OnInit, OnDestroy {
     translate = inject(TranslateService);
 
     private scanSub?: Subscription;
+
+    // El escáner global solo actúa en venta e inventario global; ahí mostramos el indicador.
+    readonly scannerEnabled = computed(() => {
+        const submenu = this.store.selectedSubMenu();
+        return submenu === 'sale' || submenu === 'global-inventory';
+    });
 
     constructor() {
         effect(() => {

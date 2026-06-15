@@ -40,8 +40,8 @@ export class StoreFormComponent implements OnInit {
         this.form.patchValue({
           name: data.name,
           address: data.address,
-          // ✨ FIX: Forzamos la transformación a mayúscula
-          status: (data.status as string).toUpperCase() as StoreStatus,
+          // El backend serializa el estado en minúscula (@JsonValue), igual que los valores del enum.
+          status: (data.status as string).toLowerCase() as StoreStatus,
           tagsId: data.tags ? data.tags.map(t => t.id) : []
         });
       }

@@ -47,6 +47,7 @@ import { EmployeeFormPageComponent } from '../../../feature-form/src/lib/employe
 
                         <app-employee-table
 							[employees]="employeeStore.employeesPage()?.employees || []"
+							[currentUserId]="currentUserId"
 							(delete)="employeeStore.deleteEmployee($event)"
 							(edit)="employeeStore.loadEmployeeDetails($event)"
 						></app-employee-table>
@@ -90,7 +91,21 @@ import { EmployeeFormPageComponent } from '../../../feature-form/src/lib/employe
 })
 export class EmployeeShellComponent implements OnInit, OnDestroy {
 	employeeStore = inject(EmployeeStore);
-	
+
+	// Id del usuario autenticado (claim employeeId del JWT) para impedir el auto-borrado.
+	readonly currentUserId = this.decodeCurrentUserId();
+
+	private decodeCurrentUserId(): string | null {
+		const token = localStorage.getItem('pibblest_token');
+		if (!token) return null;
+		try {
+			const payload = JSON.parse(atob(token.split('.')[1]));
+			return payload.employeeId ?? null;
+		} catch {
+			return null;
+		}
+	}
+
 	ngOnInit() {
 		this.employeeStore.loadEmployees();
 	}

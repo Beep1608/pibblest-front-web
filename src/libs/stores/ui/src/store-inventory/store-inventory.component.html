@@ -1,4 +1,14 @@
 <!-- src/libs/stores/ui/src/store-inventory/store-inventory.component.html -->
+@if (scannerEnabled() && scanner.isListening()) {
+    <div class="flex items-center gap-2 mb-3 w-fit px-3 py-1.5 rounded-full bg-success/10 border border-success/30 text-success text-xs font-semibold">
+        <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+        </span>
+        {{ 'stores.scanner.active' | translate }}
+    </div>
+}
+
 <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] xl:grid-cols-[3fr_1fr] gap-4 items-start w-full">
 
     <app-product-invetory-page class="w-full overflow-hidden"
