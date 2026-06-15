@@ -17,6 +17,10 @@ export class BarcodeScannerService {
     private readonly _isListening = signal(false);
     public readonly isListening = this._isListening.asReadonly();
 
+    // User-controlled on/off switch. When disabled, scan$ stops emitting.
+    private readonly _enabled = signal(true);
+    public readonly enabled = this._enabled.asReadonly();
+
     // Last barcode captured. Lets views show live "scanning" feedback.
     private readonly _lastScan = signal<string | null>(null);
     public readonly lastScan = this._lastScan.asReadonly();
@@ -35,11 +39,25 @@ export class BarcodeScannerService {
             // Usually, scanners append 'Enter' at the end of the scan.
             map(str => str.replace(/Enter$/, '').trim()),
             filter(str => str.length >= 4), // Only emit if it looks like a barcode
+            // User can switch the scanner off; when disabled we swallow every scan.
+            filter(() => this._enabled()),
             tap(str => this._lastScan.set(str))
         );
 
         this.listenToGlobalKeys();
         this._isListening.set(true);
+    }
+
+    enable() {
+        this._enabled.set(true);
+    }
+
+    disable() {
+        this._enabled.set(false);
+    }
+
+    toggle() {
+        this._enabled.update(v => !v);
     }
 
     private listenToGlobalKeys() {

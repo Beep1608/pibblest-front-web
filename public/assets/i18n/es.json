@@ -192,6 +192,8 @@
 	"sales.history.filters.search": "Buscar",
 	"sales.history.filters.clear": "Limpiar",
 	"stores.scanner.active": "Escáner activo",
+	"stores.scanner.disabled": "Escáner apagado",
 	"sales.scan.addedToCart": "Producto añadido: {{ name }}",
-	"sales.scan.notFoundInStore": "Producto no encontrado en esta tienda"
+	"sales.scan.notFoundInStore": "Producto no encontrado en esta tienda",
+	"sales.scan.noStock": "Sin stock en la tienda"
 }

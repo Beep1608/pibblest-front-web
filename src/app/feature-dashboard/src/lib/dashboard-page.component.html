@@ -21,7 +21,29 @@
       <div class="flex-1">
         <span class="text-xl font-bold ml-4">Punto de Venta</span>
       </div>
-      <div class="flex-none">
+      <div class="flex-none flex items-center gap-1">
+        <button
+          type="button"
+          (click)="toggleScanner()"
+          [attr.aria-pressed]="scanner.enabled()"
+          [title]="(scanner.enabled() ? 'stores.scanner.active' : 'stores.scanner.disabled') | translate"
+          class="btn btn-ghost btn-sm gap-2 rounded-full"
+          [class.text-success]="scanner.enabled()"
+          [class.text-base-content]="!scanner.enabled()"
+          [class.opacity-50]="!scanner.enabled()">
+          @if (scanner.enabled()) {
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+              <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-success"></span>
+            </span>
+          } @else {
+            <i class="fa-solid fa-barcode text-base"></i>
+          }
+          <span class="hidden text-xs font-semibold sm:inline">
+            {{ (scanner.enabled() ? 'stores.scanner.active' : 'stores.scanner.disabled') | translate }}
+          </span>
+        </button>
+
         <button class="btn btn-ghost btn-circle" (click)="onLogout()">
           <i class="fa-solid fa-right-from-bracket text-error"></i>
         </button>

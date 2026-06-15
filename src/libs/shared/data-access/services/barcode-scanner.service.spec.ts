@@ -47,4 +47,34 @@ describe('BarcodeScannerService', () => {
             input.remove();
         }, 100);
     });
+
+    it('should not emit while disabled and resume after being re-enabled', (done) => {
+        let emitCount = 0;
+        const lastBarcode = { value: '' };
+        service.scan$.subscribe((barcode) => {
+            emitCount += 1;
+            lastBarcode.value = barcode;
+        });
+
+        const dispatch = (chars: string[]) =>
+            chars.forEach((key) => window.dispatchEvent(new KeyboardEvent('keydown', { key })));
+
+        // Disabled: the scan must be swallowed.
+        service.disable();
+        dispatch(['1', '2', '3', '4', '5', 'Enter']);
+
+        setTimeout(() => {
+            expect(emitCount).toBe(0);
+
+            // Re-enabled: scanning works again.
+            service.enable();
+            dispatch(['9', '8', '7', '6', '5', 'Enter']);
+
+            setTimeout(() => {
+                expect(emitCount).toBe(1);
+                expect(lastBarcode.value).toBe('98765');
+                done();
+            }, 100);
+        }, 100);
+    });
 });

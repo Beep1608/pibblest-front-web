@@ -5,12 +5,6 @@
   </div>
   
   <div role="tablist" class="tabs tabs-border mb-6">
-    @if (store.hasPermission('MODULE_SALES', 'CREATE')) {
-      <a role="tab" class="tab" [class.tab-active]="store.selectedSubMenu() === 'sale'" (click)="store.setSubmenu('sale')">
-        {{ 'stores.sale' | translate }}
-      </a>
-    }
-    
     @if (store.hasPermission('MODULE_PRODUCTS')) {
       <a role="tab" class="tab font-medium" [class.tab-active]="store.selectedSubMenu() === 'products'" (click)="store.setSubmenu('products')">
         {{ 'stores.products' | translate }}
@@ -28,7 +22,7 @@
     </a>
   </div>
 
-  @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'sale' || store.selectedSubMenu() === 'global-inventory') {
+  @if (store.selectedSubMenu() === 'products' || store.selectedSubMenu() === 'global-inventory') {
     <app-store-invetory-component></app-store-invetory-component>
   }
   

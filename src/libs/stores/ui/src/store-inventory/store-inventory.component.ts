@@ -1,5 +1,5 @@
 // src/libs/stores/ui/src/store-inventory/store-inventory.component.ts
-import { Component, inject, OnInit, effect, OnDestroy, computed } from '@angular/core';
+import { Component, inject, OnInit, effect, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { StoreStore } from '../../../data-access';
 import { CheckoutComponent } from '../lib/checkout-component/checkout.component';
@@ -27,12 +27,6 @@ export class StoreInventoryComponent implements OnInit, OnDestroy {
 
     private scanSub?: Subscription;
 
-    // El escáner global solo actúa en venta e inventario global; ahí mostramos el indicador.
-    readonly scannerEnabled = computed(() => {
-        const submenu = this.store.selectedSubMenu();
-        return submenu === 'sale' || submenu === 'global-inventory';
-    });
-
     constructor() {
         effect(() => {
             const submenu = this.store.selectedSubMenu();
@@ -41,7 +35,7 @@ export class StoreInventoryComponent implements OnInit, OnDestroy {
             if (storeId) {
                 if (submenu === 'global-inventory') {
                     this.product.getGlobalProducts(null);
-                } else if (submenu === 'products' || submenu === 'sale') {
+                } else if (submenu === 'products') {
                     this.product.getAllProducts({ storeId, keyword: null });
                 }
             }
@@ -55,21 +49,25 @@ export class StoreInventoryComponent implements OnInit, OnDestroy {
         // Suscripción al escáner de códigos de barras
         this.scanSub = this.scanner.scan$.subscribe(barcode => {
             const submenu = this.store.selectedSubMenu();
-            
-            if (submenu === 'sale') {
-                // Modo Venta: Camino rápido (hot-path) en memoria
-                const products = this.product.filteredProducts();
-                const foundProduct = products.find(p => p.barcode === barcode);
-                
-                if (foundProduct) {
+            const foundProduct = this.product.filteredProducts().find(p => p.barcode === barcode);
+
+            if (submenu === 'products') {
+                // Modo Venta: hot-path en memoria, solo si existe en la tienda y hay stock.
+                if (!foundProduct) {
+                    this.ui.showToast(this.translate.instant('sales.scan.notFoundInStore'), 'error');
+                } else if (foundProduct.currentQuantity > 0) {
                     this.cart.addToCart(foundProduct);
                     this.ui.showToast(this.translate.instant('sales.scan.addedToCart', { name: foundProduct.name }));
                 } else {
-                    this.ui.showToast(this.translate.instant('sales.scan.notFoundInStore'), 'error');
+                    this.ui.showToast(this.translate.instant('sales.scan.noStock'), 'error');
                 }
             } else if (submenu === 'global-inventory') {
-                // Modo Inventario Global: Búsqueda en backend
-                this.product.searchByBarcode(barcode);
+                // Modo Inventario Global: abre el modal/vista de vínculo producto-tienda.
+                if (foundProduct) {
+                    this.onProductSelect(foundProduct.id);
+                } else {
+                    this.ui.showToast(this.translate.instant('sales.scan.notFoundInStore'), 'error');
+                }
             }
         });
     }

@@ -11,7 +11,7 @@ import { UIStore } from '../../../../shared/data-access/store/ui.store';
 import { CreateStoreDto, StorePaginationResponse, StorePreview, UpdateStoreRequest } from '../models/store.model';
 import { StoreApiService } from '../services/store-api.service';
 
-export type StoreSubmenu = 'products' | 'sale' | 'sale-history' | 'global-inventory';
+export type StoreSubmenu = 'products' | 'sale-history' | 'global-inventory';
 export type StoreView = 'view-all' | 'create-store' | 'store-page' | 'product-info' | 'sale-info' | 'edit-store' | 'manage-store-product' | 'assign-global-product' | null;
 export type DisplayMode = 'grid' | 'table';
 
@@ -45,7 +45,7 @@ const initialState: StoreState = {
     selectedStore: null,
     selectedStoreDetails: null,
     selectedProductId: null,
-    selectedSubMenu: 'sale',
+    selectedSubMenu: 'products',
     selectedView: 'view-all',
     storesPage: null,
     displayMode: 'grid',

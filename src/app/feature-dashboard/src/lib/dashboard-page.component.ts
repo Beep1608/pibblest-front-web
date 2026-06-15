@@ -10,6 +10,7 @@ import { ProductsShellComponent } from "../../../../libs/products/feature-shell"
 import { TagsShellComponent } from "../../../../libs/tags/feature-shell/src/lib/tags-shell.component";
 import { EmployeeShellComponent } from "../../../../libs/employees/feature-shell/src/lib/employee-shell.component";
 import { StoreStore } from "../../../../libs/stores/data-access/lib/store/store.store";
+import { BarcodeScannerService } from "../../../../libs/shared/data-access/services/barcode-scanner.service";
 
 @Component({
   selector: 'app-dashboard-owner-page',
@@ -29,6 +30,7 @@ export class DashboardPageComponent implements OnInit {
   dashboardStore = inject(DashboardStore);
   readonly store = inject(OwnerStore);
   storeStore = inject(StoreStore); // Inyectamos el Store maestro de tiendas
+  readonly scanner = inject(BarcodeScannerService);
   private router = inject(Router);
 
   // ✨ Signal para controlar el estado colapsado/expandido en Desktop
@@ -65,6 +67,10 @@ export class DashboardPageComponent implements OnInit {
 
   toggleSidebar() {
     this.isSidebarExpanded.update(v => !v);
+  }
+
+  toggleScanner() {
+    this.scanner.toggle();
   }
 
   expandSidebar() {
