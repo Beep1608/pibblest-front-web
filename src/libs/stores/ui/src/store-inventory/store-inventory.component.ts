@@ -9,11 +9,11 @@ import { ProductStore } from '../../../../products/data-access/lib/store/product
 import { CartStore } from '../../../../cart/data-access/lib/store/cart.store';
 import { BarcodeScannerService } from '../../../../shared/data-access/services/barcode-scanner.service';
 import { UIStore } from '../../../../shared/data-access/store/ui.store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-store-invetory-component',
-    imports: [CheckoutComponent, ProductInventoryPage],
+    imports: [CheckoutComponent, ProductInventoryPage, TranslatePipe],
     templateUrl: './store-inventory.component.html',
 })
 export class StoreInventoryComponent implements OnInit, OnDestroy {
