@@ -22,7 +22,7 @@ export class ProductCreatePageComponent implements OnInit {
 	productForm = this.fb.nonNullable.group({
 		name: ['', [Validators.required]],
 		sku: ['', [Validators.required]],
-		barcode: ['', [Validators.required]],
+		barcode: [''],
 		brand: ['', [Validators.required]],
 		basePrice: [0, [Validators.required, Validators.min(0)]],
 		cost: [0, [Validators.required, Validators.min(0)]],

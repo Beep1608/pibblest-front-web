@@ -54,6 +54,10 @@ export class ProductApiService {
         return this.http.get<Product>(`${this.baseUrl}/detail/${id}`);
     }
 
+    getProductByBarcode(barcode: string): Observable<Product> {
+        return this.http.get<Product>(`${this.baseUrl}/barcode/${barcode}`);
+    }
+
     editProduct(id: number, request: UpdateProductRequest): Observable<UpdateProductResponse> {
         return this.http.put<UpdateProductResponse>(`${this.baseUrl}/${id}`, request);
     }

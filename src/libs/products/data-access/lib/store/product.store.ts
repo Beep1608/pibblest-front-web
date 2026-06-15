@@ -100,6 +100,23 @@ export const ProductStore = signalStore(
             )
         ),
 
+        searchByBarcode: rxMethod<string>(
+            pipe(
+                tap(() => patchState(product, { isLoading: true, error: null, isSuccess: false, selectedProduct: null })),
+                switchMap((barcode) => api.getProductByBarcode(barcode).pipe(
+                    tapResponse({
+                        next: (res) => {
+                            patchState(product, { isLoading: false, selectedProduct: res, selectedProductId: res.id, currentView: 'info' });
+                        },
+                        error: (err: any) => {
+                            patchState(product, { isLoading: false, error: err.error?.message || err.message || 'Producto no encontrado' });
+                            ui.showToast(err.error?.message || 'Producto no encontrado', 'error');
+                        }
+                    })
+                ))
+            )
+        ),
+
         updateProduct: rxMethod<{id: number, request: UpdateProductRequest}>(
             pipe(
                 tap(() => patchState(product, { isSubmitting: true, error: null, isSuccess: false, message: null })),
