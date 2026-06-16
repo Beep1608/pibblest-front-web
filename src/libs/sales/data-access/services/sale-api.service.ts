@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { SaleCreateDto, SaleCreateResponse, SalePaginationResponse } from "../models/sale.model";
 import { Observable } from "rxjs";
+import { TicketResponse } from "../../../printing/services/printer.service";
 
 @Injectable({
 	providedIn: 'root',
@@ -13,8 +14,12 @@ export class SaleApiService {
 	private readonly baseUrl = 'http://localhost:8081/api/sale';
     private readonly employeeUrl = 'http://localhost:8081/api/employees';
 
-    createSale(dto: SaleCreateDto): Observable<SaleCreateResponse>{
-        return this.http.post<SaleCreateResponse>(`${this.baseUrl}`, dto);
+    createSale(dto: SaleCreateDto): Observable<SaleCreateResponse & { saleId?: number }>{
+        return this.http.post<SaleCreateResponse & { saleId?: number }>(`${this.baseUrl}`, dto);
+    }
+
+    getTicket(saleId: number, storeId: number): Observable<TicketResponse> {
+        return this.http.post<TicketResponse>(`${this.baseUrl}/ticket`, { saleId, storeId });
     }
 
     // ✨ FIX Hallazgo #1: Inyección dinámica de los parámetros de fecha y empleado

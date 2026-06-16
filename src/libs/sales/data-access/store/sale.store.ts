@@ -10,6 +10,7 @@ import { SaleCreateDto, SalePaginationResponse } from '../models/sale.model';
 import { CartItem } from '../../../cart/data-access/lib/models/cart.model';
 import { StoreStore } from '../../../stores/data-access/lib/store/store.store';
 import { UIStore } from '../../../shared/data-access/store/ui.store';
+import { PrinterService } from '../../../printing/services/printer.service';
 
 interface SaleState {
 	isLoading: boolean;
@@ -44,7 +45,7 @@ export const SaleStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),
 
-	withMethods((store, api = inject(SaleApiService), storeStore = inject(StoreStore), ui = inject(UIStore)) => ({
+	withMethods((store, api = inject(SaleApiService), storeStore = inject(StoreStore), ui = inject(UIStore), printer = inject(PrinterService)) => ({
 		
         createSale: rxMethod<SaleCreateDto>(
 			pipe(
@@ -52,10 +53,26 @@ export const SaleStore = signalStore(
 				switchMap(dto =>
 					api.createSale(dto).pipe(
 						tapResponse({
-							next: () => {
+							next: (res) => {
 								patchState(store, { isLoading: false, isSuccess: true });
                                 ui.showToast('Venta confirmada exitosamente');
 								setTimeout(() => patchState(store, { isSuccess: false }), 3000);
+								
+                                // Silent Ticket Printing Integration
+                                if (res.saleId) {
+                                    api.getTicket(res.saleId, dto.storeId).subscribe({
+                                        next: (ticket) => {
+                                            printer.print(ticket).catch(err => {
+                                                console.error("Print failed:", err);
+                                                ui.showToast("Error: check the printer connection", 'error');
+                                            });
+                                        },
+                                        error: (err) => {
+                                            console.error("Ticket fetch failed:", err);
+                                            ui.showToast("Error: check the printer connection", 'error');
+                                        }
+                                    });
+                                }
 							},
 							error: (error: HttpErrorResponse) => {
                                 ui.showToast(error.error?.message || 'Error al procesar venta', 'error');

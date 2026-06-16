@@ -20,6 +20,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@tailwindcss/postcss": "^4.2.4",
+    "qz-tray": "^2.2.4",
     "rxjs": "~7.8.0"
   },
   "devDependencies": {
@@ -44,6 +45,7 @@
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.5",
     "@swc/helpers": "~0.5.18",
+    "@types/qz-tray": "^2.2.2",
     "@typescript-eslint/utils": "^8.40.0",
     "angular-eslint": "^21.2.0",
     "autoprefixer": "^10.4.0",
