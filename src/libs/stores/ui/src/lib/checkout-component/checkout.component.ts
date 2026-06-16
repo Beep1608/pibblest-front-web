@@ -1,4 +1,4 @@
-import { Component, effect, inject } from "@angular/core";
+import { Component, effect, inject, signal } from "@angular/core";
 import { StoreStore } from "../../../../data-access";
 import { TranslatePipe } from "@ngx-translate/core";
 import { SaleStore } from "../../../../../sales/data-access/store/sale.store";
@@ -18,6 +18,10 @@ export class CheckoutComponent {
 	sale = inject(SaleStore);
 	product  = inject(ProductStore);
 	cart = inject(CartStore);
+
+	// Opt-in ticket printing: the user decides whether to print after the sale.
+	shouldPrint = signal(false);
+
 	constructor(){
 		effect(() => {
 			if(this.sale.isSuccess()){
@@ -50,6 +54,11 @@ export class CheckoutComponent {
 			storeId: this.store.selectedStore() ?? 0,
 		};
 
-		this.sale.createSale(dto);
+		const canPrint = this.store.hasPermission('MODULE_SALES', 'CREATE');
+		this.sale.createSale({ dto, print: canPrint && this.shouldPrint() });
+	}
+
+	togglePrint(value: boolean) {
+		this.shouldPrint.set(value);
 	}
 }

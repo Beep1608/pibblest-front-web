@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as qz from 'qz-tray';
-import { TicketResponse, TicketLineItem } from '../../sales/data-access/store/sale.store'; // I will define these interfaces there or locally. Let's define them in sale-api.service.ts instead, since that's where the backend response comes. I'll import from there later.
 
 export interface TicketResponse {
     saleId: number;

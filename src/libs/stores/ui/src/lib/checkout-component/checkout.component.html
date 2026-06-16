@@ -75,6 +75,18 @@
 	
 	</div>
 
+	@if (store.hasPermission('MODULE_SALES', 'CREATE')) {
+		<label class="label cursor-pointer justify-start gap-3 px-2">
+			<input
+				type="checkbox"
+				class="checkbox checkbox-primary"
+				[checked]="shouldPrint()"
+				(change)="togglePrint($any($event.target).checked)"
+			/>
+			<span class="label-text">{{ 'sale.print.ticket' | translate }}</span>
+		</label>
+	}
+
 	<button
 		class="btn btn-secondary w-full"
 		[disabled]="cart.cart().length === 0 || !store.hasPermission('MODULE_SALES', 'CREATE')"

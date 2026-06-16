@@ -134,6 +134,7 @@
 	"inventory.sale.add.cart": "Add to cart",
 	"inventory.sale.cart.title": "Cart",
 	"sale.pay.button": "Pay",
+	"sale.print.ticket": "Print ticket",
 	"admin.inventory.search.placeholder": "Search across the entire universe of products...",
 	"admin.inventory.search.button": "Search",
 	"admin.inventory.empty": "No products were found in the global universe.",

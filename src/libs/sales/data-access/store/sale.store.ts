@@ -47,10 +47,10 @@ export const SaleStore = signalStore(
 
 	withMethods((store, api = inject(SaleApiService), storeStore = inject(StoreStore), ui = inject(UIStore), printer = inject(PrinterService)) => ({
 		
-        createSale: rxMethod<SaleCreateDto>(
+        createSale: rxMethod<{ dto: SaleCreateDto; print: boolean }>(
 			pipe(
 				tap(() => patchState(store, { isLoading: true, error: null, isSuccess: false })),
-				switchMap(dto =>
+				switchMap(({ dto, print }) =>
 					api.createSale(dto).pipe(
 						tapResponse({
 							next: (res) => {
@@ -58,8 +58,8 @@ export const SaleStore = signalStore(
                                 ui.showToast('Venta confirmada exitosamente');
 								setTimeout(() => patchState(store, { isSuccess: false }), 3000);
 								
-                                // Silent Ticket Printing Integration
-                                if (res.saleId) {
+                                // Ticket printing is opt-in: only print when the user chose to.
+                                if (print && res.saleId) {
                                     api.getTicket(res.saleId, dto.storeId).subscribe({
                                         next: (ticket) => {
                                             printer.print(ticket).catch(err => {
