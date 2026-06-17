@@ -53,6 +53,9 @@
     <div class="p-6 flex-1 overflow-y-auto">
       <div class="w-full h-full max-w-screen-2xl mx-auto">
         @switch (dashboardStore.currentView()) {
+          @case ('overview') {
+            <app-dashboard-overview></app-dashboard-overview>
+          }
           @case ('stores') {
             <app-store-main-page></app-store-main-page>
           }

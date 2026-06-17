@@ -12,6 +12,8 @@ import { EmployeeShellComponent } from "../../../../libs/employees/feature-shell
 import { StoreStore } from "../../../../libs/stores/data-access/lib/store/store.store";
 import { BarcodeScannerService } from "../../../../libs/shared/data-access/services/barcode-scanner.service";
 
+import { OverviewContainerComponent } from './overview/overview-container.component';
+
 @Component({
   selector: 'app-dashboard-owner-page',
   standalone: true,
@@ -21,7 +23,8 @@ import { BarcodeScannerService } from "../../../../libs/shared/data-access/servi
     TranslatePipe,
     ProductsShellComponent,
     TagsShellComponent,
-    EmployeeShellComponent
+    EmployeeShellComponent,
+    OverviewContainerComponent
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css',
