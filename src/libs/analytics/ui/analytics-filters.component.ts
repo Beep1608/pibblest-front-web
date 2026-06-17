@@ -3,7 +3,7 @@ import { AnalyticsStore } from '../data-access/store/analytics.store';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'lib-analytics-filters',
+  selector: 'app-analytics-filters',
   standalone: true,
   imports: [FormsModule],
   template: `

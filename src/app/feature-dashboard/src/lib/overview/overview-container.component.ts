@@ -6,7 +6,7 @@ import { BestSellingProductsChartComponent } from './best-selling-products-chart
 import { PeakHoursChartComponent } from './peak-hours-chart.component';
 import { StorePerformanceChartComponent } from './store-performance-chart.component';
 import { ProductPerformanceChartComponent } from './product-performance-chart.component';
-import { AnalyticsFiltersComponent } from '../../../../../../libs/analytics/ui/analytics-filters.component';
+import { AnalyticsFiltersComponent } from '../../../../../libs/analytics/ui/analytics-filters.component';
 
 @Component({
   selector: 'app-dashboard-overview',

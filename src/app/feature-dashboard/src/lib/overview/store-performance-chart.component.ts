@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AnalyticsStore } from '../../../../../../libs/analytics/data-access/store/analytics.store';
-import { ChartWrapperComponent } from '../../../../../../libs/analytics/ui/chart-wrapper.component';
+import { ChartWrapperComponent } from '../../../../../libs/analytics/ui/chart-wrapper.component';
+import { AnalyticsStore } from '../../../../../libs/analytics/data-access';
 
 @Component({
   selector: 'app-store-performance-chart',
