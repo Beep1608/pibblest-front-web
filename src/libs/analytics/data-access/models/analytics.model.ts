@@ -32,3 +32,10 @@ export interface PeakHourEntry {
   dayOfWeek: number;
   saleCount: number;
 }
+
+export interface StoreRankEntry {
+  storeId: number;
+  storeName: string;
+  totalRevenue: number;
+  currencyCode: string;
+}

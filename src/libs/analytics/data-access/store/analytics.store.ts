@@ -13,7 +13,6 @@ interface AnalyticsState {
   bestSellingProducts: { data: any | null; loading: boolean; error: string | null };
   peakHours: { data: any | null; loading: boolean; error: string | null };
   storePerformance: { data: any | null; loading: boolean; error: string | null };
-  productPerformance: { data: any | null; loading: boolean; error: string | null };
 }
 
 const initialState: AnalyticsState = {
@@ -23,7 +22,6 @@ const initialState: AnalyticsState = {
   bestSellingProducts: { data: null, loading: false, error: null },
   peakHours: { data: null, loading: false, error: null },
   storePerformance: { data: null, loading: false, error: null },
-  productPerformance: { data: null, loading: false, error: null },
 };
 
 export const AnalyticsStore = signalStore(
@@ -94,19 +92,6 @@ export const AnalyticsStore = signalStore(
             tapResponse({
               next: (data) => patchState(store, { storePerformance: { data, loading: false, error: null } }),
               error: (error: any) => patchState(store, { storePerformance: { data: null, loading: false, error: error.message } }),
-            })
-          );
-        })
-      )
-    ),
-    loadProductPerformance: rxMethod<void>(
-      pipe(
-        switchMap(() => {
-          patchState(store, { productPerformance: { data: null, loading: true, error: null } });
-          return api.getProductPerformance(store.filters()).pipe(
-            tapResponse({
-              next: (data) => patchState(store, { productPerformance: { data, loading: false, error: null } }),
-              error: (error: any) => patchState(store, { productPerformance: { data: null, loading: false, error: error.message } }),
             })
           );
         })

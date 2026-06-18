@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AnalyticsFilters, CurrencySeriesResponse, RankedDataResponse, ProductRankEntry, PeakHourEntry } from '../models/analytics.model';
+import { AnalyticsFilters, CurrencySeriesResponse, RankedDataResponse, ProductRankEntry, PeakHourEntry, StoreRankEntry } from '../models/analytics.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsApiService {
@@ -20,7 +20,7 @@ export class AnalyticsApiService {
   }
 
   getRevenueSeries(filters: AnalyticsFilters): Observable<CurrencySeriesResponse> {
-    return this.http.get<CurrencySeriesResponse>(`${this.baseUrl}/revenue`, { params: this.createParams(filters) });
+    return this.http.get<CurrencySeriesResponse>(`${this.baseUrl}/sales-volume`, { params: this.createParams(filters) });
   }
 
   getSalesCountSeries(filters: AnalyticsFilters): Observable<CurrencySeriesResponse> {
@@ -35,12 +35,7 @@ export class AnalyticsApiService {
     return this.http.get<RankedDataResponse<PeakHourEntry>>(`${this.baseUrl}/peak-hours`, { params: this.createParams(filters) });
   }
   
-  // Placeholder for missing 2 endpoints if necessary
-  getStorePerformance(filters: AnalyticsFilters): Observable<RankedDataResponse<any>> {
-    return this.http.get<RankedDataResponse<any>>(`${this.baseUrl}/store-performance`, { params: this.createParams(filters) });
-  }
-  
-  getProductPerformance(filters: AnalyticsFilters): Observable<RankedDataResponse<any>> {
-    return this.http.get<RankedDataResponse<any>>(`${this.baseUrl}/product-performance`, { params: this.createParams(filters) });
+  getStorePerformance(filters: AnalyticsFilters): Observable<RankedDataResponse<StoreRankEntry>> {
+    return this.http.get<RankedDataResponse<StoreRankEntry>>(`${this.baseUrl}/top-stores`, { params: this.createParams(filters) });
   }
 }

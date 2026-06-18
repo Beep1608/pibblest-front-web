@@ -5,7 +5,6 @@ import { SalesCountChartComponent } from './sales-count-chart.component';
 import { BestSellingProductsChartComponent } from './best-selling-products-chart.component';
 import { PeakHoursChartComponent } from './peak-hours-chart.component';
 import { StorePerformanceChartComponent } from './store-performance-chart.component';
-import { ProductPerformanceChartComponent } from './product-performance-chart.component';
 import { AnalyticsFiltersComponent } from '../../../../../libs/analytics/ui/analytics-filters.component';
 
 @Component({
@@ -18,7 +17,6 @@ import { AnalyticsFiltersComponent } from '../../../../../libs/analytics/ui/anal
     BestSellingProductsChartComponent,
     PeakHoursChartComponent,
     StorePerformanceChartComponent,
-    ProductPerformanceChartComponent,
     AnalyticsFiltersComponent
   ],
   template: `
@@ -31,7 +29,6 @@ import { AnalyticsFiltersComponent } from '../../../../../libs/analytics/ui/anal
         <app-best-selling-products-chart></app-best-selling-products-chart>
         <app-peak-hours-chart></app-peak-hours-chart>
         <app-store-performance-chart></app-store-performance-chart>
-        <app-product-performance-chart></app-product-performance-chart>
       </div>
     </div>
   `
