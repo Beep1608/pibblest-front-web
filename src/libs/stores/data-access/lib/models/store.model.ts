@@ -19,6 +19,7 @@ export interface CreateStoreDto {
   name: string;
   address: string;
   status: StoreStatus;
+  timezone: string;
   tagsId: number[];
 }
 
@@ -26,6 +27,7 @@ export interface UpdateStoreRequest {
   name: string;
   address: string;
   status: StoreStatus;
+  timezone: string;
   tagsId: number[];
 }
 
@@ -34,6 +36,7 @@ export interface StorePreview {
   name: string;
   address: string;
   status: string;
+  timezone?: string;
   totalProducts: number;
   currentQuantityOfProducts: number;
   salesOfToday: number;

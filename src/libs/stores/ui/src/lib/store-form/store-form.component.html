@@ -53,6 +53,24 @@
 
     <div class="form-control">
       <label class="label pb-1.5">
+        <span class="label-text font-medium text-base-content/80">{{ 'stores.form.timezoneLabel' | translate }}</span>
+      </label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-clock absolute left-4 text-base-content/40 text-sm z-10"></i>
+        <select formControlName="timezone" class="select select-bordered pl-10 w-full appearance-none transition-all duration-200 focus:select-primary focus:outline-none"
+                [class.select-error]="form.controls.timezone.invalid && form.controls.timezone.touched">
+          @for (tz of timezones; track tz) {
+            <option [value]="tz">{{ tz }}</option>
+          }
+        </select>
+      </div>
+      <label class="label">
+        <span class="label-text-alt text-base-content/60">{{ 'stores.form.timezoneHint' | translate }}</span>
+      </label>
+    </div>
+
+    <div class="form-control">
+      <label class="label pb-1.5">
         <span class="label-text font-medium text-base-content/80">{{ 'stores.form.tags' | translate }}</span>
       </label>
       @if (tagStore.isLoading()) {

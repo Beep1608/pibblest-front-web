@@ -26,10 +26,16 @@ export class StoreFormComponent implements OnInit {
 
   storeStatuses = Object.values(StoreStatus);
 
+  // Full IANA list when the browser supports it; otherwise a sensible regional fallback.
+  timezones: string[] = this.resolveTimezones();
+
+  private readonly browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
   form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     address: ['', [Validators.required]],
     status: [StoreStatus.ACTIVE, [Validators.required]],
+    timezone: [this.browserTimezone, [Validators.required]],
     tagsId: [[] as number[]]
   });
 
@@ -42,6 +48,7 @@ export class StoreFormComponent implements OnInit {
           address: data.address,
           // El backend serializa el estado en minúscula (@JsonValue), igual que los valores del enum.
           status: (data.status as string).toLowerCase() as StoreStatus,
+          timezone: data.timezone ?? this.browserTimezone,
           tagsId: data.tags ? data.tags.map(t => t.id) : []
         });
       }
@@ -57,6 +64,14 @@ export class StoreFormComponent implements OnInit {
 
   ngOnInit() {
     this.tagStore.loadAllStoreTagsList();
+  }
+
+  private resolveTimezones(): string[] {
+    const intl = Intl as unknown as { supportedValuesOf?: (key: string) => string[] };
+    if (typeof intl.supportedValuesOf === 'function') {
+      return intl.supportedValuesOf('timeZone');
+    }
+    return ['UTC', 'America/Mexico_City', 'America/Bogota', 'America/Lima', 'America/Argentina/Buenos_Aires', 'America/New_York', 'Europe/Madrid'];
   }
 
   onTagsChange(event: Event) {

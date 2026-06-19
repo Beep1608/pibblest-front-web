@@ -85,6 +85,8 @@
 	"stores.form.addressPlaceholder": "123 Main Street",
 	"stores.form.statusLabel": "Status",
 	"stores.form.statusPlaceholder": "Select a status",
+	"stores.form.timezoneLabel": "Timezone",
+	"stores.form.timezoneHint": "Controls how this store's analytics are bucketed by local time.",
 	"stores.form.tags": "Assigned Tags",
 	"stores.form.cancel": "Cancel",
 	"stores.form.submit": "Save Store",

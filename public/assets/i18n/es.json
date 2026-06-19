@@ -84,6 +84,8 @@
 	"stores.form.addressPlaceholder": "Calle Principal #123",
 	"stores.form.statusLabel": "Estado",
 	"stores.form.statusPlaceholder": "Seleccione un estado",
+	"stores.form.timezoneLabel": "Zona horaria",
+	"stores.form.timezoneHint": "Define cómo se agrupan las analíticas de esta tienda por hora local.",
 	"stores.form.tags": "Etiquetas Asignadas",
 	"stores.form.cancel": "Cancelar",
 	"stores.form.submit": "Guardar Tienda",
